@@ -1,102 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!-- 1. Esta é a declaração do tipo de documento (DOCTYPE) que informa ao navegador que este é um documento HTML5. -->
-
 <head>
     <meta charset="UTF-8">
-    <!-- 2. Define o conjunto de caracteres utilizado no documento como UTF-8, que suporta a maioria dos caracteres e símbolos. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 3. Configura o viewport para garantir que a página seja exibida corretamente em dispositivos móveis. -->
     <title>Calculadora de M² e Orçamento de Películas</title>
-    <!-- 4. Define o título da página, que aparece na aba do navegador. -->
+    
+    <!-- Inclui as fontes do Google -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
-    <!-- 5. Inclui fontes personalizadas "Roboto" e "Montserrat" do Google Fonts para serem usadas na página. -->
+    
+    <!-- Inclui a biblioteca Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- 6. Inclui a biblioteca Tailwind CSS para estilização da página. -->
+    
+    <!-- Inclui a biblioteca Font Awesome para ícones -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- 7. Inclui a biblioteca Font Awesome para adicionar ícones à página. -->
-    <link rel="manifest" href="/manifest.json">
-    <!-- 8. Adiciona o manifesto para transformar a aplicação em um PWA. -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <!-- 9. Inclui a biblioteca jsPDF para permitir a geração de PDFs diretamente no navegador. -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 10. Inclui a biblioteca jQuery para facilitar a manipulação do DOM e outras operações JavaScript. -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <!-- 11. Inclui o plugin jQuery Mask para aplicar máscaras em campos de entrada de texto. -->
+
+    <!-- Manifesto para PWA -->
+    <link rel="manifest" href="data:application/manifest+json, {
+        &quot;name&quot;: &quot;Calculadora de M² e Orçamento&quot;,
+        &quot;short_name&quot;: &quot;Calculadora&quot;,
+        &quot;start_url&quot;: &quot;/index.html&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#ffffff&quot;,
+        &quot;theme_color&quot;: &quot;#000000&quot;,
+        &quot;icons&quot;: [
+            {
+                &quot;src&quot;: &quot;https://example.com/icon-192x192.png&quot;,
+                &quot;type&quot;: &quot;image/png&quot;,
+                &quot;sizes&quot;: &quot;192x192&quot;
+            },
+            {
+                &quot;src&quot;: &quot;https://example.com/icon-512x512.png&quot;,
+                &quot;type&quot;: &quot;image/png&quot;,
+                &quot;sizes&quot;: &quot;512x512&quot;
+            }
+        ]
+    }">
+
+    <!-- Service Worker Inline -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('Service Worker registrado com sucesso:', registration.scope);
+            }).catch(function(error) {
+                console.log('Falha ao registrar o Service Worker:', error);
+            });
+
+            navigator.serviceWorker.register('data:application/javascript, ' + encodeURIComponent(`
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open('app-cache-v1').then(cache => {
+                            return cache.addAll([
+                                '/',
+                                '/index.html',
+                                '/manifest.json',
+                                'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
+                                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+                                // Adicione outros arquivos necessários
+                            ]);
+                        })
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request).then(response => {
+                            return response || fetch(event.request);
+                        })
+                    );
+                });
+            `));
+        }
+    </script>
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
-    <!-- 12. Define o corpo da página com classes do Tailwind para aplicar um gradiente de fundo e centralizar o conteúdo. -->
     <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 bg-white rounded-xl shadow-lg relative">
-        <!-- 13. Define um container principal para o conteúdo, com classes do Tailwind para estilização e responsividade. -->
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
-        <!-- 14. Cria uma barra de gradiente no topo do container, para fins estéticos. -->
         <div class="text-center mb-6">
-            <!-- 15. Define um bloco de texto centralizado para o título e descrição da página. -->
             <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
-            <!-- 16. Exibe o título principal da página. -->
             <p class="text-sm text-gray-500">Calcule rapidamente o custo de películas de forma intuitiva</p>
-            <!-- 17. Exibe uma descrição curta abaixo do título. -->
         </div>
 
         <div class="space-y-4">
-            <!-- 18. Define um container para os elementos abaixo, com espaçamento vertical entre eles. -->
-
             <!-- Seletor de Cliente e Botão de Adição -->
             <div class="flex items-center space-x-2">
-                <!-- 19. Cria um layout flexível para o seletor de cliente e o botão de adicionar. -->
                 <select id="clienteSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition" onchange="onClienteChange()">
-                    <!-- 20. Cria um dropdown (select) para selecionar um cliente. A função 'onClienteChange()' será chamada ao mudar a seleção. -->
                     <option value="">Selecione um cliente</option>
-                    <!-- 21. Opção inicial do dropdown, orientando o usuário a selecionar um cliente. -->
                 </select>
                 <button id="addNewClienteBtn" class="p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="abrirPopup('adicionar')">
-                    <!-- 22. Botão para adicionar um novo cliente, com um gradiente de fundo e ícone de usuário. Ao clicar, abre o popup para adicionar um cliente. -->
                     <i class="fas fa-user-plus"></i>
-                    <!-- 23. Ícone Font Awesome de "adicionar usuário". -->
                 </button>
             </div>
 
             <!-- Ícones de Edição e Exclusão -->
             <div id="editIconContainer" class="hidden flex justify-end space-x-2">
-                <!-- 24. Container para os ícones de edição e exclusão, inicialmente oculto, que aparece ao selecionar um cliente. -->
                 <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm">
-                    <!-- 25. Botão para editar as informações do cliente selecionado, que abre o popup de edição. -->
                     <i class="fas fa-edit"></i>
-                    <!-- 26. Ícone Font Awesome de "editar". -->
                 </button>
                 <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm">
-                    <!-- 27. Botão para excluir o cliente selecionado, que chama a função de confirmação antes de apagar os dados. -->
                     <i class="fas fa-trash-alt"></i>
-                    <!-- 28. Ícone Font Awesome de "excluir". -->
                 </button>
             </div>
 
             <!-- Container de Medidas -->
             <div id="medidasContainer" class="space-y-4"></div>
-            <!-- 29. Container onde os grupos de medidas (altura, largura, quantidade, etc.) serão adicionados dinamicamente. -->
 
             <!-- Resultado -->
             <div id="resultado" class="text-right text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
-            <!-- 30. Exibe o resultado calculado, mostrando o total de metros quadrados e o preço total das películas. -->
 
             <!-- Botões de Ação -->
             <div class="grid grid-cols-2 gap-4">
-                <!-- 31. Cria uma grade (grid) com dois botões por linha, para ações como adicionar medidas, duplicar, gerar PDF, etc. -->
                 <button class="p-4 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="addMedidaGroup(true)">
-                    <!-- 32. Botão para adicionar um novo grupo de medidas. -->
                     Adicionar Medida
                 </button>
                 <button class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="duplicarMedidas()">
-                    <!-- 33. Botão para duplicar todos os grupos de medidas atuais. -->
                     Duplicar Medidas
                 </button>
                 <button class="p-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-md hover:opacity-90 transition" id="generatePdfButton">
-                    <!-- 34. Botão para gerar um PDF com as medidas e valores calculados. -->
                     Gerar PDF
                 </button>
                 <button class="p-4 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="copyShareURL()">
-                    <!-- 35. Botão para copiar a URL da página para compartilhamento. -->
                     Compartilhar URL
                 </button>
             </div>
@@ -105,91 +128,26 @@
 
     <!-- Modal para Adicionar/Editar Cliente -->
     <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <!-- 36. Define um modal (popup) para adicionar ou editar as informações do cliente. -->
         <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-            <!-- 37. Container principal do modal, com fundo branco e arredondamento das bordas. -->
             <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopup()">&times;</span>
-            <!-- 38. Botão para fechar o modal, representado por um "x". -->
             <h2 id="popupTitulo" class="text-xl font-semibold mb-4 text-gray-800">Adicionar Novo Cliente</h2>
-            <!-- 39. Título do modal, que muda dinamicamente para "Adicionar" ou "Editar" cliente. -->
-            <!-- Campos do cliente -->
             <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
-            <!-- 40. Campo de entrada para o nome do cliente. -->
             <input type="text" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone">
-            <!-- 41. Campo de entrada para o telefone do cliente. -->
             <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
-            <!-- 42. Campo de entrada para o endereço do cliente. -->
             <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF">
-            <!-- 43. Campo de entrada para o CPF do cliente. -->
             <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ">
-            <!-- 44. Campo de entrada para o CNPJ do cliente. -->
             <button id="popupClienteBtnSalvar" class="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarCliente()">
-                <!-- 45. Botão para salvar as informações do cliente após preenchimento dos campos. -->
                 Salvar Cliente
             </button>
         </div>
     </div>
 
+    <!-- Scripts da Aplicação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
     <script>
-        // IndexedDB Utility Functions
-        function openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('MeuBanco', 1);
-                request.onupgradeneeded = function (event) {
-                    const db = event.target.result;
-                    db.createObjectStore('clientes', { keyPath: 'nome' });
-                    db.createObjectStore('medidas', { keyPath: 'cliente' });
-                };
-                request.onsuccess = function (event) {
-                    resolve(event.target.result);
-                };
-                request.onerror = function (event) {
-                    reject('Erro ao abrir o banco de dados: ' + event.target.errorCode);
-                };
-            });
-        }
-
-        function salvarClienteNoDB(cliente) {
-            openDatabase().then(db => {
-                const transaction = db.transaction(['clientes'], 'readwrite');
-                const store = transaction.objectStore('clientes');
-                store.put(cliente);
-            });
-        }
-
-        function obterClienteDoDB(nome) {
-            return openDatabase().then(db => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(['clientes'], 'readonly');
-                    const store = transaction.objectStore('clientes');
-                    const request = store.get(nome);
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject('Erro ao obter o cliente');
-                });
-            });
-        }
-
-        function salvarMedidasNoDB(cliente, medidas) {
-            openDatabase().then(db => {
-                const transaction = db.transaction(['medidas'], 'readwrite');
-                const store = transaction.objectStore('medidas');
-                store.put({ cliente: cliente, medidas: medidas });
-            });
-        }
-
-        function obterMedidasDoDB(cliente) {
-            return openDatabase().then(db => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(['medidas'], 'readonly');
-                    const store = transaction.objectStore('medidas');
-                    const request = store.get(cliente);
-                    request.onsuccess = () => resolve(request.result ? request.result.medidas : null);
-                    request.onerror = () => reject('Erro ao obter as medidas');
-                });
-            });
-        }
-
-        // Inicializa máscaras nos campos
         $(document).ready(function () {
             $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
             $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
@@ -212,45 +170,52 @@
             { nome: "Window Premium", preco: 160 }
         ];
 
-        let clientes = [];
+        let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
 
-        function salvarClientesNoStorage() {
-            clientes.forEach(cliente => salvarClienteNoDB(cliente));
+        // Novo código para remover clientes vazios
+        clientes = clientes.filter(cliente => cliente.nome && cliente.nome.trim() !== "");
+        localStorage.setItem('clientes', JSON.stringify(clientes));
+
+        let clienteSelecionado = '';
+        const clienteSelect = document.getElementById('clienteSelect');
+
+        // Função para abrir o popup de adicionar ou editar cliente
+        function abrirPopup(acao) {
+            const popupTitulo = document.getElementById('popupTitulo');
+            if (acao === 'adicionar') {
+                popupTitulo.innerText = 'Adicionar Novo Cliente';
+                limparCamposPopup();
+                clienteSelecionado = '';
+            } else if (acao === 'editar') {
+                popupTitulo.innerText = 'Editar Cliente';
+                carregarDadosCliente();
+                clienteSelecionado = clienteSelect.value;
+            }
+            document.getElementById('popupCliente').classList.remove('hidden');
         }
 
-        function carregarClientes(clienteSelecionado = '') {
-            clienteSelect.innerHTML = ''; // Removemos a opção inicial
-            openDatabase().then(db => {
-                const transaction = db.transaction(['clientes'], 'readonly');
-                const store = transaction.objectStore('clientes');
-                const request = store.getAll();
-                request.onsuccess = (event) => {
-                    clientes = event.target.result;
-                    if (clientes.length > 0) {
-                        clienteSelect.classList.remove('hidden');
-                        clientes.forEach(cliente => {
-                            const option = document.createElement('option');
-                            option.value = cliente.nome;
-                            option.textContent = cliente.nome;
-                            clienteSelect.appendChild(option);
-                        });
-
-                        if (clienteSelecionado) {
-                            clienteSelect.value = clienteSelecionado;
-                        } else {
-                            clienteSelect.value = clientes[0].nome;
-                        }
-
-                        loadMedidas();
-                        mostrarEditIconContainer(true);
-                    } else {
-                        clienteSelect.classList.add('hidden');
-                        mostrarEditIconContainer(false);
-                    }
-                };
-            });
+        // Função para limpar os campos do popup
+        function limparCamposPopup() {
+            document.getElementById('popupClienteNome').value = '';
+            document.getElementById('popupClienteTelefone').value = '';
+            document.getElementById('popupClienteEndereco').value = '';
+            document.getElementById('popupClienteCPF').value = '';
+            document.getElementById('popupClienteCNPJ').value = '';
         }
 
+        // Função para carregar dados do cliente no popup de edição
+        function carregarDadosCliente() {
+            const cliente = clientes.find(c => c.nome === clienteSelect.value);
+            if (cliente) {
+                document.getElementById('popupClienteNome').value = cliente.nome;
+                document.getElementById('popupClienteTelefone').value = cliente.telefone;
+                document.getElementById('popupClienteEndereco').value = cliente.endereco;
+                document.getElementById('popupClienteCPF').value = cliente.cpf;
+                document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
+            }
+        }
+
+        // Função para salvar o cliente (adicionar ou editar)
         function salvarCliente() {
             const nome = document.getElementById('popupClienteNome').value.trim();
             const telefone = document.getElementById('popupClienteTelefone').value.trim();
@@ -258,21 +223,22 @@
             const cpf = document.getElementById('popupClienteCPF').value.trim();
             const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
 
+            // Verifica se o nome do cliente já existe e se não é o mesmo que está sendo editado
             if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !clientes.some(cliente => cliente.nome === nome))) {
                 const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
                 if (clienteSelecionado) {
                     const index = clientes.findIndex(c => c.nome === clienteSelecionado);
-                    const medidasExistentes = obterMedidasDoDB(clienteSelecionado).then(medidasExistentes => {
-                        clientes[index] = novoCliente;
-                        salvarClienteNoDB(novoCliente);
-                        if (medidasExistentes) {
-                            salvarMedidasNoDB(nome, medidasExistentes);
+                    const medidasExistentes = localStorage.getItem(`medidas_${clienteSelecionado}`);
+                    clientes[index] = novoCliente;
+                    if (medidasExistentes) {
+                        localStorage.setItem(`medidas_${nome}`, medidasExistentes);
+                        if (nome !== clienteSelecionado) {
+                            localStorage.removeItem(`medidas_${clienteSelecionado}`);
                         }
-                    });
+                    }
                 } else {
                     clientes.push(novoCliente);
-                    salvarClienteNoDB(novoCliente);
                 }
 
                 salvarClientesNoStorage();
@@ -283,8 +249,37 @@
             }
         }
 
+        // Função para carregar a lista de clientes no select
+        function carregarClientes(clienteSelecionado = '') {
+            clienteSelect.innerHTML = '';
+            if (clientes.length > 0) {
+                clienteSelect.classList.remove('hidden');
+                clientes.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = cliente.nome;
+                    option.textContent = cliente.nome;
+                    clienteSelect.appendChild(option);
+                });
+
+                if (clienteSelecionado) {
+                    clienteSelect.value = clienteSelecionado;
+                } else {
+                    clienteSelect.value = clientes[0].nome;
+                }
+
+                loadMedidas();
+                mostrarEditIconContainer(true);
+
+            } else {
+                clienteSelect.classList.add('hidden');
+                mostrarEditIconContainer(false);
+            }
+        }
+
+        // Função que executa ao mudar o cliente selecionado
         function onClienteChange() {
             clienteSelecionado = clienteSelect.value;
+            salvarClienteSelecionadoNoStorage(clienteSelecionado);
             loadMedidas();
 
             if (clienteSelecionado) {
@@ -294,6 +289,7 @@
             }
         }
 
+        // Função para exibir ou esconder o container de edição
         function mostrarEditIconContainer(exibir) {
             const editIconContainer = document.getElementById('editIconContainer');
             if (exibir && clienteSelect.value) {
@@ -303,16 +299,19 @@
             }
         }
 
+        // Função para fechar o popup de cliente
         function fecharPopup() {
             document.getElementById('popupCliente').classList.add('hidden');
         }
 
+        // Função para confirmar a exclusão das medidas do cliente
         function confirmClearMedidas() {
             if (confirm("Tem certeza que deseja apagar este cliente e suas medidas?")) {
                 clearMedidas();
             }
         }
 
+        // Função para apagar medidas do cliente
         function clearMedidas() {
             const cliente = clienteSelect.value;
             if (!cliente) {
@@ -320,25 +319,20 @@
                 return;
             }
 
-            openDatabase().then(db => {
-                const transaction = db.transaction(['medidas', 'clientes'], 'readwrite');
-                const medidasStore = transaction.objectStore('medidas');
-                const clientesStore = transaction.objectStore('clientes');
+            localStorage.removeItem(`medidas_${cliente}`);
+            const index = clientes.findIndex(c => c.nome === cliente);
+            if (index > -1) {
+                clientes.splice(index, 1);
+                localStorage.setItem('clientes', JSON.stringify(clientes));
+            }
 
-                medidasStore.delete(cliente);
-                const index = clientes.findIndex(c => c.nome === cliente);
-                if (index > -1) {
-                    clientes.splice(index, 1);
-                    clientesStore.delete(cliente);
-                }
-
-                carregarClientes();
-                document.getElementById('medidasContainer').innerHTML = '';
-                addMedidaGroup(true);
-                calculateTotal();
-            });
+            carregarClientes();
+            document.getElementById('medidasContainer').innerHTML = '';
+            addMedidaGroup(true);
+            calculateTotal();
         }
 
+        // Função para salvar medidas no local storage
         function saveMedidas() {
             const cliente = clienteSelect.value;
             if (!cliente) return;
@@ -353,26 +347,28 @@
                 pelicula: group.querySelector('.pelicula-select').value
             }));
 
-            salvarMedidasNoDB(cliente, medidas);
+            localStorage.setItem(`medidas_${cliente}`, JSON.stringify(medidas));
         }
 
+        // Função para carregar medidas do local storage
         function loadMedidas() {
             const cliente = clienteSelect.value;
-            obterMedidasDoDB(cliente).then(savedMedidas => {
-                const medidasContainer = document.getElementById('medidasContainer');
-                medidasContainer.innerHTML = '';
+            const savedMedidas = localStorage.getItem(`medidas_${cliente}`);
+            const medidasContainer = document.getElementById('medidasContainer');
+            medidasContainer.innerHTML = '';
 
-                if (savedMedidas) {
-                    savedMedidas.forEach(medida => {
-                        addMedidaGroup(false, medida.largura, medida.altura, medida.quantidade, true, medida.ambiente, medida.tipoAplicacao, medida.pelicula);
-                    });
-                } else {
-                    addMedidaGroup(true);
-                }
-                calculateTotal();
-            });
+            if (savedMedidas) {
+                const medidas = JSON.parse(savedMedidas);
+                medidas.forEach(medida => {
+                    addMedidaGroup(false, medida.largura, medida.altura, medida.quantidade, true, medida.ambiente, medida.tipoAplicacao, medida.pelicula);
+                });
+            } else {
+                addMedidaGroup(true);
+            }
+            calculateTotal();
         }
 
+        // Função para adicionar um grupo de medida
         function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
             const container = document.getElementById('medidasContainer');
             const medidaGroup = document.createElement('div');
@@ -419,7 +415,7 @@
                         <option value="Garita fundo" ${ambiente === "Garita fundo" ? 'selected' : ''}>Garita fundo</option>
                         <option value="Portaria" ${ambiente === "Portaria" ? 'selected' : ''}>Portaria</option>
                         <option value="Portaria fundo" ${ambiente === "Portaria fundo" ? 'selected' : ''}>Portaria fundo</option>
-                        <option value="Refeitório" ${ambiente === "Refeitório" ? 'selected' : ''}>Refeitório</option>
+                        <option value="Refeitorio" ${ambiente === "Refeitorio" ? 'selected' : ''}>Refeitorio</option>
                         <option value="Quarto 1" ${ambiente === "Quarto 1" ? 'selected' : ''}>Quarto 1</option>
                         <option value="Quarto 2" ${ambiente === "Quarto 2" ? 'selected' : ''}>Quarto 2</option>
                         <option value="Quarto 3" ${ambiente === "Quarto 3" ? 'selected' : ''}>Quarto 3</option>
@@ -438,7 +434,7 @@
                         <option value="Garagem" ${ambiente === "Garagem" ? 'selected' : ''}>Garagem</option>
                         <option value="Varanda" ${ambiente === "Varanda" ? 'selected' : ''}>Varanda</option>
                         <option value="Jardim" ${ambiente === "Jardim" ? 'selected' : ''}>Jardim</option>
-                        <option value="Sótão" ${ambiente === "Sótão" ? 'selected' : ''}>Sótão</option>
+                        <option value="Sotão" ${ambiente === "Sotão" ? 'selected' : ''}>Sotão</option>
                         <option value="Porão" ${ambiente === "Porão" ? 'selected' : ''}>Porão</option>
                         <option value="Elevador" ${ambiente === "Elevador" ? 'selected' : ''}>Elevador</option>
                         <option value="Outros" ${ambiente === "Outros" ? 'selected' : ''}>Outros</option>
@@ -452,6 +448,8 @@
                         <option value="Janela pivotante" ${tipoAplicacao === "Janela pivotante" ? 'selected' : ''}>Janela pivotante</option>
                         <option value="Basculante" ${tipoAplicacao === "Basculante" ? 'selected' : ''}>Basculante</option>
                         <option value="Porta" ${tipoAplicacao === "Porta" ? 'selected' : ''}>Porta</option>
+                        <option value="Porta Dupla" ${tipoAplicacao === "Porta Dupla" ? 'selected' : ''}>Porta Dupla</option>
+                        <option value="Porta Dupla C/P e F" ${tipoAplicacao === "Porta Dupla C/P e F" ? 'selected' : ''}>Porta Dupla C/P e F</option>
                         <option value="Porta Balcão" ${tipoAplicacao === "Porta Balcão" ? 'selected' : ''}>Porta Balcão</option>
                         <option value="Vitrine" ${tipoAplicacao === "Vitrine" ? 'selected' : ''}>Vitrine</option>
                         <option value="Tampo de mesa" ${tipoAplicacao === "Tampo de mesa" ? 'selected' : ''}>Tampo de mesa</option>
@@ -478,6 +476,7 @@
             calculateTotal();
         }
 
+        // Função para duplicar um grupo de medida
         function duplicarGrupo(button) {
             const group = button.closest('.bg-white');
             const largura = group.querySelector('.largura-input').value || '';
@@ -491,6 +490,7 @@
             calculateTotal();
         }
 
+        // Função para duplicar todas as medidas
         function duplicarMedidas() {
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
             medidaGroups.forEach(group => {
@@ -506,6 +506,7 @@
             calculateTotal();
         }
 
+        // Função para excluir um grupo de medida
         function deleteMedidaGroup(button) {
             if (confirm('Tem certeza que deseja excluir este grupo de medidas?')) {
                 button.closest('.bg-white').remove();
@@ -514,6 +515,7 @@
             }
         }
 
+        // Função para calcular o total de M² e preço
         function calculateTotal() {
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
             let totalM2 = 0;
@@ -543,6 +545,7 @@
             saveMedidas();
         }
 
+        // Função para alternar os campos adicionais
         function toggleAdditionalFields(button) {
             const fields = button.closest('.bg-white').querySelector('.additional-fields');
             if (fields.classList.contains('hidden')) {
@@ -554,6 +557,7 @@
             }
         }
 
+        // Função para alternar a ativação/desativação dos inputs
         function toggleInputs(checkbox) {
             const inputs = checkbox.closest('.bg-white').querySelectorAll('input, select');
             inputs.forEach(input => {
@@ -564,6 +568,7 @@
             calculateTotal();
         }
 
+        // Função para copiar a URL de compartilhamento
         function copyShareURL() {
             const cliente = clienteSelect.value;
             if (!cliente) {
@@ -582,22 +587,26 @@
             });
         }
 
+        // Função que carrega as informações ao iniciar
         document.addEventListener('DOMContentLoaded', () => {
             carregarClientes();
             document.getElementById('generatePdfButton').addEventListener('click', generatePDF_v3_0);
-
-            // Service Worker registration
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js').then(registration => {
-                        console.log('Service Worker registrado com sucesso:', registration.scope);
-                    }).catch(error => {
-                        console.log('Falha ao registrar o Service Worker:', error);
-                    });
-                });
-            }
         });
 
+        // Funções de armazenamento no LocalStorage
+        function salvarClientesNoStorage() {
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+        }
+
+        function salvarClienteSelecionadoNoStorage(cliente) {
+            localStorage.setItem('clienteSelecionado', cliente);
+        }
+
+        function carregarClienteSelecionadoDoStorage() {
+            return localStorage.getItem('clienteSelecionado');
+        }
+
+        // Função para gerar o PDF (versão 3.0 com novo design e correções)
         function generatePDF_v3_0() {
             try {
                 const clienteNome = clienteSelect.value;
@@ -636,9 +645,11 @@
                     const pageHeight = doc.internal.pageSize.height;
                     const margin = 30;
 
+                    // Fundo da página
                     doc.setFillColor(245, 245, 245);
                     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
+                    // Barras graduais no topo
                     const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
                     const barWidth = pageWidth / barColors.length;
                     barColors.forEach((color, index) => {
@@ -646,6 +657,7 @@
                         doc.rect(index * barWidth, 0, barWidth, 40, 'F');
                     });
 
+                    // Informações do cliente
                     doc.setTextColor(44, 62, 80);
                     doc.setFont("helvetica", 'bold');
                     doc.setFontSize(18);
@@ -657,8 +669,10 @@
                     doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
                     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
 
+                    // Adicionar "VÁLIDO POR 90 DIAS"
                     doc.text("VÁLIDO POR 90 DIAS", margin, 135);
 
+                    // Rodapé
                     doc.setDrawColor(41, 128, 185);
                     doc.setLineWidth(1);
                     doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
@@ -848,5 +862,4 @@
 
     </script>
 </body>
-
 </html>
