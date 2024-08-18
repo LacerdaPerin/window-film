@@ -134,15 +134,16 @@
 
     <script>
         // Registro do Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-            .then(function(registration) {
-                console.log('Service Worker registrado com sucesso:', registration);
-            })
-            .catch(function(error) {
-                console.log('Falha ao registrar o Service Worker:', error);
-            });
-        }
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/teste-pwa/service-worker.js')
+    .then(function(registration) {
+        console.log('Service Worker registrado com sucesso:', registration);
+    })
+    .catch(function(error) {
+        console.log('Falha ao registrar o Service Worker:', error);
+    });
+}
+
 
         // Service Worker diretamente no HTML
         self.addEventListener('install', function(event) {
