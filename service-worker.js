@@ -2,9 +2,11 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('app-cache').then((cache) => {
       return cache.addAll([
-        '/',
-        '/index.html',
-        'http://fumejp.com.br/wp-content/uploads/2024/07/cloud_icon.png',
+        '/teste-pwa/',
+        '/teste-pwa/index.html',
+        '/teste-pwa/icons/icone-menor.png',
+        '/teste-pwa/icons/icone-grande.png',
+        // Adicione outros recursos necessários para o funcionamento offline aqui
       ]);
     })
   );
