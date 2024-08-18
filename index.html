@@ -1,104 +1,62 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!-- 1. Esta é a declaração do tipo de documento (DOCTYPE) que informa ao navegador que este é um documento HTML5. -->
-
 <head>
     <meta charset="UTF-8">
-    <!-- 2. Define o conjunto de caracteres utilizado no documento como UTF-8, que suporta a maioria dos caracteres e símbolos. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 3. Configura o viewport para garantir que a página seja exibida corretamente em dispositivos móveis. -->
     <title>Calculadora de M² e Orçamento de Películas</title>
-    <!-- 4. Define o título da página, que aparece na aba do navegador. -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
-    <!-- 5. Inclui fontes personalizadas "Roboto" e "Montserrat" do Google Fonts para serem usadas na página. -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- 6. Inclui a biblioteca Tailwind CSS para estilização da página. -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- 7. Inclui a biblioteca Font Awesome para adicionar ícones à página. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <!-- 8. Inclui a biblioteca jsPDF para permitir a geração de PDFs diretamente no navegador. -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 9. Inclui a biblioteca jQuery para facilitar a manipulação do DOM e outras operações JavaScript. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <!-- 10. Inclui o plugin jQuery Mask para aplicar máscaras em campos de entrada de texto. -->
     
-    <!-- Manifesto integrado -->
-   <link rel="manifest" href="/teste-pwa/manifest.json">
+    <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
-    <!-- 11. Define o corpo da página com classes do Tailwind para aplicar um gradiente de fundo e centralizar o conteúdo. -->
     <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 bg-white rounded-xl shadow-lg relative">
-        <!-- 12. Define um container principal para o conteúdo, com classes do Tailwind para estilização e responsividade. -->
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
-        <!-- 13. Cria uma barra de gradiente no topo do container, para fins estéticos. -->
         <div class="text-center mb-6">
-            <!-- 14. Define um bloco de texto centralizado para o título e descrição da página. -->
             <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
-            <!-- 15. Exibe o título principal da página. -->
             <p class="text-sm text-gray-500">Calcule rapidamente o custo de películas de forma intuitiva</p>
-            <!-- 16. Exibe uma descrição curta abaixo do título. -->
         </div>
 
         <div class="space-y-4">
-            <!-- 17. Define um container para os elementos abaixo, com espaçamento vertical entre eles. -->
-
-            <!-- Seletor de Cliente e Botão de Adição -->
             <div class="flex items-center space-x-2">
-                <!-- 18. Cria um layout flexível para o seletor de cliente e o botão de adicionar. -->
                 <select id="clienteSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition" onchange="onClienteChange()">
-                    <!-- 19. Cria um dropdown (select) para selecionar um cliente. A função 'onClienteChange()' será chamada ao mudar a seleção. -->
                     <option value="">Selecione um cliente</option>
-                    <!-- 20. Opção inicial do dropdown, orientando o usuário a selecionar um cliente. -->
                 </select>
                 <button id="addNewClienteBtn" class="p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="abrirPopup('adicionar')">
-                    <!-- 21. Botão para adicionar um novo cliente, com um gradiente de fundo e ícone de usuário. Ao clicar, abre o popup para adicionar um cliente. -->
                     <i class="fas fa-user-plus"></i>
-                    <!-- 22. Ícone Font Awesome de "adicionar usuário". -->
                 </button>
             </div>
 
-            <!-- Ícones de Edição e Exclusão -->
             <div id="editIconContainer" class="hidden flex justify-end space-x-2">
-                <!-- 23. Container para os ícones de edição e exclusão, inicialmente oculto, que aparece ao selecionar um cliente. -->
                 <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm">
-                    <!-- 24. Botão para editar as informações do cliente selecionado, que abre o popup de edição. -->
                     <i class="fas fa-edit"></i>
-                    <!-- 25. Ícone Font Awesome de "editar". -->
                 </button>
                 <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm">
-                    <!-- 26. Botão para excluir o cliente selecionado, que chama a função de confirmação antes de apagar os dados. -->
                     <i class="fas fa-trash-alt"></i>
-                    <!-- 27. Ícone Font Awesome de "excluir". -->
                 </button>
             </div>
 
-            <!-- Container de Medidas -->
             <div id="medidasContainer" class="space-y-4"></div>
-            <!-- 28. Container onde os grupos de medidas (altura, largura, quantidade, etc.) serão adicionados dinamicamente. -->
 
-            <!-- Resultado -->
             <div id="resultado" class="text-right text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
-            <!-- 29. Exibe o resultado calculado, mostrando o total de metros quadrados e o preço total das películas. -->
 
-            <!-- Botões de Ação -->
             <div class="grid grid-cols-2 gap-4">
-                <!-- 30. Cria uma grade (grid) com dois botões por linha, para ações como adicionar medidas, duplicar, gerar PDF, etc. -->
                 <button class="p-4 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="addMedidaGroup(true)">
-                    <!-- 31. Botão para adicionar um novo grupo de medidas. -->
                     Adicionar Medida
                 </button>
                 <button class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="duplicarMedidas()">
-                    <!-- 32. Botão para duplicar todos os grupos de medidas atuais. -->
                     Duplicar Medidas
                 </button>
                 <button class="p-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-md hover:opacity-90 transition" id="generatePdfButton">
-                    <!-- 33. Botão para gerar um PDF com as medidas e valores calculados. -->
                     Gerar PDF
                 </button>
                 <button class="p-4 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="copyShareURL()">
-                    <!-- 34. Botão para copiar a URL da página para compartilhamento. -->
                     Compartilhar URL
                 </button>
             </div>
@@ -107,26 +65,15 @@
 
     <!-- Modal para Adicionar/Editar Cliente -->
     <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <!-- 35. Define um modal (popup) para adicionar ou editar as informações do cliente. -->
         <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-            <!-- 36. Container principal do modal, com fundo branco e arredondamento das bordas. -->
             <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopup()">&times;</span>
-            <!-- 37. Botão para fechar o modal, representado por um "x". -->
             <h2 id="popupTitulo" class="text-xl font-semibold mb-4 text-gray-800">Adicionar Novo Cliente</h2>
-            <!-- 38. Título do modal, que muda dinamicamente para "Adicionar" ou "Editar" cliente. -->
-            <!-- Campos do cliente -->
             <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
-            <!-- 39. Campo de entrada para o nome do cliente. -->
             <input type="text" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone">
-            <!-- 40. Campo de entrada para o telefone do cliente. -->
             <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
-            <!-- 41. Campo de entrada para o endereço do cliente. -->
             <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF">
-            <!-- 42. Campo de entrada para o CPF do cliente. -->
             <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ">
-            <!-- 43. Campo de entrada para o CNPJ do cliente. -->
             <button id="popupClienteBtnSalvar" class="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarCliente()">
-                <!-- 44. Botão para salvar as informações do cliente após preenchimento dos campos. -->
                 Salvar Cliente
             </button>
         </div>
@@ -134,16 +81,15 @@
 
     <script>
         // Registro do Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/teste-pwa/service-worker.js')
-    .then(function(registration) {
-        console.log('Service Worker registrado com sucesso:', registration);
-    })
-    .catch(function(error) {
-        console.log('Falha ao registrar o Service Worker:', error);
-    });
-}
-
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/teste-pwa/service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registrado com sucesso:', registration);
+            })
+            .catch(function(error) {
+                console.log('Falha ao registrar o Service Worker:', error);
+            });
+        }
 
         // Service Worker diretamente no HTML
         self.addEventListener('install', function(event) {
@@ -153,7 +99,6 @@ if ('serviceWorker' in navigator) {
                         '/',
                         '/index.html',
                         'http://fumejp.com.br/wp-content/uploads/2024/07/cloud_icon.png'
-                        // Adicione outros arquivos aqui se necessário
                     ]);
                 })
             );
@@ -169,18 +114,13 @@ if ('serviceWorker' in navigator) {
 
         // Inicializa máscaras nos campos
         $(document).ready(function () {
-            // 45. Função que será executada quando o documento estiver totalmente carregado.
             $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
-            // 46. Aplica uma máscara ao campo de telefone para aceitar números no formato (XX) XXXXX-XXXX.
             $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
-            // 47. Aplica uma máscara ao campo de CPF para aceitar números no formato XXX.XXX.XXX-XX.
             $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
-            // 48. Aplica uma máscara ao campo de CNPJ para aceitar números no formato XX.XXX.XXX/XXXX-XX.
         });
 
         // Código para auto-avançar para o próximo input
         document.addEventListener('DOMContentLoaded', function () {
-            // Seleciona todos os inputs que estão dentro de cada grupo de medidas
             const groups = document.querySelectorAll('#medidasContainer > div');
 
             groups.forEach(group => {
@@ -198,7 +138,6 @@ if ('serviceWorker' in navigator) {
                     if (alturaInput.value.length >= 4) {
                         quantidadeInput.focus();
 
-                        // Posiciona o cursor após o número "1" no campo "quantidade"
                         setTimeout(() => {
                             const length = quantidadeInput.value.length;
                             quantidadeInput.setSelectionRange(length, length);
@@ -210,7 +149,6 @@ if ('serviceWorker' in navigator) {
 
         // Lista de películas e clientes
         const peliculas = [
-            // 49. Define um array de objetos para armazenar as películas disponíveis e seus preços.
             { nome: "Window Blue Performance", preco: 240 },
             { nome: "Window BLUE 70", preco: 200 },
             { nome: "Carbono Window Usa", preco: 100 },
@@ -449,66 +387,12 @@ if ('serviceWorker' in navigator) {
                         <option value="">Ambiente</option>
                         <option value="Sala de estar" ${ambiente === "Sala de estar" ? 'selected' : ''}>Sala de estar</option>
                         <option value="Sala de jantar" ${ambiente === "Sala de jantar" ? 'selected' : ''}>Sala de jantar</option>
-                        <option value="Cozinha" ${ambiente === "Cozinha" ? 'selected' : ''}>Cozinha</option>
-                        <option value="Copa" ${ambiente === "Copa" ? 'selected' : ''}>Copa</option>
-                        <option value="Suite 1" ${ambiente === "Suite 1" ? 'selected' : ''}>Suite 1</option>
-                        <option value="Suite 2" ${ambiente === "Suite 2" ? 'selected' : ''}>Suite 2</option>
-                        <option value="Escritorio 1" ${ambiente === "Escritorio 1" ? 'selected' : ''}>Escritorio 1</option>
-                        <option value="Escritorio 2" ${ambiente === "Escritorio 2" ? 'selected' : ''}>Escritorio 2</option>
-                        <option value="Escritorio 3" ${ambiente === "Escritorio 3" ? 'selected' : ''}>Escritorio 3</option>
-                        <option value="Sala de Espera" ${ambiente === "Sala de Espera" ? 'selected' : ''}>Sala de Espera</option>
-                        <option value="Loja" ${ambiente === "Loja" ? 'selected' : ''}>Loja</option>
-                        <option value="Recepção" ${ambiente === "Recepção" ? 'selected' : ''}>Recepção</option>
-                        <option value="Garita" ${ambiente === "Garita" ? 'selected' : ''}>Garita</option>
-                        <option value="Garita fundo" ${ambiente === "Garita fundo" ? 'selected' : ''}>Garita fundo</option>
-                        <option value="Portaria" ${ambiente === "Portaria" ? 'selected' : ''}>Portaria</option>
-                        <option value="Portaria fundo" ${ambiente === "Portaria fundo" ? 'selected' : ''}>Portaria fundo</option>
-                        <option value="Refeitorio" ${ambiente === "Refeitorio" ? 'selected' : ''}>Refeitorio</option>
-                        <option value="Quarto 1" ${ambiente === "Quarto 1" ? 'selected' : ''}>Quarto 1</option>
-                        <option value="Quarto 2" ${ambiente === "Quarto 2" ? 'selected' : ''}>Quarto 2</option>
-                        <option value="Quarto 3" ${ambiente === "Quarto 3" ? 'selected' : ''}>Quarto 3</option>
-                        <option value="Quarto 4" ${ambiente === "Quarto 4" ? 'selected' : ''}>Quarto 4</option>
-                        <option value="Quarto empregada" ${ambiente === "Quarto empregada" ? 'selected' : ''}>Quarto empregada</option>
-                        <option value="Quarto principal" ${ambiente === "Quarto principal" ? 'selected' : ''}>Quarto principal</option>
-                        <option value="Quarto de hóspedes" ${ambiente === "Quarto de hóspedes" ? 'selected' : ''}>Quarto de hóspedes</option>
-                        <option value="Banheiro 1" ${ambiente === "Banheiro 1" ? 'selected' : ''}>Banheiro 1</option>
-                        <option value="Banheiro 2" ${ambiente === "Banheiro 2" ? 'selected' : ''}>Banheiro 2</option>
-                        <option value="Banheiro 3" ${ambiente === "Banheiro 3" ? 'selected' : ''}>Banheiro 3</option>
-                        <option value="Banheiro de hóspedes" ${ambiente === "Banheiro de hóspedes" ? 'selected' : ''}>Banheiro de hóspedes</option>
-                        <option value="Corredor" ${ambiente === "Corredor" ? 'selected' : ''}>Corredor</option>
-                        <option value="Escada" ${ambiente === "Escada" ? 'selected' : ''}>Escada</option>
-                        <option value="Escritório" ${ambiente === "Escritório" ? 'selected' : ''}>Escritório</option>
-                        <option value="Lavanderia" ${ambiente === "Lavanderia" ? 'selected' : ''}>Lavanderia</option>
-                        <option value="Garagem" ${ambiente === "Garagem" ? 'selected' : ''}>Garagem</option>
-                        <option value="Varanda" ${ambiente === "Varanda" ? 'selected' : ''}>Varanda</option>
-                        <option value="Jardim" ${ambiente === "Jardim" ? 'selected' : ''}>Jardim</option>
-                        <option value="Sotão" ${ambiente === "Sotão" ? 'selected' : ''}>Sotão</option>
-                        <option value="Porão" ${ambiente === "Porão" ? 'selected' : ''}>Porão</option>
-                        <option value="Elevador" ${ambiente === "Elevador" ? 'selected' : ''}>Elevador</option>
                         <option value="Outros" ${ambiente === "Outros" ? 'selected' : ''}>Outros</option>
                     </select>
                     <select onchange="calculateTotal()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500">
                         <option value="">Tipo de Aplicação</option>
                         <option value="Vidro Fixo" ${tipoAplicacao === "Vidro Fixo" ? 'selected' : ''}>Vidro Fixo</option>
                         <option value="Janela Padrão" ${tipoAplicacao === "Janela Padrão" ? 'selected' : ''}>Janela Padrão</option>
-                        <option value="Janelão" ${tipoAplicacao === "Janelão" ? 'selected' : ''}>Janelão</option>
-                        <option value="Janela de correr" ${tipoAplicacao === "Janela de correr" ? 'selected' : ''}>Janela de correr</option>
-                        <option value="Janela pivotante" ${tipoAplicacao === "Janela pivotante" ? 'selected' : ''}>Janela pivotante</option>
-                        <option value="Basculante" ${tipoAplicacao === "Basculante" ? 'selected' : ''}>Basculante</option>
-                        <option value="Porta" ${tipoAplicacao === "Porta" ? 'selected' : ''}>Porta</option>
-                        <option value="Porta Dupla" ${tipoAplicacao === "Porta Dupla" ? 'selected' : ''}>Porta Dupla</option>
-                        <option value="Porta Dupla C/P e F" ${tipoAplicacao === "Porta Dupla C/P e F" ? 'selected' : ''}>Porta Dupla C/P e F</option>
-                        <option value="Porta Balcão" ${tipoAplicacao === "Porta Balcão" ? 'selected' : ''}>Porta Balcão</option>
-                        <option value="Vitrine" ${tipoAplicacao === "Vitrine" ? 'selected' : ''}>Vitrine</option>
-                        <option value="Tampo de mesa" ${tipoAplicacao === "Tampo de mesa" ? 'selected' : ''}>Tampo de mesa</option>
-                        <option value="Box de banheiro" ${tipoAplicacao === "Box de banheiro" ? 'selected' : ''}>Box de banheiro</option>
-                        <option value="Guarda-corpo" ${tipoAplicacao === "Guarda-corpo" ? 'selected' : ''}>Guarda-corpo</option>
-                        <option value="Dispensa" ${tipoAplicacao === "Dispensa" ? 'selected' : ''}>Dispensa</option>
-                        <option value="Armário" ${tipoAplicacao === "Armário" ? 'selected' : ''}>Armário</option>
-                        <option value="Teto" ${tipoAplicacao === "Teto" ? 'selected' : ''}>Teto</option>
-                        <option value="Parede divisória" ${tipoAplicacao === "Parede divisória" ? 'selected' : ''}>Parede divisória</option>
-                        <option value="Fachada" ${tipoAplicacao === "Fachada" ? 'selected' : ''}>Fachada</option>
-                        <option value="Claraboia" ${tipoAplicacao === "Claraboia" ? 'selected' : ''}>Claraboia</option>
                         <option value="Balcão" ${tipoAplicacao === "Balcão" ? 'selected' : ''}>Balcão</option>
                         <option value="Outras" ${tipoAplicacao === "Outras" ? 'selected' : ''}>Outras</option>
                     </select>
@@ -673,14 +557,18 @@ if ('serviceWorker' in navigator) {
         document.addEventListener('DOMContentLoaded', async () => {
             await carregarClientes();
             document.getElementById('generatePdfButton').addEventListener('click', generatePDF_v3_0);
+            
+            // Verificar status de ativação
+            const verificado = await obterStatusVerificacao();
+            if (!verificado) {
+                mostrarPopupVerificacao();
+            }
         });
 
         // Funções para manipular o IndexedDB
-
-        // Função para abrir conexão com IndexedDB
         function abrirIndexedDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('ClientesDB', 1);
+                const request = indexedDB.open('ClientesDB', 2);
 
                 request.onerror = event => {
                     console.error('Erro ao abrir o IndexedDB:', event);
@@ -699,11 +587,13 @@ if ('serviceWorker' in navigator) {
                     if (!db.objectStoreNames.contains('medidas')) {
                         db.createObjectStore('medidas', { keyPath: 'cliente' });
                     }
+                    if (!db.objectStoreNames.contains('verificacao')) {
+                        db.createObjectStore('verificacao', { keyPath: 'id' });
+                    }
                 };
             });
         }
 
-        // Função para salvar cliente no IndexedDB
         async function salvarClienteNoIndexedDB(cliente) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readwrite');
@@ -711,7 +601,6 @@ if ('serviceWorker' in navigator) {
             return objectStore.put(cliente);
         }
 
-        // Função para obter todos os clientes do IndexedDB
         async function obterTodosClientesDoIndexedDB() {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readonly');
@@ -728,7 +617,6 @@ if ('serviceWorker' in navigator) {
             });
         }
 
-        // Função para verificar se o cliente já existe no IndexedDB
         async function verificarClienteExistente(nome) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readonly');
@@ -745,7 +633,6 @@ if ('serviceWorker' in navigator) {
             });
         }
 
-        // Função para atualizar cliente no IndexedDB
         async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readwrite');
@@ -754,7 +641,6 @@ if ('serviceWorker' in navigator) {
             return objectStore.put(novoCliente);
         }
 
-        // Função para obter cliente específico do IndexedDB
         async function obterClienteDoIndexedDB(nome) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readonly');
@@ -771,7 +657,6 @@ if ('serviceWorker' in navigator) {
             });
         }
 
-        // Função para remover cliente do IndexedDB
         async function removerClienteDoIndexedDB(nome) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readwrite');
@@ -779,7 +664,6 @@ if ('serviceWorker' in navigator) {
             return objectStore.delete(nome);
         }
 
-        // Função para salvar medidas no IndexedDB
         async function salvarMedidasNoIndexedDB(cliente, medidas) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['medidas'], 'readwrite');
@@ -787,7 +671,6 @@ if ('serviceWorker' in navigator) {
             return objectStore.put({ cliente, medidas });
         }
 
-        // Função para obter medidas do IndexedDB
         async function obterMedidasDoIndexedDB(cliente) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['medidas'], 'readonly');
@@ -804,7 +687,6 @@ if ('serviceWorker' in navigator) {
             });
         }
 
-        // Função para remover medidas do IndexedDB
         async function removerMedidasDoIndexedDB(cliente) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['medidas'], 'readwrite');
@@ -1065,7 +947,124 @@ if ('serviceWorker' in navigator) {
                 alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
             }
         }
+
+        // Novas funções para o sistema de verificação
+        function gerarFrasesAleatorias() {
+            const frases = [];
+            for (let i = 0; i < 7; i++) {
+                const tamanho = Math.floor(Math.random() * 4) + 5; // 5 a 8 caracteres
+                let frase = '';
+                for (let j = 0; j < tamanho; j++) {
+                    frase += String.fromCharCode(Math.floor(Math.random() * 94) + 33); // Caracteres ASCII imprimíveis
+                }
+                frases.push(frase);
+            }
+            return frases;
+        }
+
+        function extrairCodigoAtivacao(frases) {
+            let codigo = '';
+            
+            // Sequência 1
+            let seq1 = frases[0][frases[0].length - 2];
+            if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
+            codigo += seq1;
+            
+            // Sequência 2
+            let seq2 = frases[1][2];
+            if (!seq2.match(/[a-zA-Z0-9]/)) seq2 = frases[1][4] || '';
+            codigo += seq2;
+            
+            // Sequência 3
+            let seq3 = frases[2][0];
+            if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
+            codigo += seq3;
+            
+            // Sequência 4
+            let seq4 = frases[3][frases[3].length - 1];
+            if (seq4.match(/[0-9]/)) seq4 = (frases[3][frases[3].length - 2] || '') + seq4;
+            codigo += seq4;
+            
+            // Sequência 5
+            let seq5 = frases[4][1];
+            if (seq5.match(/[a-zA-Z]/)) {
+                const novoIndex = Math.max(0, frases[4].indexOf(seq5) - 2);
+                seq5 = frases[4][novoIndex];
+            }
+            codigo += seq5;
+            
+            // Sequência 6
+            let seq6 = frases[5][4] || '';
+            if (!seq6.match(/[a-zA-Z0-9]/)) seq6 = seq6 + (frases[4][2] || '');
+            codigo += seq6;
+            
+            // Sequência 7
+            let seq7 = frases[6][3] || '';
+            if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
+            codigo += seq7;
+            
+            return codigo;
+        }
+
+        function verificarCodigo(codigoUsuario, frasesOriginais) {
+            const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
+            return codigoUsuario === codigoCorreto;
+        }
+
+        async function mostrarPopupVerificacao() {
+            const frasesGeradas = gerarFrasesAleatorias();
+            const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+            
+            const popupHTML = `
+                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Verificação Necessária</h2>
+                        <p>Por favor, envie as seguintes frases para o WhatsApp +5583993015765:</p>
+                        <ol class="list-decimal list-inside mb-4">
+                            ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
+                        </ol>
+                        <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
+                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Verificar Código</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+            
+            document.getElementById('verificarCodigo').addEventListener('click', () => {
+                const codigoUsuario = document.getElementById('codigoAtivacao').value;
+                if (verificarCodigo(codigoUsuario, frasesGeradas)) {
+                    alert('Código correto! Aplicativo ativado.');
+                    document.getElementById('popupVerificacao').remove();
+                    salvarVerificacaoNoIndexedDB(true);
+                } else {
+                    alert('Código incorreto. Tente novamente.');
+                }
+            });
+        }
+
+        async function salvarVerificacaoNoIndexedDB(verificado) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            return objectStore.put({ id: 'status', verificado });
+        }
+
+        async function obterStatusVerificacao() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readonly');
+            const objectStore = transaction.objectStore('verificacao');
+            const request = objectStore.get('status');
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result ? event.target.result.verificado : false);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
     </script>
 </body>
-
 </html>
