@@ -10,17 +10,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    
+    <link rel="icon" href="icons/peliqueiros.png" type="image/png">
+
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
-    <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 pt-12 bg-white rounded-xl shadow-lg relative">
+    <div class="relative">
+        <img src="icons/peliqueiros.png" alt="Logo Peliqueiros" class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-4" style="max-width: 200px; height: auto;">
+
+        <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 bg-white rounded-xl shadow-lg relative">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
+        
     <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
         <div class="text-center mb-6">
             <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
-            <p class="text-sm text-gray-500">Calcule rapidamente o custo de películas de forma intuitiva</p>
         </div>
 
         <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
