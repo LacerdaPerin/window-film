@@ -16,11 +16,15 @@
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
-    <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 bg-white rounded-xl shadow-lg relative">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
+    <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 pt-12 bg-white rounded-xl shadow-lg relative">
+    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
         <div class="text-center mb-6">
             <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
             <p class="text-sm text-gray-500">Calcule rapidamente o custo de películas de forma intuitiva</p>
+        </div>
+
+        <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
+            <i class="fas fa-check-circle text-3xl"></i>
         </div>
 
         <div class="space-y-4">
@@ -68,11 +72,12 @@
         <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
             <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopup()">&times;</span>
             <h2 id="popupTitulo" class="text-xl font-semibold mb-4 text-gray-800">Adicionar Novo Cliente</h2>
-            <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
-            <input type="text" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone">
-            <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
-            <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF">
-            <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ">
+            <!-- Substitua os campos existentes no modal de cliente por estes: -->
+<input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
+<input type="tel" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone" inputmode="tel">
+<input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
+<input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF" inputmode="numeric">
+<input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ" inputmode="numeric">
             <button id="popupClienteBtnSalvar" class="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarCliente()">
                 Salvar Cliente
             </button>
@@ -90,6 +95,18 @@
                 console.log('Falha ao registrar o Service Worker:', error);
             });
         }
+
+// Adicione esta função ao seu JavaScript
+function atualizarIconeVerificacao(status) {
+    const icone = document.getElementById('verificacaoIcon');
+    if (status === 'ativado') {
+        icone.classList.remove('hidden');
+    } else {
+        icone.classList.add('hidden');
+    }
+}
+
+
 
         // Service Worker diretamente no HTML
         self.addEventListener('install', function(event) {
@@ -554,16 +571,36 @@
         }
 
         // Função que carrega as informações ao iniciar
-        document.addEventListener('DOMContentLoaded', async () => {
-            await carregarClientes();
-            document.getElementById('generatePdfButton').addEventListener('click', generatePDF_v3_0);
-            
-            // Verificar status de ativação
-            const verificado = await obterStatusVerificacao();
-            if (!verificado) {
-                mostrarPopupVerificacao();
-            }
-        });
+// Modifique o evento DOMContentLoaded para incluir a atualização do ícone
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregarClientes();
+    document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+    
+    const status = await verificarStatusAplicativo();
+    switch (status.status) {
+        case 'novo':
+            await iniciarTesteGratis();
+            alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
+            atualizarIconeVerificacao('nao_ativado');
+            break;
+        case 'em_teste':
+            alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
+            atualizarIconeVerificacao('nao_ativado');
+            break;
+        case 'expirado':
+            mostrarPopupVerificacao();
+            atualizarIconeVerificacao('nao_ativado');
+            break;
+        case 'ativado':
+            console.log('Aplicativo ativado');
+            atualizarIconeVerificacao('ativado');
+            break;
+        default:
+            console.error('Erro ao verificar o status do aplicativo');
+            atualizarIconeVerificacao('nao_ativado');
+    }
+});
+
 
         // Funções para manipular o IndexedDB
         function abrirIndexedDB() {
@@ -616,6 +653,65 @@
                 };
             });
         }
+
+        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
+
+// Função para verificar o status do teste grátis ou ativação
+async function verificarStatusAplicativo() {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['verificacao'], 'readonly');
+    const objectStore = transaction.objectStore('verificacao');
+    const request = objectStore.get('status');
+
+    return new Promise((resolve) => {
+        request.onsuccess = event => {
+            const result = event.target.result;
+            if (result) {
+                if (result.ativado) {
+                    resolve({ status: 'ativado' });
+                } else if (result.inicioTeste) {
+                    const agora = new Date().getTime();
+                    const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
+                    if (agora < fimTeste) {
+                        resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
+                    } else {
+                        resolve({ status: 'expirado' });
+                    }
+                } else {
+                    resolve({ status: 'novo' });
+                }
+            } else {
+                resolve({ status: 'novo' });
+            }
+        };
+        request.onerror = () => resolve({ status: 'erro' });
+    });
+}
+        // Função para Resetar o Status do Teste
+async function resetarStatusTeste() {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['verificacao'], 'readwrite');
+    const objectStore = transaction.objectStore('verificacao');
+    await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
+    console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
+}
+
+// Função para iniciar o período de teste grátis
+async function iniciarTesteGratis() {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['verificacao'], 'readwrite');
+    const objectStore = transaction.objectStore('verificacao');
+    await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
+}
+
+// Modifique a função ativarAplicativo para atualizar o ícone após a ativação
+async function ativarAplicativo() {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['verificacao'], 'readwrite');
+    const objectStore = transaction.objectStore('verificacao');
+    await objectStore.put({ id: 'status', ativado: true });
+    atualizarIconeVerificacao('ativado');
+}
 
         async function verificarClienteExistente(nome) {
             const db = await abrirIndexedDB();
@@ -963,48 +1059,45 @@
         }
 
         function extrairCodigoAtivacao(frases) {
-            let codigo = '';
-            
-            // Sequência 1
-            let seq1 = frases[0][frases[0].length - 2];
-            if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
-            codigo += seq1;
-            
-            // Sequência 2
-            let seq2 = frases[1][2];
-            if (!seq2.match(/[a-zA-Z0-9]/)) seq2 = frases[1][4] || '';
-            codigo += seq2;
-            
-            // Sequência 3
-            let seq3 = frases[2][0];
-            if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
-            codigo += seq3;
-            
-            // Sequência 4
-            let seq4 = frases[3][frases[3].length - 1];
-            if (seq4.match(/[0-9]/)) seq4 = (frases[3][frases[3].length - 2] || '') + seq4;
-            codigo += seq4;
-            
-            // Sequência 5
-            let seq5 = frases[4][1];
-            if (seq5.match(/[a-zA-Z]/)) {
-                const novoIndex = Math.max(0, frases[4].indexOf(seq5) - 2);
-                seq5 = frases[4][novoIndex];
-            }
-            codigo += seq5;
-            
-            // Sequência 6
-            let seq6 = frases[5][4] || '';
-            if (!seq6.match(/[a-zA-Z0-9]/)) seq6 = seq6 + (frases[4][2] || '');
-            codigo += seq6;
-            
-            // Sequência 7
-            let seq7 = frases[6][3] || '';
-            if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
-            codigo += seq7;
-            
-            return codigo;
-        }
+    let codigo = '';
+    
+    // Sequência 1: Penúltimo caractere (se for letra, incluir também o primeiro)
+    let seq1 = frases[0][frases[0].length - 2];
+    if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
+    codigo += seq1;
+    
+    // Sequência 2: Segundo caractere (se for símbolo ou letra minúscula usar terceiro)
+    let seq2 = frases[1][1];
+    if (seq2.match(/[^a-zA-Z0-9]/) || seq2.match(/[a-z]/)) seq2 = frases[1][2] || '';
+    codigo += seq2;
+    
+    // Sequência 3: Primeiro caractere (se for número, incluir o segundo)
+    let seq3 = frases[2][0];
+    if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
+    codigo += seq3;
+    
+    // Sequência 4: Último caractere (se for número usar o penúltimo)
+    let seq4 = frases[3][frases[3].length - 1];
+    if (seq4.match(/[0-9]/)) seq4 = frases[3][frases[3].length - 2] || '';
+    codigo += seq4;
+    
+    // Sequência 5: Segundo caractere (se for letra, incluir o terceiro)
+    let seq5 = frases[4][1];
+    if (seq5.match(/[a-zA-Z]/)) seq5 += frases[4][2] || '';
+    codigo += seq5;
+    
+    // Sequência 6: Quinto caractere (se for símbolo, usar o primeiro)
+    let seq6 = frases[5][4] || '';
+    if (seq6.match(/[^a-zA-Z0-9]/)) seq6 = frases[5][0] || '';
+    codigo += seq6;
+    
+    // Sequência 7: Quarto caractere (se for letra maiúscula, incluir o último)
+    let seq7 = frases[6][3] || '';
+    if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
+    codigo += seq7;
+    
+    return codigo;
+}
 
         function verificarCodigo(codigoUsuario, frasesOriginais) {
             const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
@@ -1012,35 +1105,45 @@
         }
 
         async function mostrarPopupVerificacao() {
-            const frasesGeradas = gerarFrasesAleatorias();
-            const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
-            
-            const popupHTML = `
-                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Verificação Necessária</h2>
-                        <p>Por favor, envie as seguintes frases para o WhatsApp +5583993015765:</p>
-                        <ol class="list-decimal list-inside mb-4">
-                            ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
-                        </ol>
-                        <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
-                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Verificar Código</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', popupHTML);
-            
-            document.getElementById('verificarCodigo').addEventListener('click', () => {
-                const codigoUsuario = document.getElementById('codigoAtivacao').value;
-                if (verificarCodigo(codigoUsuario, frasesGeradas)) {
-                    alert('Código correto! Aplicativo ativado.');
-                    document.getElementById('popupVerificacao').remove();
-                    salvarVerificacaoNoIndexedDB(true);
-                } else {
-                    alert('Código incorreto. Tente novamente.');
-                }
-            });
+    const frasesGeradas = gerarFrasesAleatorias();
+    const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+    
+    const popupHTML = `
+        <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Período de Teste Expirado</h2>
+                <p>Seu período de teste gratuito expirou. Para continuar usando o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
+                <ol class="list-decimal list-inside mb-4">
+                    ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
+                </ol>
+                <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
+                <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    
+    document.getElementById('verificarCodigo').addEventListener('click', async () => {
+        const codigoUsuario = document.getElementById('codigoAtivacao').value;
+        if (verificarCodigo(codigoUsuario, frasesGeradas)) {
+            await ativarAplicativo();
+            alert('Código correto! Aplicativo ativado com sucesso.');
+            document.getElementById('popupVerificacao').remove();
+        } else {
+            alert('Código incorreto. Tente novamente.');
         }
+    });
+}
+
+// Nova função para verificar ativação antes de executar ações importantes
+async function verificarAtivacaoAntes(acao) {
+    const status = await verificarStatusAplicativo();
+    if (status.status === 'ativado' || status.status === 'em_teste') {
+        acao();
+    } else {
+        mostrarPopupVerificacao();
+    }
+}
 
         async function salvarVerificacaoNoIndexedDB(verificado) {
             const db = await abrirIndexedDB();
