@@ -77,19 +77,26 @@
 
 
     <!-- Modal para Informações do Usuário -->
-<div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-        <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopupUsuario()">&times;</span>
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Informações do Usuário</h2>
-        <input type="text" id="nomeUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome">
-        <input type="text" id="empresaUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Empresa">
-        <input type="tel" id="telefoneUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone" inputmode="tel">
-        <input type="email" id="emailUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Email">
-        <button id="salvarInfoUsuario" class="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarInformacoesUsuario()">
-            Salvar Informações
-        </button>
+    <div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+            <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopupUsuario()">&times;</span>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Informações do Usuário</h2>
+            <input type="text" id="nomeUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome">
+            <input type="text" id="empresaUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Empresa">
+            <input type="tel" id="telefoneUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone" inputmode="tel">
+            <input type="email" id="emailUsuario" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Email">
+            <div class="mb-4">
+                <label for="logoUsuario" class="block text-sm font-medium text-gray-700 mb-2">Logo da Empresa</label>
+                <input type="file" id="logoUsuario" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 shadow-sm">
+            </div>
+            <div id="previewLogo" class="mb-4 hidden">
+                <img id="logoPreview" src="" alt="Preview da Logo" class="max-w-full h-auto">
+            </div>
+            <button id="salvarInfoUsuario" class="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarInformacoesUsuario()">
+                Salvar Informações
+            </button>
+        </div>
     </div>
-</div>
 
     <!-- Modal para Adicionar/Editar Cliente -->
     <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -188,6 +195,8 @@ function atualizarIconeVerificacao(status) {
             });
         });
 
+        
+
         // Lista de películas e clientes
         const peliculas = [
             { nome: "Window Blue Performance", preco: 240 },
@@ -210,92 +219,202 @@ function atualizarIconeVerificacao(status) {
 
         // Função para abrir o popup de adicionar ou editar cliente
         function abrirPopup(acao) {
-            const popupTitulo = document.getElementById('popupTitulo');
-            if (acao === 'adicionar') {
-                popupTitulo.innerText = 'Adicionar Novo Cliente';
-                limparCamposPopup();
-                clienteSelecionado = '';
-            } else if (acao === 'editar') {
-                popupTitulo.innerText = 'Editar Cliente';
-                carregarDadosCliente();
-                clienteSelecionado = clienteSelect.value;
-            }
-            document.getElementById('popupCliente').classList.remove('hidden');
-        }
+    console.log("abrirPopup chamada com ação:", acao);
+    
+    const popupCliente = document.getElementById('popupCliente');
+    const popupTitulo = document.getElementById('popupTitulo');
+    
+    if (!popupCliente || !popupTitulo) {
+        console.error("Elementos do popup não encontrados");
+        return;
+    }
 
-        function abrirPopupUsuario() {
-    // 1. Seleciona o elemento do popup
+    if (acao === 'adicionar') {
+        popupTitulo.innerText = 'Adicionar Novo Cliente';
+        limparCamposPopup();
+        clienteSelecionado = '';
+    } else if (acao === 'editar') {
+        popupTitulo.innerText = 'Editar Cliente';
+        carregarDadosCliente();
+        clienteSelecionado = clienteSelect.value;
+    }
+
+    popupCliente.classList.remove('hidden');
+    popupCliente.style.display = 'flex';
+}
+        function limparCamposPopup() {
+    document.getElementById('popupClienteNome').value = '';
+    document.getElementById('popupClienteTelefone').value = '';
+    document.getElementById('popupClienteEndereco').value = '';
+    document.getElementById('popupClienteCPF').value = '';
+    document.getElementById('popupClienteCNPJ').value = '';
+}
+
+      // Função para abrir o popup de usuário
+      function abrirPopupUsuario() {
     const popupUsuario = document.getElementById('popupUsuario');
-    
-    // 2. Remove a classe 'hidden' para mostrar o popup
     popupUsuario.classList.remove('hidden');
-    
-    // 3. Carrega as informações existentes do usuário (se houver)
     carregarInformacoesUsuario();
 }
-
-function carregarInformacoesUsuario() {
-    // Esta função deve carregar as informações do usuário do armazenamento (IndexedDB, por exemplo)
-    // e preencher os campos do formulário
-    
-    // Exemplo de como poderia ser:
-    obterInformacoesUsuarioDoIndexedDB().then(info => {
-        if (info) {
-            document.getElementById('nomeUsuario').value = info.nome || '';
-            document.getElementById('empresaUsuario').value = info.empresa || '';
-            document.getElementById('telefoneUsuario').value = info.telefone || '';
-            document.getElementById('emailUsuario').value = info.email || '';
+async function carregarInformacoesUsuario() {
+    const info = await obterInformacoesUsuarioDoIndexedDB();
+    if (info) {
+        document.getElementById('nomeUsuario').value = info.nome || '';
+        document.getElementById('empresaUsuario').value = info.empresa || '';
+        document.getElementById('telefoneUsuario').value = info.telefone || '';
+        document.getElementById('emailUsuario').value = info.email || '';
+        
+        if (info.logo) {
+            const previewLogo = document.getElementById('previewLogo');
+            const logoPreview = document.getElementById('logoPreview');
+            logoPreview.src = info.logo;
+            previewLogo.classList.remove('hidden');
         }
-    });
+    }
 }
 
-// Função para fechar o popup
 function fecharPopupUsuario() {
     document.getElementById('popupUsuario').classList.add('hidden');
 }
 
-// Função para salvar as informações do usuário
-function salvarInformacoesUsuario() {
+async function salvarInformacoesUsuario() {
+    const nome = document.getElementById('nomeUsuario').value;
+    const empresa = document.getElementById('empresaUsuario').value;
+    const telefone = document.getElementById('telefoneUsuario').value;
+    const email = document.getElementById('emailUsuario').value;
+    const logoFile = document.getElementById('logoUsuario').files[0];
+
+    let logoUrl = '';
+    if (logoFile) {
+        logoUrl = await converterImagemParaBase64(logoFile);
+    } else {
+        // Manter a logo existente se nenhuma nova for carregada
+        const infoExistente = await obterInformacoesUsuarioDoIndexedDB();
+        if (infoExistente && infoExistente.logo) {
+            logoUrl = infoExistente.logo;
+        }
+    }
+
     const infoUsuario = {
-        nome: document.getElementById('nomeUsuario').value,
-        empresa: document.getElementById('empresaUsuario').value,
-        telefone: document.getElementById('telefoneUsuario').value,
-        email: document.getElementById('emailUsuario').value
+        id: 'info',
+        nome,
+        empresa,
+        telefone,
+        email,
+        logo: logoUrl
     };
 
-    // Salvar no IndexedDB
-    salvarInformacoesUsuarioNoIndexedDB(infoUsuario).then(() => {
+    try {
+        await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
         fecharPopupUsuario();
-        alert('Informações do usuário salvas com sucesso!');
-    }).catch(error => {
+        alert('Informações do usuário atualizadas com sucesso!');
+    } catch (error) {
         console.error('Erro ao salvar informações:', error);
-        alert('Erro ao salvar informações. Por favor, tente novamente.');
+        alert('Erro ao atualizar informações. Por favor, tente novamente.');
+    }
+}
+
+// Função para converter imagem para Base64
+function converterImagemParaBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
     });
 }
 
 // Funções para interagir com o IndexedDB
+async function abrirIndexedDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClientesDB', 3);
+
+        request.onerror = event => {
+            console.error('Erro ao abrir o IndexedDB:', event);
+            reject(event);
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('usuario')) {
+                db.createObjectStore('usuario', { keyPath: 'id' });
+            }
+            // Mantenha os outros object stores existentes
+            if (!db.objectStoreNames.contains('clientes')) {
+                db.createObjectStore('clientes', { keyPath: 'nome' });
+            }
+            if (!db.objectStoreNames.contains('medidas')) {
+                db.createObjectStore('medidas', { keyPath: 'cliente' });
+            }
+            if (!db.objectStoreNames.contains('verificacao')) {
+                db.createObjectStore('verificacao', { keyPath: 'id' });
+            }
+        };
+    });
+}
+
 async function obterInformacoesUsuarioDoIndexedDB() {
     const db = await abrirIndexedDB();
-    const transaction = db.transaction(['usuario'], 'readonly');
-    const objectStore = transaction.objectStore('usuario');
-    return objectStore.get('info');
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['usuario'], 'readonly');
+        const objectStore = transaction.objectStore('usuario');
+        const request = objectStore.get('info');
+
+        request.onerror = event => {
+            console.error('Erro ao obter informações do usuário:', event);
+            reject(event);
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+    });
 }
 
 async function salvarInformacoesUsuarioNoIndexedDB(infoUsuario) {
     const db = await abrirIndexedDB();
-    const transaction = db.transaction(['usuario'], 'readwrite');
-    const objectStore = transaction.objectStore('usuario');
-    return objectStore.put(infoUsuario, 'info');
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['usuario'], 'readwrite');
+        const objectStore = transaction.objectStore('usuario');
+        const request = objectStore.put(infoUsuario);
+
+        request.onerror = event => {
+            console.error('Erro ao salvar no IndexedDB:', event);
+            reject(event);
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+    });
 }
 
-        // Função para limpar os campos do popup
-        function limparCamposPopup() {
-            document.getElementById('popupClienteNome').value = '';
-            document.getElementById('popupClienteTelefone').value = '';
-            document.getElementById('popupClienteEndereco').value = '';
-            document.getElementById('popupClienteCPF').value = '';
-            document.getElementById('popupClienteCNPJ').value = '';
+// Event listener para o botão de upload de logo
+document.getElementById('logoUsuario').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewLogo = document.getElementById('previewLogo');
+            const logoPreview = document.getElementById('logoPreview');
+            logoPreview.src = e.target.result;
+            previewLogo.classList.remove('hidden');
         }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Adicione este event listener quando o documento estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    const salvarInfoUsuarioBtn = document.getElementById('salvarInfoUsuario');
+    if (salvarInfoUsuarioBtn) {
+        salvarInfoUsuarioBtn.addEventListener('click', salvarInformacoesUsuario);
+    }
+});
 
         // Função para carregar dados do cliente no popup de edição
         async function carregarDadosCliente() {
@@ -389,10 +508,21 @@ async function salvarInformacoesUsuarioNoIndexedDB(infoUsuario) {
             }
         }
 
+
+
         // Função para fechar o popup de cliente
         function fecharPopup() {
             document.getElementById('popupCliente').classList.add('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const addNewClienteBtn = document.getElementById('addNewClienteBtn');
+    if (addNewClienteBtn) {
+        addNewClienteBtn.addEventListener('click', function() {
+            abrirPopup('adicionar');
+        });
+    }
+});
 
         // Função para confirmar a exclusão das medidas do cliente
         function confirmClearMedidas() {
@@ -693,32 +823,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Funções para manipular o IndexedDB
         function abrirIndexedDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('ClientesDB', 2);
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClientesDB', 3); // Aumentamos a versão para 3
 
-                request.onerror = event => {
-                    console.error('Erro ao abrir o IndexedDB:', event);
-                    reject(event);
-                };
+        request.onerror = event => {
+            console.error('Erro ao abrir o IndexedDB:', event);
+            reject(event);
+        };
 
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
 
-                request.onupgradeneeded = event => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('clientes')) {
-                        db.createObjectStore('clientes', { keyPath: 'nome' });
-                    }
-                    if (!db.objectStoreNames.contains('medidas')) {
-                        db.createObjectStore('medidas', { keyPath: 'cliente' });
-                    }
-                    if (!db.objectStoreNames.contains('verificacao')) {
-                        db.createObjectStore('verificacao', { keyPath: 'id' });
-                    }
-                };
-            });
-        }
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('usuario')) {
+                db.createObjectStore('usuario', { keyPath: 'id' });
+            }
+            // Mantenha os outros object stores existentes
+            if (!db.objectStoreNames.contains('clientes')) {
+                db.createObjectStore('clientes', { keyPath: 'nome' });
+            }
+            if (!db.objectStoreNames.contains('medidas')) {
+                db.createObjectStore('medidas', { keyPath: 'cliente' });
+            }
+            if (!db.objectStoreNames.contains('verificacao')) {
+                db.createObjectStore('verificacao', { keyPath: 'id' });
+            }
+        };
+    });
+}
 
         async function salvarClienteNoIndexedDB(cliente) {
             const db = await abrirIndexedDB();
