@@ -11,7 +11,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
-
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
 </head>
@@ -22,59 +21,56 @@
 
         <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl p-2 bg-white rounded-xl shadow-lg relative">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
-        
-    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-xl"></div>
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
-        </div>
-
-        <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
-            <i class="fas fa-check-circle text-3xl"></i>
-        </div>
-
-        <div class="space-y-4">
-            <div class="flex items-center space-x-2">
-                <select id="clienteSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition" onchange="onClienteChange()">
-                    <option value="">Selecione um cliente</option>
-                </select>
-                <button id="addNewClienteBtn" class="p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="abrirPopup('adicionar')">
-                    <i class="fas fa-user-plus"></i>
-                </button>
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
             </div>
 
-            <div id="editIconContainer" class="hidden flex justify-end space-x-2">
-                <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-                <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition shadow-sm">
-                    <i class="fas fa-user-cog"></i>
-                </button>
+            <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
+                <i class="fas fa-check-circle text-3xl"></i>
             </div>
-            <div id="medidasContainer" class="space-y-4"></div>
 
-            <div id="resultado" class="text-right text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <select id="clienteSelect" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 transition" onchange="onClienteChange()">
+                        <option value="">Selecione um cliente</option>
+                    </select>
+                    <button id="addNewClienteBtn" class="p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <button class="p-4 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="addMedidaGroup(true)">
-                    Adicionar Medida
-                </button>
-                <button class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="duplicarMedidas()">
-                    Duplicar Medidas
-                </button>
-                <button class="p-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-md hover:opacity-90 transition" id="generatePdfButton">
-                    Gerar PDF
-                </button>
-                <button class="p-4 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="copyShareURL()">
-                    Compartilhar URL
-                </button>
-                
+                <div id="editIconContainer" class="hidden flex justify-end space-x-2">
+                    <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition shadow-sm">
+                        <i class="fas fa-user-cog"></i>
+                    </button>
+                </div>
+                <div id="medidasContainer" class="space-y-4"></div>
+
+                <div id="resultado" class="text-right text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="p-4 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="addMedidaGroup(true)">
+                        Adicionar Medida
+                    </button>
+                    <button class="p-4 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="duplicarMedidas()">
+                        Duplicar Medidas
+                    </button>
+                    <button class="p-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-md hover:opacity-90 transition" id="generatePdfButton">
+                        Gerar PDF
+                    </button>
+                    <button class="p-4 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-lg shadow-md hover:opacity-90 transition" onclick="copyShareURL()">
+                        Compartilhar URL
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-
 
     <!-- Modal para Informações do Usuário -->
     <div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -92,7 +88,7 @@
             <div id="previewLogo" class="mb-4 hidden">
                 <img id="logoPreview" src="" alt="Preview da Logo" class="max-w-full h-auto">
             </div>
-            <button id="salvarInfoUsuario" class="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarInformacoesUsuario()">
+            <button id="salvarInfoUsuario" class="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md shadow-md hover:opacity-90 transition">
                 Salvar Informações
             </button>
         </div>
@@ -103,13 +99,12 @@
         <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
             <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopup()">&times;</span>
             <h2 id="popupTitulo" class="text-xl font-semibold mb-4 text-gray-800">Adicionar Novo Cliente</h2>
-            <!-- Substitua os campos existentes no modal de cliente por estes: -->
-<input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
-<input type="tel" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone" inputmode="tel">
-<input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
-<input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF" inputmode="numeric">
-<input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ" inputmode="numeric">
-            <button id="popupClienteBtnSalvar" class="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition" onclick="salvarCliente()">
+            <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Nome do Cliente">
+            <input type="tel" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Telefone" inputmode="tel">
+            <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="Endereço">
+            <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CPF" inputmode="numeric">
+            <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md mb-6 focus:ring-2 focus:ring-purple-500 shadow-sm" placeholder="CNPJ" inputmode="numeric">
+            <button id="popupClienteBtnSalvar" class="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md shadow-md hover:opacity-90 transition">
                 Salvar Cliente
             </button>
         </div>
@@ -127,17 +122,14 @@
             });
         }
 
-// Adicione esta função ao seu JavaScript
-function atualizarIconeVerificacao(status) {
-    const icone = document.getElementById('verificacaoIcon');
-    if (status === 'ativado') {
-        icone.classList.remove('hidden');
-    } else {
-        icone.classList.add('hidden');
-    }
-}
-
-
+        function atualizarIconeVerificacao(status) {
+            const icone = document.getElementById('verificacaoIcon');
+            if (status === 'ativado') {
+                icone.classList.remove('hidden');
+            } else {
+                icone.classList.add('hidden');
+            }
+        }
 
         // Service Worker diretamente no HTML
         self.addEventListener('install', function(event) {
@@ -167,36 +159,6 @@ function atualizarIconeVerificacao(status) {
             $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
         });
 
-        // Código para auto-avançar para o próximo input
-        document.addEventListener('DOMContentLoaded', function () {
-            const groups = document.querySelectorAll('#medidasContainer > div');
-
-            groups.forEach(group => {
-                const larguraInput = group.querySelector('.largura-input');
-                const alturaInput = group.querySelector('.altura-input');
-                const quantidadeInput = group.querySelector('.quantidade-input');
-
-                larguraInput.addEventListener('input', function () {
-                    if (larguraInput.value.length >= 4) {
-                        alturaInput.focus();
-                    }
-                });
-
-                alturaInput.addEventListener('input', function () {
-                    if (alturaInput.value.length >= 4) {
-                        quantidadeInput.focus();
-
-                        setTimeout(() => {
-                            const length = quantidadeInput.value.length;
-                            quantidadeInput.setSelectionRange(length, length);
-                        }, 0);
-                    }
-                });
-            });
-        });
-
-        
-
         // Lista de películas e clientes
         const peliculas = [
             { nome: "Window Blue Performance", preco: 240 },
@@ -219,204 +181,211 @@ function atualizarIconeVerificacao(status) {
 
         // Função para abrir o popup de adicionar ou editar cliente
         function abrirPopup(acao) {
-    console.log("abrirPopup chamada com ação:", acao);
-    
-    const popupCliente = document.getElementById('popupCliente');
-    const popupTitulo = document.getElementById('popupTitulo');
-    
-    if (!popupCliente || !popupTitulo) {
-        console.error("Elementos do popup não encontrados");
-        return;
-    }
+            console.log("abrirPopup chamada com ação:", acao);
+            
+            const popupCliente = document.getElementById('popupCliente');
+            const popupTitulo = document.getElementById('popupTitulo');
+            
+            if (!popupCliente || !popupTitulo) {
+                console.error("Elementos do popup não encontrados");
+                return;
+            }
 
-    if (acao === 'adicionar') {
-        popupTitulo.innerText = 'Adicionar Novo Cliente';
-        limparCamposPopup();
-        clienteSelecionado = '';
-    } else if (acao === 'editar') {
-        popupTitulo.innerText = 'Editar Cliente';
-        carregarDadosCliente();
-        clienteSelecionado = clienteSelect.value;
-    }
+            if (acao === 'adicionar') {
+                popupTitulo.innerText = 'Adicionar Novo Cliente';
+                limparCamposPopup();
+                clienteSelecionado = '';
+            } else if (acao === 'editar') {
+                popupTitulo.innerText = 'Editar Cliente';
+                carregarDadosCliente();
+                clienteSelecionado = clienteSelect.value;
+            }
 
-    popupCliente.classList.remove('hidden');
-    popupCliente.style.display = 'flex';
-}
+            popupCliente.classList.remove('hidden');
+            popupCliente.style.display = 'flex';
+        }
+
         function limparCamposPopup() {
-    document.getElementById('popupClienteNome').value = '';
-    document.getElementById('popupClienteTelefone').value = '';
-    document.getElementById('popupClienteEndereco').value = '';
-    document.getElementById('popupClienteCPF').value = '';
-    document.getElementById('popupClienteCNPJ').value = '';
-}
-
-      // Função para abrir o popup de usuário
-      function abrirPopupUsuario() {
-    const popupUsuario = document.getElementById('popupUsuario');
-    popupUsuario.classList.remove('hidden');
-    carregarInformacoesUsuario();
-}
-async function carregarInformacoesUsuario() {
-    const info = await obterInformacoesUsuarioDoIndexedDB();
-    if (info) {
-        document.getElementById('nomeUsuario').value = info.nome || '';
-        document.getElementById('empresaUsuario').value = info.empresa || '';
-        document.getElementById('telefoneUsuario').value = info.telefone || '';
-        document.getElementById('emailUsuario').value = info.email || '';
-        
-        if (info.logo) {
-            const previewLogo = document.getElementById('previewLogo');
-            const logoPreview = document.getElementById('logoPreview');
-            logoPreview.src = info.logo;
-            previewLogo.classList.remove('hidden');
+            document.getElementById('popupClienteNome').value = '';
+            document.getElementById('popupClienteTelefone').value = '';
+            document.getElementById('popupClienteEndereco').value = '';
+            document.getElementById('popupClienteCPF').value = '';
+            document.getElementById('popupClienteCNPJ').value = '';
         }
-    }
-}
 
-function fecharPopupUsuario() {
-    document.getElementById('popupUsuario').classList.add('hidden');
-}
-
-async function salvarInformacoesUsuario() {
-    const nome = document.getElementById('nomeUsuario').value;
-    const empresa = document.getElementById('empresaUsuario').value;
-    const telefone = document.getElementById('telefoneUsuario').value;
-    const email = document.getElementById('emailUsuario').value;
-    const logoFile = document.getElementById('logoUsuario').files[0];
-
-    let logoUrl = '';
-    if (logoFile) {
-        logoUrl = await converterImagemParaBase64(logoFile);
-    } else {
-        // Manter a logo existente se nenhuma nova for carregada
-        const infoExistente = await obterInformacoesUsuarioDoIndexedDB();
-        if (infoExistente && infoExistente.logo) {
-            logoUrl = infoExistente.logo;
+        function abrirPopupUsuario() {
+            const popupUsuario = document.getElementById('popupUsuario');
+            popupUsuario.classList.remove('hidden');
+            carregarInformacoesUsuario();
         }
-    }
 
-    const infoUsuario = {
-        id: 'info',
-        nome,
-        empresa,
-        telefone,
-        email,
-        logo: logoUrl
-    };
-
-    try {
-        await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
-        fecharPopupUsuario();
-        alert('Informações do usuário atualizadas com sucesso!');
-    } catch (error) {
-        console.error('Erro ao salvar informações:', error);
-        alert('Erro ao atualizar informações. Por favor, tente novamente.');
-    }
-}
-
-// Função para converter imagem para Base64
-function converterImagemParaBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-    });
-}
-
-// Funções para interagir com o IndexedDB
-async function abrirIndexedDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('ClientesDB', 3);
-
-        request.onerror = event => {
-            console.error('Erro ao abrir o IndexedDB:', event);
-            reject(event);
-        };
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-
-        request.onupgradeneeded = event => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('usuario')) {
-                db.createObjectStore('usuario', { keyPath: 'id' });
+        async function carregarInformacoesUsuario() {
+            const info = await obterInformacoesUsuarioDoIndexedDB();
+            if (info) {
+                document.getElementById('nomeUsuario').value = info.nome || '';
+                document.getElementById('empresaUsuario').value = info.empresa || '';
+                document.getElementById('telefoneUsuario').value = info.telefone || '';
+                document.getElementById('emailUsuario').value = info.email || '';
+                
+                if (info.logo) {
+                    const previewLogo = document.getElementById('previewLogo');
+                    const logoPreview = document.getElementById('logoPreview');
+                    logoPreview.src = info.logo;
+                    previewLogo.classList.remove('hidden');
+                }
             }
-            // Mantenha os outros object stores existentes
-            if (!db.objectStoreNames.contains('clientes')) {
-                db.createObjectStore('clientes', { keyPath: 'nome' });
-            }
-            if (!db.objectStoreNames.contains('medidas')) {
-                db.createObjectStore('medidas', { keyPath: 'cliente' });
-            }
-            if (!db.objectStoreNames.contains('verificacao')) {
-                db.createObjectStore('verificacao', { keyPath: 'id' });
-            }
-        };
-    });
-}
-
-async function obterInformacoesUsuarioDoIndexedDB() {
-    const db = await abrirIndexedDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['usuario'], 'readonly');
-        const objectStore = transaction.objectStore('usuario');
-        const request = objectStore.get('info');
-
-        request.onerror = event => {
-            console.error('Erro ao obter informações do usuário:', event);
-            reject(event);
-        };
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-    });
-}
-
-async function salvarInformacoesUsuarioNoIndexedDB(infoUsuario) {
-    const db = await abrirIndexedDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['usuario'], 'readwrite');
-        const objectStore = transaction.objectStore('usuario');
-        const request = objectStore.put(infoUsuario);
-
-        request.onerror = event => {
-            console.error('Erro ao salvar no IndexedDB:', event);
-            reject(event);
-        };
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-    });
-}
-
-// Event listener para o botão de upload de logo
-document.getElementById('logoUsuario').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const previewLogo = document.getElementById('previewLogo');
-            const logoPreview = document.getElementById('logoPreview');
-            logoPreview.src = e.target.result;
-            previewLogo.classList.remove('hidden');
         }
-        reader.readAsDataURL(file);
-    }
-});
 
-// Adicione este event listener quando o documento estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    const salvarInfoUsuarioBtn = document.getElementById('salvarInfoUsuario');
-    if (salvarInfoUsuarioBtn) {
-        salvarInfoUsuarioBtn.addEventListener('click', salvarInformacoesUsuario);
-    }
-});
+        function fecharPopupUsuario() {
+            document.getElementById('popupUsuario').classList.add('hidden');
+        }
 
-        // Função para carregar dados do cliente no popup de edição
+        async function salvarInformacoesUsuario() {
+            const nome = document.getElementById('nomeUsuario').value;
+            const empresa = document.getElementById('empresaUsuario').value;
+            const telefone = document.getElementById('telefoneUsuario').value;
+            const email = document.getElementById('emailUsuario').value;
+            const logoFile = document.getElementById('logoUsuario').files[0];
+
+            let logoUrl = '';
+            if (logoFile) {
+                logoUrl = await converterImagemParaBase64(logoFile);
+            } else {
+                const infoExistente = await obterInformacoesUsuarioDoIndexedDB();
+                if (infoExistente && infoExistente.logo) {
+                    logoUrl = infoExistente.logo;
+                }
+            }
+
+            const infoUsuario = {
+                id: 'info',
+                nome,
+                empresa,
+                telefone,
+                email,
+                logo: logoUrl
+            };
+
+            try {
+                await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
+                fecharPopupUsuario();
+                alert('Informações do usuário atualizadas com sucesso!');
+            } catch (error) {
+                console.error('Erro ao salvar informações:', error);
+                alert('Erro ao atualizar informações. Por favor, tente novamente.');
+            }
+        }
+
+        function converterImagemParaBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function abrirIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('ClientesDB', 3);
+
+                request.onerror = event => {
+                    console.error('Erro ao abrir o IndexedDB:', event);
+                    reject(event);
+                };
+
+                request.onsuccess = event => {
+                    resolve(event.target.result);
+                };
+
+                request.onupgradeneeded = event => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('usuario')) {
+                        db.createObjectStore('usuario', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('clientes')) {
+                        db.createObjectStore('clientes', { keyPath: 'nome' });
+                    }
+                    if (!db.objectStoreNames.contains('medidas')) {
+                        db.createObjectStore('medidas', { keyPath: 'cliente' });
+                    }
+                    if (!db.objectStoreNames.contains('verificacao')) {
+                        db.createObjectStore('verificacao', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        async function obterInformacoesUsuarioDoIndexedDB() {
+            const db = await abrirIndexedDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['usuario'], 'readonly');
+                const objectStore = transaction.objectStore('usuario');
+                const request = objectStore.get('info');
+
+                request.onerror = event => {
+                    console.error('Erro ao obter informações do usuário:', event);
+                    reject(event);
+                };
+
+                request.onsuccess = event => {
+                    resolve(event.target.result);
+                };
+            });
+        }
+
+        async function salvarInformacoesUsuarioNoIndexedDB(infoUsuario) {
+            const db = await abrirIndexedDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['usuario'], 'readwrite');
+                const objectStore = transaction.objectStore('usuario');
+                const request = objectStore.put(infoUsuario);
+
+                request.onerror = event => {
+                    console.error('Erro ao salvar no IndexedDB:', event);
+                    reject(event);
+                };
+
+                request.onsuccess = event => {
+                    resolve(event.target.result);
+                };
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const salvarInfoUsuarioBtn = document.getElementById('salvarInfoUsuario');
+            if (salvarInfoUsuarioBtn) {
+                salvarInfoUsuarioBtn.addEventListener('click', salvarInformacoesUsuario);
+            }
+
+            const addNewClienteBtn = document.getElementById('addNewClienteBtn');
+            if (addNewClienteBtn) {
+                addNewClienteBtn.addEventListener('click', function() {
+                    abrirPopup('adicionar');
+                });
+            }
+
+            const logoUsuario = document.getElementById('logoUsuario');
+            if (logoUsuario) {
+                logoUsuario.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const previewLogo = document.getElementById('previewLogo');
+                            const logoPreview = document.getElementById('logoPreview');
+                            logoPreview.src = e.target.result;
+                            previewLogo.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            carregarClientes();
+            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+        });
+
         async function carregarDadosCliente() {
             const cliente = await obterClienteDoIndexedDB(clienteSelect.value);
             if (cliente) {
@@ -428,7 +397,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Função para salvar o cliente (adicionar ou editar)
         async function salvarCliente() {
             const nome = document.getElementById('popupClienteNome').value.trim();
             const telefone = document.getElementById('popupClienteTelefone').value.trim();
@@ -454,12 +422,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 await carregarClientes(nome);
                 fecharPopup();
+                alert("Cliente salvo com sucesso!");
             } else {
                 alert("O nome do cliente já existe ou não foi informado.");
             }
         }
 
-        // Função para carregar a lista de clientes no select
         async function carregarClientes(clienteSelecionado = '') {
             clientes = await obterTodosClientesDoIndexedDB();
             clienteSelect.innerHTML = '';
@@ -480,14 +448,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 loadMedidas();
                 mostrarEditIconContainer(true);
-
             } else {
                 clienteSelect.classList.add('hidden');
                 mostrarEditIconContainer(false);
             }
         }
 
-        // Função que executa ao mudar o cliente selecionado
         function onClienteChange() {
             clienteSelecionado = clienteSelect.value;
             loadMedidas();
@@ -498,7 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Função para exibir ou esconder o container de edição
         function mostrarEditIconContainer(exibir) {
             const editIconContainer = document.getElementById('editIconContainer');
             if (exibir && clienteSelect.value) {
@@ -508,30 +473,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-
-
-        // Função para fechar o popup de cliente
         function fecharPopup() {
-            document.getElementById('popupCliente').classList.add('hidden');
+            console.log("Tentando fechar o popup");
+            const popupCliente = document.getElementById('popupCliente');
+            if (popupCliente) {
+                popupCliente.classList.add('hidden');
+                popupCliente.style.display = 'none';
+            } else {
+                console.error("Elemento popupCliente não encontrado");
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-    const addNewClienteBtn = document.getElementById('addNewClienteBtn');
-    if (addNewClienteBtn) {
-        addNewClienteBtn.addEventListener('click', function() {
-            abrirPopup('adicionar');
-        });
-    }
-});
-
-        // Função para confirmar a exclusão das medidas do cliente
         function confirmClearMedidas() {
             if (confirm("Tem certeza que deseja apagar este cliente e suas medidas?")) {
                 clearMedidas();
             }
         }
 
-        // Função para apagar medidas do cliente
         async function clearMedidas() {
             const cliente = clienteSelect.value;
             if (!cliente) {
@@ -555,7 +513,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para salvar medidas no IndexedDB
         async function saveMedidas() {
             const cliente = clienteSelect.value;
             if (!cliente) return;
@@ -573,7 +530,6 @@ document.addEventListener('DOMContentLoaded', function() {
             await salvarMedidasNoIndexedDB(cliente, medidas);
         }
 
-        // Função para carregar medidas do IndexedDB
         async function loadMedidas() {
             const cliente = clienteSelect.value;
             const savedMedidas = await obterMedidasDoIndexedDB(cliente);
@@ -590,7 +546,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para adicionar um grupo de medida
         function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
             const container = document.getElementById('medidasContainer');
             const medidaGroup = document.createElement('div');
@@ -636,7 +591,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(medidaGroup);
 
-            // Adicionar listeners para auto-avançar
             const larguraInput = medidaGroup.querySelector('.largura-input');
             const alturaInput = medidaGroup.querySelector('.altura-input');
             const quantidadeInput = medidaGroup.querySelector('.quantidade-input');
@@ -650,8 +604,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alturaInput.addEventListener('input', function () {
                 if (alturaInput.value.length >= 4) {
                     quantidadeInput.focus();
-
-                    // Posiciona o cursor após o número "1" no campo "quantidade"
                     setTimeout(() => {
                         const length = quantidadeInput.value.length;
                         quantidadeInput.setSelectionRange(length, length);
@@ -666,7 +618,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para atualizar o total de M²
         function atualizarTotal(input, event) {
             const group = input.closest('.bg-white');
             const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
@@ -675,10 +626,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalM2 = largura * altura * quantidade;
 
             group.querySelector('input[placeholder="M²"]').value = totalM2.toFixed(2);
-            calculateTotal(); // Recalcula o total geral
+            calculateTotal();
         }
 
-        // Função para duplicar um grupo de medida
         function duplicarGrupo(button) {
             const group = button.closest('.bg-white');
             const largura = group.querySelector('.largura-input').value || '';
@@ -692,7 +642,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para duplicar todas as medidas
         function duplicarMedidas() {
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
             medidaGroups.forEach(group => {
@@ -708,7 +657,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para excluir um grupo de medida
         function deleteMedidaGroup(button) {
             if (confirm('Tem certeza que deseja excluir este grupo de medidas?')) {
                 button.closest('.bg-white').remove();
@@ -717,7 +665,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Função para calcular o total de M² e preço
         function calculateTotal() {
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
             let totalM2 = 0;
@@ -747,7 +694,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveMedidas();
         }
 
-        // Função para alternar os campos adicionais
         function toggleAdditionalFields(button) {
             const fields = button.closest('.bg-white').querySelector('.additional-fields');
             if (fields.classList.contains('hidden')) {
@@ -759,7 +705,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Função para alternar a ativação/desativação dos inputs
         function toggleInputs(checkbox) {
             const inputs = checkbox.closest('.bg-white').querySelectorAll('input, select');
             inputs.forEach(input => {
@@ -770,7 +715,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
         }
 
-        // Função para copiar a URL de compartilhamento
         function copyShareURL() {
             const cliente = clienteSelect.value;
             if (!cliente) {
@@ -789,70 +733,61 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Função que carrega as informações ao iniciar
-// Modifique o evento DOMContentLoaded para incluir a atualização do ícone
-document.addEventListener('DOMContentLoaded', async () => {
-    await carregarClientes();
-    document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
-    
-    const status = await verificarStatusAplicativo();
-    switch (status.status) {
-        case 'novo':
-            await iniciarTesteGratis();
-            alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'em_teste':
-            alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'expirado':
-            mostrarPopupVerificacao();
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'ativado':
-            console.log('Aplicativo ativado');
+        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
+
+        async function verificarStatusAplicativo() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readonly');
+            const objectStore = transaction.objectStore('verificacao');
+            const request = objectStore.get('status');
+
+            return new Promise((resolve) => {
+                request.onsuccess = event => {
+                    const result = event.target.result;
+                    if (result) {
+                        if (result.ativado) {
+                            resolve({ status: 'ativado' });
+                        } else if (result.inicioTeste) {
+                            const agora = new Date().getTime();
+                            const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
+                            if (agora < fimTeste) {
+                                resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
+                            } else {
+                                resolve({ status: 'expirado' });
+                            }
+                        } else {
+                            resolve({ status: 'novo' });
+                        }
+                    } else {
+                        resolve({ status: 'novo' });
+                    }
+                };
+                request.onerror = () => resolve({ status: 'erro' });
+            });
+        }
+
+        async function resetarStatusTeste() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
+            console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
+        }
+
+        async function iniciarTesteGratis() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
+        }
+
+        async function ativarAplicativo() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: true });
             atualizarIconeVerificacao('ativado');
-            break;
-        default:
-            console.error('Erro ao verificar o status do aplicativo');
-            atualizarIconeVerificacao('nao_ativado');
-    }
-});
-
-
-        // Funções para manipular o IndexedDB
-        function abrirIndexedDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('ClientesDB', 3); // Aumentamos a versão para 3
-
-        request.onerror = event => {
-            console.error('Erro ao abrir o IndexedDB:', event);
-            reject(event);
-        };
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-
-        request.onupgradeneeded = event => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('usuario')) {
-                db.createObjectStore('usuario', { keyPath: 'id' });
-            }
-            // Mantenha os outros object stores existentes
-            if (!db.objectStoreNames.contains('clientes')) {
-                db.createObjectStore('clientes', { keyPath: 'nome' });
-            }
-            if (!db.objectStoreNames.contains('medidas')) {
-                db.createObjectStore('medidas', { keyPath: 'cliente' });
-            }
-            if (!db.objectStoreNames.contains('verificacao')) {
-                db.createObjectStore('verificacao', { keyPath: 'id' });
-            }
-        };
-    });
-}
+        }
 
         async function salvarClienteNoIndexedDB(cliente) {
             const db = await abrirIndexedDB();
@@ -876,65 +811,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 };
             });
         }
-
-        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
-
-// Função para verificar o status do teste grátis ou ativação
-async function verificarStatusAplicativo() {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['verificacao'], 'readonly');
-    const objectStore = transaction.objectStore('verificacao');
-    const request = objectStore.get('status');
-
-    return new Promise((resolve) => {
-        request.onsuccess = event => {
-            const result = event.target.result;
-            if (result) {
-                if (result.ativado) {
-                    resolve({ status: 'ativado' });
-                } else if (result.inicioTeste) {
-                    const agora = new Date().getTime();
-                    const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
-                    if (agora < fimTeste) {
-                        resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
-                    } else {
-                        resolve({ status: 'expirado' });
-                    }
-                } else {
-                    resolve({ status: 'novo' });
-                }
-            } else {
-                resolve({ status: 'novo' });
-            }
-        };
-        request.onerror = () => resolve({ status: 'erro' });
-    });
-}
-        // Função para Resetar o Status do Teste
-async function resetarStatusTeste() {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['verificacao'], 'readwrite');
-    const objectStore = transaction.objectStore('verificacao');
-    await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
-    console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
-}
-
-// Função para iniciar o período de teste grátis
-async function iniciarTesteGratis() {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['verificacao'], 'readwrite');
-    const objectStore = transaction.objectStore('verificacao');
-    await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
-}
-
-// Modifique a função ativarAplicativo para atualizar o ícone após a ativação
-async function ativarAplicativo() {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['verificacao'], 'readwrite');
-    const objectStore = transaction.objectStore('verificacao');
-    await objectStore.put({ id: 'status', ativado: true });
-    atualizarIconeVerificacao('ativado');
-}
 
         async function verificarClienteExistente(nome) {
             const db = await abrirIndexedDB();
@@ -1013,261 +889,256 @@ async function ativarAplicativo() {
             return objectStore.delete(cliente);
         }
 
-        // Função para gerar o PDF (versão 3.0 com novo design e correções)
         function generatePDF_v3_0() {
-            try {
-                const clienteNome = clienteSelect.value;
-                if (!clienteNome) {
-                    alert('Selecione um cliente.');
-                    return;
-                }
-
-                const cliente = clientes.find(c => c.nome === clienteNome);
-                if (!cliente) {
-                    alert('Informações do cliente não encontradas.');
-                    return;
-                }
-
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                const pageWidth = doc.internal.pageSize.width;
-                const pageHeight = doc.internal.pageSize.height;
-                const margin = 15;
-
-                const colors = {
-                    primary: [28, 4, 56],
-                    secondary: [242, 182, 3],
-                    text: [44, 62, 80],
-                    lightGray: [236, 240, 241],
-                    header: [0, 51, 102]
-                };
-
-                function addCover() {
-                    const pageWidth = doc.internal.pageSize.width;
-                    const pageHeight = doc.internal.pageSize.height;
-                    const margin = 30;
-
-                    // Fundo da página
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(0, 0, pageWidth, pageHeight, 'F');
-
-                    // Barras graduais no topo
-                    const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
-                    const barWidth = pageWidth / barColors.length;
-                    barColors.forEach((color, index) => {
-                        doc.setFillColor(color);
-                        doc.rect(index * barWidth, 0, barWidth, 40, 'F');
-                    });
-
-                    // Informações do cliente
-                    doc.setTextColor(44, 62, 80);
-                    doc.setFont("helvetica", 'bold');
-                    doc.setFontSize(18);
-                    doc.text(`Cliente: ${cliente.nome}`, margin, 70);
-
-                    doc.setFont("helvetica", 'normal');
-                    doc.setFontSize(12);
-                    doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
-                    doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
-                    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
-
-                    // Adicionar "VÁLIDO POR 90 DIAS"
-                    doc.text("VÁLIDO POR 90 DIAS", margin, 135);
-
-                    // Rodapé
-                    doc.setDrawColor(41, 128, 185);
-                    doc.setLineWidth(1);
-                    doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
-
-                    doc.setTextColor(41, 128, 185);
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", 'italic');
-                    doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
-                }
-
-                function addFooter() {
-                    const footerHeight = 20;
-                    const footerY = pageHeight - footerHeight;
-
-                    doc.setFillColor(...colors.primary);
-                    doc.rect(0, footerY, pageWidth, footerHeight, 'F');
-
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", 'normal');
-                    doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
-
-                    doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
-                }
-
-                function addPage() {
-                    doc.addPage();
-                    addFooter();
-                    return margin + 20;
-                }
-
-                function addContent() {
-                    let y = addPage();
-
-                    function addSectionTitle(title) {
-                        if (y > pageHeight - 40) y = addPage();
-                        doc.setFillColor(...colors.header);
-                        doc.rect(0, y, pageWidth, 30, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(12);
-                        doc.setFont("helvetica", 'bold');
-                        doc.text(title, margin, y + 12);
-                        y += 15;
-                    }
-
-                    function addTableHeader() {
-                        const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
-
-                        doc.setFillColor(...colors.primary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(9);
-                        doc.setFont("helvetica", 'bold');
-
-                        let xOffset = margin;
-                        headers.forEach((header, index) => {
-                            doc.text(header, xOffset + 2, y + 6.5);
-                            xOffset += colWidths[index];
-                        });
-
-                        y += 12;
-                    }
-
-                    function addMedidaItem(medida, index) {
-                        if (y > pageHeight - 40) {
-                            y = addPage();
-                            addTableHeader();
-                        }
-
-                        const largura = medida.querySelector('.largura-input').value || '0';
-                        const altura = medida.querySelector('.altura-input').value || '0';
-                        const quantidade = medida.querySelector('.quantidade-input').value || '0';
-                        const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
-                        const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
-                        const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
-                        const peliculaNome = medida.querySelector('.pelicula-select').value || '';
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
-
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
-                        let xOffset = margin;
-
-                        if (index % 2 === 0) {
-                            doc.setFillColor(...colors.lightGray);
-                        } else {
-                            doc.setFillColor(255, 255, 255);
-                        }
-                        doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
-
-                        doc.setTextColor(...colors.text);
-                        doc.setFontSize(8);
-                        doc.setFont("helvetica", 'normal');
-
-                        doc.text(`${index}`, xOffset + 2, y + 4);
-                        xOffset += colWidths[0];
-                        doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-                        xOffset += colWidths[1];
-                        doc.text(peliculaNome, xOffset + 2, y + 4);
-                        xOffset += colWidths[2];
-                        doc.text(ambiente, xOffset + 2, y + 4);
-                        xOffset += colWidths[3];
-                        doc.text(tipoAplicacao, xOffset + 2, y + 4);
-                        xOffset += colWidths[4];
-                        doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
-                        xOffset += colWidths[5];
-
-                        if (pelicula) {
-                            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                            doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
-                        }
-
-                        y += 12;
-                    }
-
-                    function addTotalSection(peliculaNome, total) {
-                        if (y > pageHeight - 30) y = addPage();
-
-                        doc.setFillColor(...colors.secondary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
-
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", 'bold');
-                        doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
-                        doc.text(`Área Total: ${total.totalM2.toFixed(2)} m²`, margin + 5, y + 15);
-                        doc.text(`Preço Total: R$ ${total.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 15, { align: 'right' });
-
-                        y += 25;
-                    }
-
-                    const medidaGroups = document.querySelectorAll('#medidasContainer > div');
-                    const medidasPorPelicula = {};
-                    const totaisGerais = { totalM2: 0, precoTotal: 0 };
-
-                    medidaGroups.forEach(group => {
-                        const peliculaNome = group.querySelector('.pelicula-select').value || 'Sem Película';
-                        if (!medidasPorPelicula[peliculaNome]) {
-                            medidasPorPelicula[peliculaNome] = [];
-                        }
-                        medidasPorPelicula[peliculaNome].push(group);
-
-                        const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
-                        const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
-                        const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                        const area = largura * altura * quantidade;
-                        const preco = pelicula ? area * pelicula.preco : 0;
-
-                        totaisGerais.totalM2 += area;
-                        totaisGerais.precoTotal += preco;
-                    });
-
-                    Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
-                        if (index > 0) y = addPage();
-                        addSectionTitle(`Orçamento para: ${peliculaNome}`);
-                        addTableHeader();
-                        medidas.forEach((group, idx) => {
-                            addMedidaItem(group, idx + 1);
-                        });
-
-                        const totalPelicula = {
-                            totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0), 0),
-                            precoTotal: medidas.reduce((sum, group) => {
-                                const area = parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0;
-                                const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                                return sum + (pelicula ? area * pelicula.preco : 0);
-                            }, 0)
-                        };
-
-                        addTotalSection(peliculaNome, totalPelicula);
-                    });
-
-                    y = addPage();
-                    addSectionTitle("Total Geral do Orçamento");
-                    addTotalSection("Todas as Películas", totaisGerais);
-                }
-
-                addCover();
-                addContent();
-
-                doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
-            } catch (error) {
-                console.error("Erro ao gerar PDF:", error);
-                alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
-            }
+    try {
+        const clienteNome = clienteSelect.value;
+        if (!clienteNome) {
+            alert('Selecione um cliente.');
+            return;
         }
 
-        // Novas funções para o sistema de verificação
+        const cliente = clientes.find(c => c.nome === clienteNome);
+        if (!cliente) {
+            alert('Informações do cliente não encontradas.');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 15;
+
+        const colors = {
+            primary: [28, 4, 56],
+            secondary: [242, 182, 3],
+            text: [44, 62, 80],
+            lightGray: [236, 240, 241],
+            header: [0, 51, 102]
+        };
+
+        function addCover() {
+            // Fundo da página
+            doc.setFillColor(245, 245, 245);
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+            // Barras graduais no topo
+            const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
+            const barWidth = pageWidth / barColors.length;
+            barColors.forEach((color, index) => {
+                doc.setFillColor(color);
+                doc.rect(index * barWidth, 0, barWidth, 40, 'F');
+            });
+
+            // Informações do cliente
+            doc.setTextColor(44, 62, 80);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(18);
+            doc.text(`Cliente: ${cliente.nome}`, margin, 70);
+
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(12);
+            doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
+            doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
+
+            // Adicionar "VÁLIDO POR 90 DIAS"
+            doc.text("VÁLIDO POR 90 DIAS", margin, 135);
+
+            // Rodapé
+            doc.setDrawColor(41, 128, 185);
+            doc.setLineWidth(1);
+            doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+
+            doc.setTextColor(41, 128, 185);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", 'italic');
+            doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
+        }
+
+        function addFooter() {
+            const footerHeight = 20;
+            const footerY = pageHeight - footerHeight;
+
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, footerY, pageWidth, footerHeight, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", 'normal');
+            doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
+
+            doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
+        }
+
+        function addPage() {
+            doc.addPage();
+            addFooter();
+            return margin + 20;
+        }
+
+        function addContent() {
+            let y = addPage();
+
+            function addSectionTitle(title) {
+                if (y > pageHeight - 40) y = addPage();
+                doc.setFillColor(...colors.header);
+                doc.rect(0, y, pageWidth, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(12);
+                doc.setFont("helvetica", 'bold');
+                doc.text(title, margin, y + 12);
+                y += 15;
+            }
+
+            function addTableHeader() {
+                const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
+                const colWidths = [15, 30, 35, 30, 30, 20, 25];
+
+                doc.setFillColor(...colors.primary);
+                doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(9);
+                doc.setFont("helvetica", 'bold');
+
+                let xOffset = margin;
+                headers.forEach((header, index) => {
+                    doc.text(header, xOffset + 2, y + 6.5);
+                    xOffset += colWidths[index];
+                });
+
+                y += 12;
+            }
+
+            function addMedidaItem(medida, index) {
+                if (y > pageHeight - 40) {
+                    y = addPage();
+                    addTableHeader();
+                }
+
+                const largura = medida.querySelector('.largura-input').value || '0';
+                const altura = medida.querySelector('.altura-input').value || '0';
+                const quantidade = medida.querySelector('.quantidade-input').value || '0';
+                const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
+                const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
+                const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
+                const peliculaNome = medida.querySelector('.pelicula-select').value || '';
+                const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+                const colWidths = [15, 30, 35, 30, 30, 20, 25];
+                let xOffset = margin;
+
+                if (index % 2 === 0) {
+                    doc.setFillColor(...colors.lightGray);
+                } else {
+                    doc.setFillColor(255, 255, 255);
+                }
+                doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+
+                doc.setTextColor(...colors.text);
+                doc.setFontSize(8);
+                doc.setFont("helvetica", 'normal');
+
+                doc.text(`${index}`, xOffset + 2, y + 4);
+                xOffset += colWidths[0];
+                doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+                xOffset += colWidths[1];
+                doc.text(peliculaNome, xOffset + 2, y + 4);
+                xOffset += colWidths[2];
+                doc.text(ambiente, xOffset + 2, y + 4);
+                xOffset += colWidths[3];
+                doc.text(tipoAplicacao, xOffset + 2, y + 4);
+                xOffset += colWidths[4];
+                doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
+                xOffset += colWidths[5];
+
+                if (pelicula) {
+                    const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                    doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
+                }
+
+                y += 12;
+            }
+
+            function addTotalSection(peliculaNome, total) {
+                if (y > pageHeight - 30) y = addPage();
+
+                doc.setFillColor(...colors.secondary);
+                doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(11);
+                doc.setFont("helvetica", 'bold');
+                doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
+                doc.text(`Área Total: ${total.totalM2.toFixed(2)} m²`, margin + 5, y + 15);
+                doc.text(`Preço Total: R$ ${total.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 15, { align: 'right' });
+
+                y += 25;
+            }
+
+            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+            const medidasPorPelicula = {};
+            const totaisGerais = { totalM2: 0, precoTotal: 0 };
+
+            medidaGroups.forEach(group => {
+                const peliculaNome = group.querySelector('.pelicula-select').value || 'Sem Película';
+                if (!medidasPorPelicula[peliculaNome]) {
+                    medidasPorPelicula[peliculaNome] = [];
+                }
+                medidasPorPelicula[peliculaNome].push(group);
+
+                const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+                const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+                const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+                const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                const area = largura * altura * quantidade;
+                const preco = pelicula ? area * pelicula.preco : 0;
+
+                totaisGerais.totalM2 += area;
+                totaisGerais.precoTotal += preco;
+            });
+
+            Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
+                if (index > 0) y = addPage();
+                addSectionTitle(`Orçamento para: ${peliculaNome}`);
+                addTableHeader();
+                medidas.forEach((group, idx) => {
+                    addMedidaItem(group, idx + 1);
+                });
+
+                const totalPelicula = {
+                    totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0), 0),
+                    precoTotal: medidas.reduce((sum, group) => {
+                        const area = parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0;
+                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                        return sum + (pelicula ? area * pelicula.preco : 0);
+                    }, 0)
+                };
+
+                addTotalSection(peliculaNome, totalPelicula);
+            });
+
+            y = addPage();
+            addSectionTitle("Total Geral do Orçamento");
+            addTotalSection("Todas as Películas", totaisGerais);
+        }
+
+        addCover();
+        addContent();
+
+        doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+        alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
+    }
+}
+
+
         function gerarFrasesAleatorias() {
             const frases = [];
             for (let i = 0; i < 7; i++) {
@@ -1328,45 +1199,44 @@ async function ativarAplicativo() {
         }
 
         async function mostrarPopupVerificacao() {
-    const frasesGeradas = gerarFrasesAleatorias();
-    const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
-    
-    const popupHTML = `
-        <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Período de Teste Expirado</h2>
-                <p>Seu período de teste gratuito expirou. Para continuar usando o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
-                <ol class="list-decimal list-inside mb-4">
-                    ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
-                </ol>
-                <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
-                <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', popupHTML);
-    
-    document.getElementById('verificarCodigo').addEventListener('click', async () => {
-        const codigoUsuario = document.getElementById('codigoAtivacao').value;
-        if (verificarCodigo(codigoUsuario, frasesGeradas)) {
-            await ativarAplicativo();
-            alert('Código correto! Aplicativo ativado com sucesso.');
-            document.getElementById('popupVerificacao').remove();
-        } else {
-            alert('Código incorreto. Tente novamente.');
+            const frasesGeradas = gerarFrasesAleatorias();
+            const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+            
+            const popupHTML = `
+                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Período de Teste Expirado</h2>
+                        <p>Seu período de teste gratuito expirou. Para continuar usando o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
+                        <ol class="list-decimal list-inside mb-4">
+                            ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
+                        </ol>
+                        <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
+                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+            
+            document.getElementById('verificarCodigo').addEventListener('click', async () => {
+                const codigoUsuario = document.getElementById('codigoAtivacao').value;
+                if (verificarCodigo(codigoUsuario, frasesGeradas)) {
+                    await ativarAplicativo();
+                    alert('Código correto! Aplicativo ativado com sucesso.');
+                    document.getElementById('popupVerificacao').remove();
+                } else {
+                    alert('Código incorreto. Tente novamente.');
+                }
+            });
         }
-    });
-}
 
-// Nova função para verificar ativação antes de executar ações importantes
-async function verificarAtivacaoAntes(acao) {
-    const status = await verificarStatusAplicativo();
-    if (status.status === 'ativado' || status.status === 'em_teste') {
-        acao();
-    } else {
-        mostrarPopupVerificacao();
-    }
-}
+        async function verificarAtivacaoAntes(acao) {
+            const status = await verificarStatusAplicativo();
+            if (status.status === 'ativado' || status.status === 'em_teste') {
+                acao();
+            } else {
+                mostrarPopupVerificacao();
+            }
+        }
 
         async function salvarVerificacaoNoIndexedDB(verificado) {
             const db = await abrirIndexedDB();
@@ -1390,6 +1260,55 @@ async function verificarAtivacaoAntes(acao) {
                 };
             });
         }
+
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', async () => {
+            await carregarClientes();
+            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+            
+            const status = await verificarStatusAplicativo();
+            switch (status.status) {
+                case 'novo':
+                    await iniciarTesteGratis();
+                    alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'em_teste':
+                    alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'expirado':
+                    mostrarPopupVerificacao();
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'ativado':
+                    console.log('Aplicativo ativado');
+                    atualizarIconeVerificacao('ativado');
+                    break;
+                default:
+                    console.error('Erro ao verificar o status do aplicativo');
+                    atualizarIconeVerificacao('nao_ativado');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+    if (popupClienteBtnSalvar) {
+        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    }
+
+    const closeButtons = document.querySelectorAll('.close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const popup = this.closest('.fixed');
+            if (popup) {
+                popup.classList.add('hidden');
+            }
+        });
+    });
+
+    clienteSelect.addEventListener('change', onClienteChange);
+});
 
     </script>
 </body>
