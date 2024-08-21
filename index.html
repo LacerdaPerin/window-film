@@ -13,6 +13,10 @@
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
+
+    <!-- Incluindo a biblioteca Pickr para o seletor de cores -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
@@ -87,6 +91,15 @@
             </div>
             <div id="previewLogo" class="mb-4 hidden">
                 <img id="logoPreview" src="" alt="Preview da Logo" class="max-w-full h-auto">
+            </div>
+            <!-- Seção de seleção de cores -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Cores da Empresa</label>
+                <div class="flex space-x-2">
+                    <div id="cor1" class="color-picker w-1/3"></div>
+                    <div id="cor2" class="color-picker w-1/3"></div>
+                    <div id="cor3" class="color-picker w-1/3"></div>
+                </div>
             </div>
             <button id="salvarInfoUsuario" class="w-full p-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md shadow-md hover:opacity-90 transition">
                 Salvar Informações
@@ -233,6 +246,12 @@
                     logoPreview.src = info.logo;
                     previewLogo.classList.remove('hidden');
                 }
+
+                if (info.cores) {
+                    pickr1.setColor(info.cores[0]);
+                    pickr2.setColor(info.cores[1]);
+                    pickr3.setColor(info.cores[2]);
+                }
             }
         }
 
@@ -246,6 +265,9 @@
             const telefone = document.getElementById('telefoneUsuario').value;
             const email = document.getElementById('emailUsuario').value;
             const logoFile = document.getElementById('logoUsuario').files[0];
+            const cor1 = pickr1.getColor().toHEXA().toString();
+            const cor2 = pickr2.getColor().toHEXA().toString();
+            const cor3 = pickr3.getColor().toHEXA().toString();
 
             let logoUrl = '';
             if (logoFile) {
@@ -263,7 +285,8 @@
                 empresa,
                 telefone,
                 email,
-                logo: logoUrl
+                logo: logoUrl,
+                cores: [cor1, cor2, cor3]
             };
 
             try {
@@ -1187,7 +1210,7 @@
     
     // Sequência 7: Quarto caractere (se for letra maiúscula, incluir o último)
     let seq7 = frases[6][3] || '';
-    if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
+    if (seq7.match(/[A-Z]/)) seq7 += seq7 += frases[6][frases[6].length - 1] || '';
     codigo += seq7;
     
     return codigo;
@@ -1310,6 +1333,69 @@
     clienteSelect.addEventListener('change', onClienteChange);
 });
 
+        // Inicializar os Pickrs de seleção de cor
+        const pickr1 = Pickr.create({
+            el: '#cor1',
+            theme: 'classic',
+            default: '#FF0000',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        const pickr2 = Pickr.create({
+            el: '#cor2',
+            theme: 'classic',
+            default: '#00FF00',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        const pickr3 = Pickr.create({
+            el: '#cor3',
+            theme: 'classic',
+            default: '#0000FF',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                    cmyk: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
     </script>
 </body>
 </html>
