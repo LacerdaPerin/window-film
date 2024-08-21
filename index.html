@@ -18,7 +18,16 @@
 
     <!-- Incluindo a biblioteca Pickr para o seletor de cores -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <style>
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #000;
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 
 <body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
@@ -123,29 +132,26 @@
 
             <!-- Seção de seleção de cores -->
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Cores da Empresa</label>
-                <div class="grid grid-cols-3 gap-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Cores da Marca</label>
+                <div class="grid grid-cols-1 gap-4">
                     <div class="flex items-center">
-                        <div id="cor1" class="color-picker w-full"></div>
-                    </div>
-                    <div class="flex items-center">
-                        <div id="cor2" class="color-picker w-full"></div>
-                    </div>
-                    <div class="flex items-center">
-                        <div id="cor3" class="color-picker w-full"></div>
-                    </div>
-                    <div class="flex justify-center items-center">
-                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md">
+                        <div id="corPrimaria" class="color-picker w-full"></div>
+                        <div class="color-preview ml-2" id="previewCorPrimaria"></div>
+                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md ml-2" data-color="primaria">
                             <i class="fas fa-eye-dropper"></i>
                         </button>
                     </div>
-                    <div class="flex justify-center items-center">
-                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md">
+                    <div class="flex items-center">
+                        <div id="corSecundaria" class="color-picker w-full"></div>
+                        <div class="color-preview ml-2" id="previewCorSecundaria"></div>
+                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md ml-2" data-color="secundaria">
                             <i class="fas fa-eye-dropper"></i>
                         </button>
                     </div>
-                    <div class="flex justify-center items-center">
-                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md">
+                    <div class="flex items-center">
+                        <div id="corTerciaria" class="color-picker w-full"></div>
+                        <div class="color-preview ml-2" id="previewCorTerciaria"></div>
+                        <button type="button" class="eyedropperButton p-2 bg-purple-500 text-white rounded-md ml-2" data-color="terciaria">
                             <i class="fas fa-eye-dropper"></i>
                         </button>
                     </div>
@@ -311,9 +317,12 @@
                 }
 
                 if (info.cores) {
-                    pickr1.setColor(info.cores[0]);
-                    pickr2.setColor(info.cores[1]);
-                    pickr3.setColor(info.cores[2]);
+                    pickrPrimaria.setColor(info.cores.primaria || '#FF0000');
+                    pickrSecundaria.setColor(info.cores.secundaria || '#00FF00');
+                    pickrTerciaria.setColor(info.cores.terciaria || '#0000FF');
+                    updateColorPreview(pickrPrimaria, 'previewCorPrimaria');
+                    updateColorPreview(pickrSecundaria, 'previewCorSecundaria');
+                    updateColorPreview(pickrTerciaria, 'previewCorTerciaria');
                 }
             }
         }
@@ -328,9 +337,9 @@
             const telefone = document.getElementById('telefoneUsuario').value;
             const email = document.getElementById('emailUsuario').value;
             const logoFile = document.getElementById('logoUsuario').files[0];
-            const cor1 = pickr1.getColor().toHEXA().toString();
-            const cor2 = pickr2.getColor().toHEXA().toString();
-            const cor3 = pickr3.getColor().toHEXA().toString();
+            const corPrimaria = pickrPrimaria.getColor().toHEXA().toString();
+            const corSecundaria = pickrSecundaria.getColor().toHEXA().toString();
+            const corTerciaria = pickrTerciaria.getColor().toHEXA().toString();
 
             let logoUrl = '';
             if (logoFile) {
@@ -349,7 +358,11 @@
                 telefone,
                 email,
                 logo: logoUrl,
-                cores: [cor1, cor2, cor3]
+                cores: {
+                    primaria: corPrimaria,
+                    secundaria: corSecundaria,
+                    terciaria: corTerciaria
+                }
             };
 
             try {
@@ -470,6 +483,88 @@
 
             carregarClientes();
             document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+
+            // Inicializar os Pickrs de seleção de cor
+            const pickrOptions = {
+                theme: 'classic',
+                components: {
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+                    interaction: {
+                        hex: true,
+                        rgba: true,
+                        hsla: true,
+                        hsva: true,
+                        cmyk: true,
+                        input: true,
+                        clear: true,
+                        save: true
+                    }
+                }
+            };
+
+            const pickrPrimaria = Pickr.create({
+                el: '#corPrimaria',
+                default: '#FF0000',
+                ...pickrOptions
+            });
+
+            const pickrSecundaria = Pickr.create({
+                el: '#corSecundaria',
+                default: '#00FF00',
+                ...pickrOptions
+            });
+
+            const pickrTerciaria = Pickr.create({
+                el: '#corTerciaria',
+                default: '#0000FF',
+                ...pickrOptions
+            });
+
+            // Função para atualizar a preview da cor
+            function updateColorPreview(pickr, previewId) {
+                const color = pickr.getColor().toHEXA().toString();
+                document.getElementById(previewId).style.backgroundColor = color;
+            }
+
+            // Adicione event listeners para atualizar as previews
+            pickrPrimaria.on('change', () => updateColorPreview(pickrPrimaria, 'previewCorPrimaria'));
+            pickrSecundaria.on('change', () => updateColorPreview(pickrSecundaria, 'previewCorSecundaria'));
+            pickrTerciaria.on('change', () => updateColorPreview(pickrTerciaria, 'previewCorTerciaria'));
+
+            // Implementação corrigida do conta-gotas para dispositivos móveis
+            const eyedropperButtons = document.querySelectorAll('.eyedropperButton');
+            let currentPickr = null;
+
+            eyedropperButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const colorType = button.dataset.color;
+                    switch(colorType) {
+                        case 'primaria':
+                            currentPickr = pickrPrimaria;
+                            break;
+                        case 'secundaria':
+                            currentPickr = pickrSecundaria;
+                            break;
+                        case 'terciaria':
+                            currentPickr = pickrTerciaria;
+                            break;
+                    }
+                    
+                    if ('EyeDropper' in window) {
+                        const eyeDropper = new EyeDropper();
+                        eyeDropper.open().then(result => {
+                            currentPickr.setColor(result.sRGBHex);
+                            updateColorPreview(currentPickr, `previewCor${colorType.charAt(0).toUpperCase() + colorType.slice(1)}`);
+                        }).catch(e => {
+                            console.log('EyeDropper falhou:', e);
+                        });
+                    } else {
+                        alert('Seu dispositivo não suporta a funcionalidade de conta-gotas. Por favor, selecione a cor manualmente.');
+                    }
+                });
+            });
         });
 
         async function carregarDadosCliente() {
@@ -812,352 +907,352 @@
             url.searchParams.set('cliente', cliente);
             const shareURL = url.toString();
 
-            navigator.clipboard.writeText(shareURL).then(() => {
-                alert('URL copiada para a área de transferência!');
-            }, (err) => {
-                console.error('Erro ao copiar a URL: ', err);
-            });
-        }
+navigator.clipboard.writeText(shareURL).then(() => {
+    alert('URL copiada para a área de transferência!');
+}, (err) => {
+    console.error('Erro ao copiar a URL: ', err);
+});
+}
 
-        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
+const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
 
-        async function verificarStatusAplicativo() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readonly');
-            const objectStore = transaction.objectStore('verificacao');
-            const request = objectStore.get('status');
+async function verificarStatusAplicativo() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readonly');
+const objectStore = transaction.objectStore('verificacao');
+const request = objectStore.get('status');
 
-            return new Promise((resolve) => {
-                request.onsuccess = event => {
-                    const result = event.target.result;
-                    if (result) {
-                        if (result.ativado) {
-                            resolve({ status: 'ativado' });
-                        } else if (result.inicioTeste) {
-                            const agora = new Date().getTime();
-                            const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
-                            if (agora < fimTeste) {
-                                resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
-                            } else {
-                                resolve({ status: 'expirado' });
-                            }
-                        } else {
-                            resolve({ status: 'novo' });
-                        }
-                    } else {
-                        resolve({ status: 'novo' });
-                    }
-                };
-                request.onerror = () => resolve({ status: 'erro' });
-            });
-        }
-
-        async function resetarStatusTeste() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
-            console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
-        }
-
-        async function iniciarTesteGratis() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
-        }
-
-        async function ativarAplicativo() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: true });
-            atualizarIconeVerificacao('ativado');
-        }
-
-        async function salvarClienteNoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            return objectStore.put(cliente);
-        }
-
-        async function obterTodosClientesDoIndexedDB() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.getAll();
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function verificarClienteExistente(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(!!event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            await objectStore.delete(clienteSelecionado);
-            return objectStore.put(novoCliente);
-        }
-
-        async function obterClienteDoIndexedDB(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function removerClienteDoIndexedDB(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            return objectStore.delete(nome);
-        }
-
-        async function salvarMedidasNoIndexedDB(cliente, medidas) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.put({ cliente, medidas });
-        }
-
-        async function obterMedidasDoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readonly');
-            const objectStore = transaction.objectStore('medidas');
-            const request = objectStore.get(cliente);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result ? event.target.result.medidas : null);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function removerMedidasDoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.delete(cliente);
-        }
-
-        function generatePDF_v3_0() {
-            try {
-                const clienteNome = clienteSelect.value;
-                if (!clienteNome) {
-                    alert('Selecione um cliente.');
-                    return;
+return new Promise((resolve) => {
+    request.onsuccess = event => {
+        const result = event.target.result;
+        if (result) {
+            if (result.ativado) {
+                resolve({ status: 'ativado' });
+            } else if (result.inicioTeste) {
+                const agora = new Date().getTime();
+                const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
+                if (agora < fimTeste) {
+                    resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
+                } else {
+                    resolve({ status: 'expirado' });
                 }
+            } else {
+                resolve({ status: 'novo' });
+            }
+        } else {
+            resolve({ status: 'novo' });
+        }
+    };
+    request.onerror = () => resolve({ status: 'erro' });
+});
+}
 
-                const cliente = clientes.find(c => c.nome === clienteNome);
-                if (!cliente) {
-                    alert('Informações do cliente não encontradas.');
-                    return;
-                }
+async function resetarStatusTeste() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
+console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
+}
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
+async function iniciarTesteGratis() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
+}
 
-                const pageWidth = doc.internal.pageSize.width;
-                const pageHeight = doc.internal.pageSize.height;
-                const margin = 15;
+async function ativarAplicativo() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: true });
+atualizarIconeVerificacao('ativado');
+}
 
-                const colors = {
-                    primary: [28, 4, 56],
-                    secondary: [242, 182, 3],
-                    text: [44, 62, 80],
-                    lightGray: [236, 240, 241],
-                    header: [0, 51, 102]
-                };
+async function salvarClienteNoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+return objectStore.put(cliente);
+}
 
-                function addCover() {
-                    // Fundo da página
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+async function obterTodosClientesDoIndexedDB() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.getAll();
 
-                    // Barras graduais no topo
-                    const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
-                    const barWidth = pageWidth / barColors.length;
-                    barColors.forEach((color, index) => {
-                        doc.setFillColor(color);
-                        doc.rect(index * barWidth, 0, barWidth, 40, 'F');
-                    });
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                    // Informações do cliente
-                    doc.setTextColor(44, 62, 80);
-                    doc.setFont("helvetica", 'bold');
-                    doc.setFontSize(18);
-                    doc.text(`Cliente: ${cliente.nome}`, margin, 70);
+async function verificarClienteExistente(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.get(nome);
 
-                    doc.setFont("helvetica", 'normal');
-                    doc.setFontSize(12);
-                    doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
-                    doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
-                    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(!!event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                    // Adicionar "VÁLIDO POR 90 DIAS"
-                    doc.text("VÁLIDO POR 90 DIAS", margin, 135);
+async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+await objectStore.delete(clienteSelecionado);
+return objectStore.put(novoCliente);
+}
 
-                    // Rodapé
-                    doc.setDrawColor(41, 128, 185);
-                    doc.setLineWidth(1);
-                    doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+async function obterClienteDoIndexedDB(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.get(nome);
 
-                    doc.setTextColor(41, 128, 185);
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", 'italic');
-                    doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
-                }
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                function addFooter() {
-                    const footerHeight = 20;
-                    const footerY = pageHeight - footerHeight;
+async function removerClienteDoIndexedDB(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+return objectStore.delete(nome);
+}
 
-                    doc.setFillColor(...colors.primary);
-                    doc.rect(0, footerY, pageWidth, footerHeight, 'F');
+async function salvarMedidasNoIndexedDB(cliente, medidas) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readwrite');
+const objectStore = transaction.objectStore('medidas');
+return objectStore.put({ cliente, medidas });
+}
 
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", 'normal');
-                    doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
+async function obterMedidasDoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readonly');
+const objectStore = transaction.objectStore('medidas');
+const request = objectStore.get(cliente);
 
-                    doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
-                }
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result ? event.target.result.medidas : null);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                function addPage() {
-                    doc.addPage();
-                    addFooter();
-                    return margin + 20;
-                }
+async function removerMedidasDoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readwrite');
+const objectStore = transaction.objectStore('medidas');
+return objectStore.delete(cliente);
+}
 
-                function addContent() {
-                    let y = addPage();
+function generatePDF_v3_0() {
+try {
+    const clienteNome = clienteSelect.value;
+    if (!clienteNome) {
+        alert('Selecione um cliente.');
+        return;
+    }
 
-                    function addSectionTitle(title) {
-                        if (y > pageHeight - 40) y = addPage();
-                        doc.setFillColor(...colors.header);
-                        doc.rect(0, y, pageWidth, 30, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(12);
-                        doc.setFont("helvetica", 'bold');
-                        doc.text(title, margin, y + 12);
-                        y += 15;
-                    }
+    const cliente = clientes.find(c => c.nome === clienteNome);
+    if (!cliente) {
+        alert('Informações do cliente não encontradas.');
+        return;
+    }
 
-                    function addTableHeader() {
-                        const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
 
-                        doc.setFillColor(...colors.primary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(9);
-                        doc.setFont("helvetica", 'bold');
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
 
-                        let xOffset = margin;
-                        headers.forEach((header, index) => {
-                            doc.text(header, xOffset + 2, y + 6.5);
-                            xOffset += colWidths[index];
-                        });
+    const colors = {
+        primary: [28, 4, 56],
+        secondary: [242, 182, 3],
+        text: [44, 62, 80],
+        lightGray: [236, 240, 241],
+        header: [0, 51, 102]
+    };
 
-                        y += 12;
-                    }
+    function addCover() {
+        // Fundo da página
+        doc.setFillColor(245, 245, 245);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-                    function addMedidaItem(medida, index) {
-                        if (y > pageHeight - 40) {
-                            y = addPage();
-                            addTableHeader();
-                        }
+        // Barras graduais no topo
+        const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
+        const barWidth = pageWidth / barColors.length;
+        barColors.forEach((color, index) => {
+            doc.setFillColor(color);
+            doc.rect(index * barWidth, 0, barWidth, 40, 'F');
+        });
 
-                        const largura = medida.querySelector('.largura-input').value || '0';
-                        const altura = medida.querySelector('.altura-input').value || '0';
-                        const quantidade = medida.querySelector('.quantidade-input').value || '0';
-                        const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
-                        const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
-                        const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
-                        const peliculaNome = medida.querySelector('.pelicula-select').value || '';
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+        // Informações do cliente
+        doc.setTextColor(44, 62, 80);
+        doc.setFont("helvetica", 'bold');
+        doc.setFontSize(18);
+        doc.text(`Cliente: ${cliente.nome}`, margin, 70);
 
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
-                        let xOffset = margin;
+        doc.setFont("helvetica", 'normal');
+        doc.setFontSize(12);
+        doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
+        doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
+        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
 
-                        if (index % 2 === 0) {
-                            doc.setFillColor(...colors.lightGray);
-                        } else {
-                            doc.setFillColor(255, 255, 255);
-                        }
-                        doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+        // Adicionar "VÁLIDO POR 90 DIAS"
+        doc.text("VÁLIDO POR 90 DIAS", margin, 135);
 
-                        doc.setTextColor(...colors.text);
-                        doc.setFontSize(8);
-                        doc.setFont("helvetica", 'normal');
+        // Rodapé
+        doc.setDrawColor(41, 128, 185);
+        doc.setLineWidth(1);
+        doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
 
-                        doc.text(`${index}`, xOffset + 2, y + 4);
-                        xOffset += colWidths[0];
-                        doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-                        xOffset += colWidths[1];
-                        doc.text(peliculaNome, xOffset + 2, y + 4);
-                        xOffset += colWidths[2];
-                        doc.text(ambiente, xOffset + 2, y + 4);
-                        xOffset += colWidths[3];
-                        doc.text(tipoAplicacao, xOffset + 2, y + 4);
-                        xOffset += colWidths[4];
-                        doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
-                        xOffset += colWidths[5];
+        doc.setTextColor(41, 128, 185);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", 'italic');
+        doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
+    }
 
-                        if (pelicula) {
-                            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                            doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
-                        }
+    function addFooter() {
+        const footerHeight = 20;
+        const footerY = pageHeight - footerHeight;
 
-                        y += 12;
-                    }
+        doc.setFillColor(...colors.primary);
+        doc.rect(0, footerY, pageWidth, footerHeight, 'F');
 
-                    function addTotalSection(peliculaNome, total) {
-                        if (y > pageHeight - 30) y = addPage();
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont("helvetica", 'normal');
+        doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
 
-                        doc.setFillColor(...colors.secondary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+        doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
+    }
 
-                        doc.setTextColor(255, 255, 255);
+    function addPage() {
+        doc.addPage();
+        addFooter();
+        return margin + 20;
+    }
+
+    function addContent() {
+        let y = addPage();
+
+        function addSectionTitle(title) {
+            if (y > pageHeight - 40) y = addPage();
+            doc.setFillColor(...colors.header);
+            doc.rect(0, y, pageWidth, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", 'bold');
+            doc.text(title, margin, y + 12);
+            y += 15;
+        }
+
+        function addTableHeader() {
+            const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
+            const colWidths = [15, 30, 35, 30, 30, 20, 25];
+
+            doc.setFillColor(...colors.primary);
+            doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.setFont("helvetica", 'bold');
+
+            let xOffset = margin;
+            headers.forEach((header, index) => {
+                doc.text(header, xOffset + 2, y + 6.5);
+                xOffset += colWidths[index];
+            });
+
+            y += 12;
+        }
+
+        function addMedidaItem(medida, index) {
+            if (y > pageHeight - 40) {
+                y = addPage();
+                addTableHeader();
+            }
+
+            const largura = medida.querySelector('.largura-input').value || '0';
+            const altura = medida.querySelector('.altura-input').value || '0';
+            const quantidade = medida.querySelector('.quantidade-input').value || '0';
+            const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
+            const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
+            const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
+            const peliculaNome = medida.querySelector('.pelicula-select').value || '';
+            const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+            const colWidths = [15, 30, 35, 30, 30, 20, 25];
+            let xOffset = margin;
+
+            if (index % 2 === 0) {
+                doc.setFillColor(...colors.lightGray);
+            } else {
+                doc.setFillColor(255, 255, 255);
+            }
+            doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+
+            doc.setTextColor(...colors.text);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", 'normal');
+
+            doc.text(`${index}`, xOffset + 2, y + 4);
+            xOffset += colWidths[0];
+            doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+            xOffset += colWidths[1];
+            doc.text(peliculaNome, xOffset + 2, y + 4);
+            xOffset += colWidths[2];
+            doc.text(ambiente, xOffset + 2, y + 4);
+            xOffset += colWidths[3];
+            doc.text(tipoAplicacao, xOffset + 2, y + 4);
+            xOffset += colWidths[4];
+            doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
+            xOffset += colWidths[5];
+
+            if (pelicula) {
+                const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
+            }
+
+            y += 12;
+        }
+
+        function addTotalSection(peliculaNome, total) {
+            if (y > pageHeight - 30) y = addPage();
+
+            doc.setFillColor(...colors.secondary);
+            doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+
+            doc.setTextColor(255, 255, 255);
                         doc.setFontSize(11);
                         doc.setFont("helvetica", 'bold');
                         doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
@@ -1394,104 +1489,6 @@
 
             clienteSelect.addEventListener('change', onClienteChange);
         });
-
-        // Inicializar os Pickrs de seleção de cor
-        const pickr1 = Pickr.create({
-            el: '#cor1',
-            theme: 'classic',
-            default: '#FF0000',
-            components: {
-                preview: true,
-                opacity: true,
-                hue: true,
-                interaction: {
-                    hex: true,
-                    rgba: true,
-                    hsla: true,
-                    hsva: true,
-                    cmyk: true,
-                    input: true,
-                    clear: true,
-                    save: true
-                }
-            }
-        });
-
-        const pickr2 = Pickr.create({
-            el: '#cor2',
-            theme: 'classic',
-            default: '#00FF00',
-            components: {
-                preview: true,
-                opacity: true,
-                hue: true,
-                interaction: {
-                    hex: true,
-                    rgba: true,
-                    hsla: true,
-                    hsva: true,
-                    cmyk: true,
-                    input: true,
-                    clear: true,
-                    save: true
-                }
-            }
-        });
-
-        const pickr3 = Pickr.create({
-            el: '#cor3',
-            theme: 'classic',
-            default: '#0000FF',
-            components: {
-                preview: true,
-                opacity: true,
-                hue: true,
-                interaction: {
-                    hex: true,
-                    rgba: true,
-                    hsla: true,
-                    hsva: true,
-                    cmyk: true,
-                    input: true,
-                    clear: true,
-                    save: true
-                }
-            }
-        });
-
-        // Implementando o conta-gotas para cada seletor de cor
-        const eyeDropper = window.EyeDropper ? new EyeDropper() : null;
-
-        document.querySelectorAll('.eyedropperButton').forEach((button, index) => {
-            button.addEventListener('click', () => {
-                if (eyeDropper) {
-                    eyeDropper.open()
-                        .then(result => {
-                            const preciseColor = adjustColorPrecision(result.sRGBHex);
-                            if (index === 0) {
-                                pickr1.setColor(preciseColor);
-                            } else if (index === 1) {
-                                pickr2.setColor(preciseColor);
-                            } else if (index === 2) {
-                                pickr3.setColor(preciseColor);
-                            }
-                        })
-                        .catch(e => {
-                            console.error(e);
-                            alert('Erro ao selecionar cor com conta-gotas. Tente novamente.');
-                        });
-                } else {
-                    alert('Seu navegador não suporta a API EyeDropper.');
-                }
-            });
-        });
-
-        // Função para ajustar a precisão da cor capturada
-        function adjustColorPrecision(hexColor) {
-            const rgb = hexColor.slice(1).match(/.{2}/g).map(val => parseInt(val, 16));
-            const adjustedRgb = rgb.map(channel => Math.min(255, Math.max(0, channel)));
-            return `#${adjustedRgb.map(val => val.toString(16).padStart(2, '0')).join('')}`;
-        }
     </script>
 </body>
 
