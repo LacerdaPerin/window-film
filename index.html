@@ -1385,56 +1385,6 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-    await carregarClientes();
-
-    // Variável de controle para impedir múltiplas gerações simultâneas
-    let pdfEmGeracao = false;
-
-    // Listener para o botão de gerar PDF
-    document.getElementById('generatePdfButton').addEventListener('click', async () => {
-        if (pdfEmGeracao) {
-            console.log("Geração de PDF já em andamento.");
-            return; // Evita gerar múltiplos PDFs simultaneamente
-        }
-
-        pdfEmGeracao = true; // Marca que o PDF está sendo gerado
-        console.log("Iniciando geração do PDF...");
-
-        try {
-            await verificarAtivacaoAntes(generatePDF_v3_0);
-        } catch (error) {
-            console.error("Erro ao gerar PDF:", error);
-        } finally {
-            pdfEmGeracao = false; // Libera para futuras gerações
-            console.log("Geração do PDF concluída.");
-        }
-    });
-
-    const status = await verificarStatusAplicativo();
-    switch (status.status) {
-        case 'novo':
-            await iniciarTesteGratis();
-            alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'em_teste':
-            alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'expirado':
-            mostrarPopupVerificacao();
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'ativado':
-            console.log('Aplicativo ativado');
-            atualizarIconeVerificacao('ativado');
-            break;
-        default:
-            console.error('Erro ao verificar o status do aplicativo');
-            atualizarIconeVerificacao('nao_ativado');
-    }
-});
 
 
         document.addEventListener('DOMContentLoaded', function () {
