@@ -13,7 +13,7 @@
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
-<style>
+    <style>
         /* Aumentando a área clicável e melhorando a acessibilidade */
         button, input, select {
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -51,16 +51,17 @@
     </style>
 </head>
 <body class="h-full font-roboto text-gray-700 flex items-center justify-center">
-    <div class="container mx-auto px-4 py-8 w-full max-w-4xl">
-        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
-            <div class="text-center mb-6">
+    <div class="container mx-auto px-2 py-6 w-full max-w-4xl">
+        <div class="bg-white rounded-xl shadow-lg p-2 sm:p-4 mb-6">
+            <div class="text-center mb-4">
                 <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
             </div>
             <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
                 <i class="fas fa-check-circle text-3xl"></i>
             </div>
-            <div class="space-y-4">
-                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <div class="w-full">
+
+                <div class="flex flex-col sm:flex-row items-center w-full space-y-2 sm:space-y-0">
                     <select id="clienteSelect" class="w-full sm:flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
                         <option value="">Selecione um cliente</option>
                     </select>
@@ -68,7 +69,8 @@
                         <i class="fas fa-user-plus"></i> Adicionar Cliente
                     </button>
                 </div>
-                <div id="editIconContainer" class="hidden flex justify-end space-x-2">
+
+                <div id="editIconContainer" class="hidden flex justify-end space-x-2 mt-2">
                     <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
                         <i class="fas fa-edit"></i>
                     </button>
@@ -79,9 +81,10 @@
                         <i class="fas fa-user-cog"></i>
                     </button>
                 </div>
-                <div id="medidasContainer" class="space-y-4 w-full"></div>
-                <div id="resultado" class="text-right text-xl sm:text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div id="medidasContainer" class="space-y-2 w-full mt-4"></div>
+                <div id="resultado" class="text-right text-xl sm:text-2xl font-bold text-green-500 mt-4">Total M²: 0,00 | Preço Total: R$ 0,00</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <button onclick="addMedidaGroup(true)" class="w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 shadow-md">
                         Adicionar Medida
                     </button>
@@ -644,10 +647,10 @@
         function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
             const container = document.getElementById('medidasContainer');
             const medidaGroup = document.createElement('div');
-            medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-4', 'space-y-2');
+            medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2');
 
             medidaGroup.innerHTML = `
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1">
                     <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
                     <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this, event)" maxlength="3">
                     <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this, event)" maxlength="3">
@@ -821,352 +824,352 @@
             url.searchParams.set('cliente', cliente);
             const shareURL = url.toString();
 
-navigator.clipboard.writeText(shareURL).then(() => {
-    alert('URL copiada para a área de transferência!');
-}, (err) => {
-    console.error('Erro ao copiar a URL: ', err);
-});
-}
-
-const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
-
-async function verificarStatusAplicativo() {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['verificacao'], 'readonly');
-const objectStore = transaction.objectStore('verificacao');
-const request = objectStore.get('status');
-
-return new Promise((resolve) => {
-    request.onsuccess = event => {
-        const result = event.target.result;
-        if (result) {
-            if (result.ativado) {
-                resolve({ status: 'ativado' });
-            } else if (result.inicioTeste) {
-                const agora = new Date().getTime();
-                const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
-                if (agora < fimTeste) {
-                    resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
-                } else {
-                    resolve({ status: 'expirado' });
-                }
-            } else {
-                resolve({ status: 'novo' });
-            }
-        } else {
-            resolve({ status: 'novo' });
-        }
-    };
-    request.onerror = () => resolve({ status: 'erro' });
-});
-}
-
-async function resetarStatusTeste() {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['verificacao'], 'readwrite');
-const objectStore = transaction.objectStore('verificacao');
-await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
-console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
-}
-
-async function iniciarTesteGratis() {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['verificacao'], 'readwrite');
-const objectStore = transaction.objectStore('verificacao');
-await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
-}
-
-async function ativarAplicativo() {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['verificacao'], 'readwrite');
-const objectStore = transaction.objectStore('verificacao');
-await objectStore.put({ id: 'status', ativado: true });
-atualizarIconeVerificacao('ativado');
-}
-
-async function salvarClienteNoIndexedDB(cliente) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readwrite');
-const objectStore = transaction.objectStore('clientes');
-return objectStore.put(cliente);
-}
-
-async function obterTodosClientesDoIndexedDB() {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readonly');
-const objectStore = transaction.objectStore('clientes');
-const request = objectStore.getAll();
-
-return new Promise((resolve, reject) => {
-    request.onsuccess = event => {
-        resolve(event.target.result);
-    };
-    request.onerror = event => {
-        reject(event);
-    };
-});
-}
-
-async function verificarClienteExistente(nome) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readonly');
-const objectStore = transaction.objectStore('clientes');
-const request = objectStore.get(nome);
-
-return new Promise((resolve, reject) => {
-    request.onsuccess = event => {
-        resolve(!!event.target.result);
-    };
-    request.onerror = event => {
-        reject(event);
-    };
-});
-}
-
-async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readwrite');
-const objectStore = transaction.objectStore('clientes');
-await objectStore.delete(clienteSelecionado);
-return objectStore.put(novoCliente);
-}
-
-async function obterClienteDoIndexedDB(nome) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readonly');
-const objectStore = transaction.objectStore('clientes');
-const request = objectStore.get(nome);
-
-return new Promise((resolve, reject) => {
-    request.onsuccess = event => {
-        resolve(event.target.result);
-    };
-    request.onerror = event => {
-        reject(event);
-    };
-});
-}
-
-async function removerClienteDoIndexedDB(nome) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['clientes'], 'readwrite');
-const objectStore = transaction.objectStore('clientes');
-return objectStore.delete(nome);
-}
-
-async function salvarMedidasNoIndexedDB(cliente, medidas) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['medidas'], 'readwrite');
-const objectStore = transaction.objectStore('medidas');
-return objectStore.put({ cliente, medidas });
-}
-
-async function obterMedidasDoIndexedDB(cliente) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['medidas'], 'readonly');
-const objectStore = transaction.objectStore('medidas');
-const request = objectStore.get(cliente);
-
-return new Promise((resolve, reject) => {
-    request.onsuccess = event => {
-        resolve(event.target.result ? event.target.result.medidas : null);
-    };
-    request.onerror = event => {
-        reject(event);
-    };
-});
-}
-
-async function removerMedidasDoIndexedDB(cliente) {
-const db = await abrirIndexedDB();
-const transaction = db.transaction(['medidas'], 'readwrite');
-const objectStore = transaction.objectStore('medidas');
-return objectStore.delete(cliente);
-}
-
-function generatePDF_v3_0() {
-try {
-    const clienteNome = clienteSelect.value;
-    if (!clienteNome) {
-        alert('Selecione um cliente.');
-        return;
-    }
-
-    const cliente = clientes.find(c => c.nome === clienteNome);
-    if (!cliente) {
-        alert('Informações do cliente não encontradas.');
-        return;
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-    });
-
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-    const margin = 15;
-
-    const colors = {
-        primary: [28, 4, 56],
-        secondary: [242, 182, 3],
-        text: [44, 62, 80],
-        lightGray: [236, 240, 241],
-        header: [0, 51, 102]
-    };
-
-    function addCover() {
-        // Fundo da página
-        doc.setFillColor(245, 245, 245);
-        doc.rect(0, 0, pageWidth, pageHeight, 'F');
-
-        // Barras graduais no topo
-        const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
-        const barWidth = pageWidth / barColors.length;
-        barColors.forEach((color, index) => {
-            doc.setFillColor(color);
-            doc.rect(index * barWidth, 0, barWidth, 40, 'F');
-        });
-
-        // Informações do cliente
-        doc.setTextColor(44, 62, 80);
-        doc.setFont("helvetica", 'bold');
-        doc.setFontSize(18);
-        doc.text(`Cliente: ${cliente.nome}`, margin, 70);
-
-        doc.setFont("helvetica", 'normal');
-        doc.setFontSize(12);
-        doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
-        doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
-        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
-
-        // Adicionar "VÁLIDO POR 90 DIAS"
-        doc.text("VÁLIDO POR 90 DIAS", margin, 135);
-
-        // Rodapé
-        doc.setDrawColor(41, 128, 185);
-        doc.setLineWidth(1);
-        doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
-
-        doc.setTextColor(41, 128, 185);
-        doc.setFontSize(12);
-        doc.setFont("helvetica", 'italic');
-        doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
-    }
-
-    function addFooter() {
-        const footerHeight = 20;
-        const footerY = pageHeight - footerHeight;
-
-        doc.setFillColor(...colors.primary);
-        doc.rect(0, footerY, pageWidth, footerHeight, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", 'normal');
-        doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
-
-        doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
-    }
-
-    function addPage() {
-        doc.addPage();
-        addFooter();
-        return margin + 20;
-    }
-
-    function addContent() {
-        let y = addPage();
-
-        function addSectionTitle(title) {
-            if (y > pageHeight - 40) y = addPage();
-            doc.setFillColor(...colors.header);
-            doc.rect(0, y, pageWidth, 30, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", 'bold');
-            doc.text(title, margin, y + 12);
-            y += 15;
-        }
-
-        function addTableHeader() {
-            const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
-            const colWidths = [15, 30, 35, 30, 30, 20, 25];
-
-            doc.setFillColor(...colors.primary);
-            doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(9);
-            doc.setFont("helvetica", 'bold');
-
-            let xOffset = margin;
-            headers.forEach((header, index) => {
-                doc.text(header, xOffset + 2, y + 6.5);
-                xOffset += colWidths[index];
+            navigator.clipboard.writeText(shareURL).then(() => {
+                alert('URL copiada para a área de transferência!');
+            }, (err) => {
+                console.error('Erro ao copiar a URL: ', err);
             });
-
-            y += 12;
         }
 
-        function addMedidaItem(medida, index) {
-            if (y > pageHeight - 40) {
-                y = addPage();
-                addTableHeader();
-            }
+        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
 
-            const largura = medida.querySelector('.largura-input').value || '0';
-            const altura = medida.querySelector('.altura-input').value || '0';
-            const quantidade = medida.querySelector('.quantidade-input').value || '0';
-            const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
-            const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
-            const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
-            const peliculaNome = medida.querySelector('.pelicula-select').value || '';
-            const pelicula = peliculas.find(p => p.nome === peliculaNome);
+        async function verificarStatusAplicativo() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readonly');
+            const objectStore = transaction.objectStore('verificacao');
+            const request = objectStore.get('status');
 
-            const colWidths = [15, 30, 35, 30, 30, 20, 25];
-            let xOffset = margin;
-
-            if (index % 2 === 0) {
-                doc.setFillColor(...colors.lightGray);
-            } else {
-                doc.setFillColor(255, 255, 255);
-            }
-            doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
-
-            doc.setTextColor(...colors.text);
-            doc.setFontSize(8);
-            doc.setFont("helvetica", 'normal');
-
-            doc.text(`${index}`, xOffset + 2, y + 4);
-            xOffset += colWidths[0];
-            doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-            xOffset += colWidths[1];
-            doc.text(peliculaNome, xOffset + 2, y + 4);
-            xOffset += colWidths[2];
-            doc.text(ambiente, xOffset + 2, y + 4);
-            xOffset += colWidths[3];
-            doc.text(tipoAplicacao, xOffset + 2, y + 4);
-            xOffset += colWidths[4];
-            doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
-            xOffset += colWidths[5];
-
-            if (pelicula) {
-                const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
-            }
-
-            y += 12;
+            return new Promise((resolve) => {
+                request.onsuccess = event => {
+                    const result = event.target.result;
+                    if (result) {
+                        if (result.ativado) {
+                            resolve({ status: 'ativado' });
+                        } else if (result.inicioTeste) {
+                            const agora = new Date().getTime();
+                            const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
+                            if (agora < fimTeste) {
+                                resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
+                            } else {
+                                resolve({ status: 'expirado' });
+                            }
+                        } else {
+                            resolve({ status: 'novo' });
+                        }
+                    } else {
+                        resolve({ status: 'novo' });
+                    }
+                };
+                request.onerror = () => resolve({ status: 'erro' });
+            });
         }
 
-        function addTotalSection(peliculaNome, total) {
-            if (y > pageHeight - 30) y = addPage();
+        async function resetarStatusTeste() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
+            console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
+        }
 
-            doc.setFillColor(...colors.secondary);
-            doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+        async function iniciarTesteGratis() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
+        }
 
-            doc.setTextColor(255, 255, 255);
+        async function ativarAplicativo() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            await objectStore.put({ id: 'status', ativado: true });
+            atualizarIconeVerificacao('ativado');
+        }
+
+        async function salvarClienteNoIndexedDB(cliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readwrite');
+            const objectStore = transaction.objectStore('clientes');
+            return objectStore.put(cliente);
+        }
+
+        async function obterTodosClientesDoIndexedDB() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readonly');
+            const objectStore = transaction.objectStore('clientes');
+            const request = objectStore.getAll();
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        async function verificarClienteExistente(nome) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readonly');
+            const objectStore = transaction.objectStore('clientes');
+            const request = objectStore.get(nome);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(!!event.target.result);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readwrite');
+            const objectStore = transaction.objectStore('clientes');
+            await objectStore.delete(clienteSelecionado);
+            return objectStore.put(novoCliente);
+        }
+
+        async function obterClienteDoIndexedDB(nome) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readonly');
+            const objectStore = transaction.objectStore('clientes');
+            const request = objectStore.get(nome);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        async function removerClienteDoIndexedDB(nome) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readwrite');
+            const objectStore = transaction.objectStore('clientes');
+            return objectStore.delete(nome);
+        }
+
+        async function salvarMedidasNoIndexedDB(cliente, medidas) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readwrite');
+            const objectStore = transaction.objectStore('medidas');
+            return objectStore.put({ cliente, medidas });
+        }
+
+        async function obterMedidasDoIndexedDB(cliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readonly');
+            const objectStore = transaction.objectStore('medidas');
+            const request = objectStore.get(cliente);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result ? event.target.result.medidas : null);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        async function removerMedidasDoIndexedDB(cliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readwrite');
+            const objectStore = transaction.objectStore('medidas');
+            return objectStore.delete(cliente);
+        }
+
+        function generatePDF_v3_0() {
+            try {
+                const clienteNome = clienteSelect.value;
+                if (!clienteNome) {
+                    alert('Selecione um cliente.');
+                    return;
+                }
+
+                const cliente = clientes.find(c => c.nome === clienteNome);
+                if (!cliente) {
+                    alert('Informações do cliente não encontradas.');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 15;
+
+                const colors = {
+                    primary: [28, 4, 56],
+                    secondary: [242, 182, 3],
+                    text: [44, 62, 80],
+                    lightGray: [236, 240, 241],
+                    header: [0, 51, 102]
+                };
+
+                function addCover() {
+                    // Fundo da página
+                    doc.setFillColor(245, 245, 245);
+                    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+                    // Barras graduais no topo
+                    const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
+                    const barWidth = pageWidth / barColors.length;
+                    barColors.forEach((color, index) => {
+                        doc.setFillColor(color);
+                        doc.rect(index * barWidth, 0, barWidth, 40, 'F');
+                    });
+
+                    // Informações do cliente
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont("helvetica", 'bold');
+                    doc.setFontSize(18);
+                    doc.text(`Cliente: ${cliente.nome}`, margin, 70);
+
+                    doc.setFont("helvetica", 'normal');
+                    doc.setFontSize(12);
+                    doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
+                    doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
+                    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
+
+                    // Adicionar "VÁLIDO POR 90 DIAS"
+                    doc.text("VÁLIDO POR 90 DIAS", margin, 135);
+
+                    // Rodapé
+                    doc.setDrawColor(41, 128, 185);
+                    doc.setLineWidth(1);
+                    doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+
+                    doc.setTextColor(41, 128, 185);
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", 'italic');
+                    doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
+                }
+
+                function addFooter() {
+                    const footerHeight = 20;
+                    const footerY = pageHeight - footerHeight;
+
+                    doc.setFillColor(...colors.primary);
+                    doc.rect(0, footerY, pageWidth, footerHeight, 'F');
+
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(8);
+                    doc.setFont("helvetica", 'normal');
+                    doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
+
+                    doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
+                }
+
+                function addPage() {
+                    doc.addPage();
+                    addFooter();
+                    return margin + 20;
+                }
+
+                function addContent() {
+                    let y = addPage();
+
+                    function addSectionTitle(title) {
+                        if (y > pageHeight - 40) y = addPage();
+                        doc.setFillColor(...colors.header);
+                        doc.rect(0, y, pageWidth, 30, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(12);
+                        doc.setFont("helvetica", 'bold');
+                        doc.text(title, margin, y + 12);
+                        y += 15;
+                    }
+
+                    function addTableHeader() {
+                        const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
+                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
+
+                        doc.setFillColor(...colors.primary);
+                        doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(9);
+                        doc.setFont("helvetica", 'bold');
+
+                        let xOffset = margin;
+                        headers.forEach((header, index) => {
+                            doc.text(header, xOffset + 2, y + 6.5);
+                            xOffset += colWidths[index];
+                        });
+
+                        y += 12;
+                    }
+
+                    function addMedidaItem(medida, index) {
+                        if (y > pageHeight - 40) {
+                            y = addPage();
+                            addTableHeader();
+                        }
+
+                        const largura = medida.querySelector('.largura-input').value || '0';
+                        const altura = medida.querySelector('.altura-input').value || '0';
+                        const quantidade = medida.querySelector('.quantidade-input').value || '0';
+                        const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
+                        const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
+                        const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
+                        const peliculaNome = medida.querySelector('.pelicula-select').value || '';
+                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
+                        let xOffset = margin;
+
+                        if (index % 2 === 0) {
+                            doc.setFillColor(...colors.lightGray);
+                        } else {
+                            doc.setFillColor(255, 255, 255);
+                        }
+                        doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+
+                        doc.setTextColor(...colors.text);
+                        doc.setFontSize(8);
+                        doc.setFont("helvetica", 'normal');
+
+                        doc.text(`${index}`, xOffset + 2, y + 4);
+                        xOffset += colWidths[0];
+                        doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+                        xOffset += colWidths[1];
+                        doc.text(peliculaNome, xOffset + 2, y + 4);
+                        xOffset += colWidths[2];
+                        doc.text(ambiente, xOffset + 2, y + 4);
+                        xOffset += colWidths[3];
+                        doc.text(tipoAplicacao, xOffset + 2, y + 4);
+                        xOffset += colWidths[4];
+                        doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
+                        xOffset += colWidths[5];
+
+                        if (pelicula) {
+                            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                            doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
+                        }
+
+                        y += 12;
+                    }
+
+                    function addTotalSection(peliculaNome, total) {
+                        if (y > pageHeight - 30) y = addPage();
+
+                        doc.setFillColor(...colors.secondary);
+                        doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+
+                        doc.setTextColor(255, 255, 255);
                         doc.setFontSize(11);
                         doc.setFont("helvetica", 'bold');
                         doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
@@ -1289,8 +1292,16 @@ try {
 
         function verificarCodigo(codigoUsuario, frasesOriginais) {
             const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
+
+            // Adiciona verificação para a senha alternativa "987410"
+            if (codigoUsuario === '987410') {
+                return true; // Senha alternativa correta
+            }
+
+            // Verifica o código gerado a partir das frases
             return codigoUsuario === codigoCorreto;
         }
+
 
         async function mostrarPopupVerificacao() {
             const frasesGeradas = gerarFrasesAleatorias();
@@ -1386,10 +1397,95 @@ try {
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
-            if (popupClienteBtnSalvar) {
-                popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+    if (popupClienteBtnSalvar) {
+        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    }
+
+    // Função para salvar o cliente no IndexedDB
+    async function salvarCliente(event) {
+        event.preventDefault(); // Impede o comportamento padrão de envio do formulário
+
+        const nome = document.getElementById('popupClienteNome').value.trim();
+        const telefone = document.getElementById('popupClienteTelefone').value.trim();
+        const endereco = document.getElementById('popupClienteEndereco').value.trim();
+        const cpf = document.getElementById('popupClienteCPF').value.trim();
+        const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
+
+        if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
+            const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+
+            if (clienteSelecionado) {
+                await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+                const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
+                if (medidasExistentes) {
+                    await salvarMedidasNoIndexedDB(nome, medidasExistentes);
+                    if (nome !== clienteSelecionado) {
+                        await removerMedidasDoIndexedDB(clienteSelecionado);
+                    }
+                }
+            } else {
+                await salvarClienteNoIndexedDB(novoCliente);
             }
+
+            await carregarClientes(nome);
+            fecharPopup();
+            alert("Cliente salvo com sucesso!");
+        } else {
+            alert("O nome do cliente já existe ou não foi informado.");
+        }
+    }
+
+      // Função para verificar se o cliente existe no IndexedDB
+      async function verificarClienteExistente(nome) {
+        const db = await abrirIndexedDB();
+        const transaction = db.transaction(['clientes'], 'readonly');
+        const objectStore = transaction.objectStore('clientes');
+        const request = objectStore.get(nome);
+
+        return new Promise((resolve, reject) => {
+            request.onsuccess = event => {
+                resolve(!!event.target.result);
+            };
+            request.onerror = event => {
+                reject(event);
+            };
+        });
+    }
+
+
+    // Outras funções relevantes...
+
+    async function abrirIndexedDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('ClientesDB', 3);
+
+            request.onerror = event => {
+                console.error('Erro ao abrir o IndexedDB:', event);
+                reject(event);
+            };
+
+            request.onsuccess = event => {
+                resolve(event.target.result);
+            };
+
+            request.onupgradeneeded = event => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('usuario')) {
+                    db.createObjectStore('usuario', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('clientes')) {
+                    db.createObjectStore('clientes', { keyPath: 'nome' });
+                }
+                if (!db.objectStoreNames.contains('medidas')) {
+                    db.createObjectStore('medidas', { keyPath: 'cliente' });
+                }
+                if (!db.objectStoreNames.contains('verificacao')) {
+                    db.createObjectStore('verificacao', { keyPath: 'id' });
+                }
+            };
+        });
+    }
 
             const closeButtons = document.querySelectorAll('.close');
             closeButtons.forEach(button => {
