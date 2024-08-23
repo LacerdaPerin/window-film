@@ -14,6 +14,25 @@
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: auto; /* Assegura que o scroll está ativado */
+        }
+
+        .container {
+            max-height: 100vh; /* Define altura máxima baseada na viewport */
+            overflow-y: auto; /* Ativa scroll vertical para o contêiner principal */
+            padding: 2rem;
+        }
+
+        /* Ajusta o contêiner de medidas para ter um scroll interno se necessário */
+        #medidasContainer {
+            max-height: 60vh; /* Define a altura máxima do contêiner de medidas */
+            overflow-y: auto; /* Ativa o scroll interno */
+        }
+
         /* Aumentando a área clicável e melhorando a acessibilidade */
         button, input, select {
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -22,6 +41,7 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
         }
+
         /* Aumentando o tamanho do botão em dispositivos móveis */
         @media (max-width: 640px) {
             button, input, select {
@@ -32,6 +52,7 @@
                 font-size: 2rem;
             }
         }
+
         /* Aperfeiçoamento visual para dispositivos maiores */
         @media (min-width: 1024px) {
             h1 {
@@ -183,7 +204,6 @@
                     console.log('Falha ao registrar o Service Worker:', error);
                 });
         }
-
 
         function atualizarIconeVerificacao(status) {
             const icone = document.getElementById('verificacaoIcon');
@@ -1302,7 +1322,6 @@
             return codigoUsuario === codigoCorreto;
         }
 
-
         async function mostrarPopupVerificacao() {
             const frasesGeradas = gerarFrasesAleatorias();
             const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
@@ -1366,63 +1385,7 @@
             });
         }
 
-        // Inicialização quando o documento estiver carregado
-document.addEventListener('DOMContentLoaded', async () => {
-    await carregarClientes();
-
-    let pdfEmGeracao = false;
-
-    // Adiciona o listener de clique no botão de gerar PDF
-    const generatePdfButton = document.getElementById('generatePdfButton');
-    
-    // Removendo qualquer listener duplicado
-    generatePdfButton.replaceWith(generatePdfButton.cloneNode(true));
-    generatePdfButton = document.getElementById('generatePdfButton');
-
-    generatePdfButton.addEventListener('click', async () => {
-        if (pdfEmGeracao) {
-            console.log("PDF já está em geração, abortando chamada duplicada.");
-            return; // Impede a geração múltipla de PDFs
-        }
-
-        console.log("Iniciando geração do PDF...");
-        pdfEmGeracao = true; // Marca que o PDF está sendo gerado
-
-        try {
-            await verificarAtivacaoAntes(generatePDF_v3_0);
-        } catch (error) {
-            console.error("Erro durante a geração do PDF:", error);
-        } finally {
-            pdfEmGeracao = false; // Libera para futuras gerações
-            console.log("Geração do PDF concluída.");
-        }
-    });
-
-    const status = await verificarStatusAplicativo();
-    switch (status.status) {
-        case 'novo':
-            await iniciarTesteGratis();
-            alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'em_teste':
-            alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'expirado':
-            mostrarPopupVerificacao();
-            atualizarIconeVerificacao('nao_ativado');
-            break;
-        case 'ativado':
-            console.log('Aplicativo ativado');
-            atualizarIconeVerificacao('ativado');
-            break;
-        default:
-            console.error('Erro ao verificar o status do aplicativo');
-            atualizarIconeVerificacao('nao_ativado');
-    }
-});
-document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
     await carregarClientes();
 
     // Variável de controle para impedir múltiplas gerações simultâneas
@@ -1475,109 +1438,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
         document.addEventListener('DOMContentLoaded', function () {
-    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
-    if (popupClienteBtnSalvar) {
-        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
-    }
-
-    // Função para salvar o cliente no IndexedDB
-    async function salvarCliente(event) {
-        event.preventDefault(); // Impede o comportamento padrão de envio do formulário
-
-        const nome = document.getElementById('popupClienteNome').value.trim();
-        const telefone = document.getElementById('popupClienteTelefone').value.trim();
-        const endereco = document.getElementById('popupClienteEndereco').value.trim();
-        const cpf = document.getElementById('popupClienteCPF').value.trim();
-        const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
-
-        if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
-            const novoCliente = { nome, telefone, endereco, cpf, cnpj };
-
-            if (clienteSelecionado) {
-                await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                if (medidasExistentes) {
-                    await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                    if (nome !== clienteSelecionado) {
-                        await removerMedidasDoIndexedDB(clienteSelecionado);
-                    }
-                }
-            } else {
-                await salvarClienteNoIndexedDB(novoCliente);
+            const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+            if (popupClienteBtnSalvar) {
+                popupClienteBtnSalvar.addEventListener('click', salvarCliente);
             }
 
-            await carregarClientes(nome);
-            fecharPopup();
-            alert("Cliente salvo com sucesso!");
-        } else {
-            alert("O nome do cliente já existe ou não foi informado.");
-        }
-    }
+            // Função para salvar o cliente no IndexedDB
+            async function salvarCliente(event) {
+                event.preventDefault(); // Impede o comportamento padrão de envio do formulário
 
-      // Função para verificar se o cliente existe no IndexedDB
-      async function verificarClienteExistente(nome) {
-        const db = await abrirIndexedDB();
-        const transaction = db.transaction(['clientes'], 'readonly');
-        const objectStore = transaction.objectStore('clientes');
-        const request = objectStore.get(nome);
+                const nome = document.getElementById('popupClienteNome').value.trim();
+                const telefone = document.getElementById('popupClienteTelefone').value.trim();
+                const endereco = document.getElementById('popupClienteEndereco').value.trim();
+                const cpf = document.getElementById('popupClienteCPF').value.trim();
+                const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
 
-        return new Promise((resolve, reject) => {
-            request.onsuccess = event => {
-                resolve(!!event.target.result);
-            };
-            request.onerror = event => {
-                reject(event);
-            };
-        });
-    }
+                if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
+                    const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
-
-    // Outras funções relevantes...
-
-    async function abrirIndexedDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open('ClientesDB', 3);
-
-            request.onerror = event => {
-                console.error('Erro ao abrir o IndexedDB:', event);
-                reject(event);
-            };
-
-            request.onsuccess = event => {
-                resolve(event.target.result);
-            };
-
-            request.onupgradeneeded = event => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains('usuario')) {
-                    db.createObjectStore('usuario', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('clientes')) {
-                    db.createObjectStore('clientes', { keyPath: 'nome' });
-                }
-                if (!db.objectStoreNames.contains('medidas')) {
-                    db.createObjectStore('medidas', { keyPath: 'cliente' });
-                }
-                if (!db.objectStoreNames.contains('verificacao')) {
-                    db.createObjectStore('verificacao', { keyPath: 'id' });
-                }
-            };
-        });
-    }
-
-            const closeButtons = document.querySelectorAll('.close');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const popup = this.closest('.fixed');
-                    if (popup) {
-                        popup.classList.add('hidden');
+                    if (clienteSelecionado) {
+                        await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+                        const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
+                        if (medidasExistentes) {
+                            await salvarMedidasNoIndexedDB(nome, medidasExistentes);
+                            if (nome !== clienteSelecionado) {
+                                await removerMedidasDoIndexedDB(clienteSelecionado);
+                            }
+                        }
+                    } else {
+                        await salvarClienteNoIndexedDB(novoCliente);
                     }
-                });
-            });
 
-            clienteSelect.addEventListener('change', onClienteChange);
+                    await carregarClientes(nome);
+                    fecharPopup();
+                    alert("Cliente salvo com sucesso!");
+                } else {
+                    alert("O nome do cliente já existe ou não foi informado.");
+                }
+            }
+
+            const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
+            if (fecharPopupBtn) {
+                fecharPopupBtn.addEventListener('click', fecharPopup);
+            }
         });
     </script>
 </body>
 </html>
-
