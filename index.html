@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-BR" class="h-full bg-gradient-to-r from-blue-50 via-white to-blue-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de M² e Orçamento de Películas</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@700&display=swap"
-        rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -15,190 +13,85 @@
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
     <link rel="manifest" href="/teste-pwa/manifest.json">
     <meta name="theme-color" content="#000000">
-
-    <style>
-        :root {
-            --primary-color: #4CAF50;
-            --primary-color-dark: #45a049;
-            --secondary-color: #FFC107;
-            --background-color: #f0f0f0;
-            --text-color: #333;
-            --text-color-light: #666;
-            --border-color: #ddd;
-            --border-radius: 8px;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 1.5rem;
-            --font-size-sm: 0.9rem;
-            --font-size-md: 1rem;
-            --font-size-lg: 1.2rem;
-            --transition-speed: 0.3s;
+<style>
+        /* Aumentando a área clicável e melhorando a acessibilidade */
+        button, input, select {
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to right, #e0e0e0, #ffffff, #e0e0e0);
-            color: var(--text-color);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: var(--spacing-lg);
-        }
-
-        .card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: var(--spacing-sm);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: var(--font-size-md);
-            transition: border-color var(--transition-speed);
-        }
-
-        .form-control:focus {
+        button:focus, input:focus, select:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
         }
-
-        .btn {
-            padding: var(--spacing-sm) var(--spacing-md);
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: var(--font-size-md);
-            cursor: pointer;
-            transition: background-color var(--transition-speed);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-color-dark);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: #e6ac00;
-        }
-
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .popup-content {
-            background-color: white;
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-        }
-
-        .color-preview {
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: var(--spacing-sm);
-            cursor: pointer;
-        }
-
-        #logoPreview {
-            max-width: 100%;
-            max-height: 100px;
-            margin-top: var(--spacing-sm);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: var(--spacing-md);
+        /* Aumentando o tamanho do botão em dispositivos móveis */
+        @media (max-width: 640px) {
+            button, input, select {
+                padding: 1rem;
+                font-size: 1.2rem;
             }
-
-            .popup-content {
-                max-width: 90%;
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        /* Aperfeiçoamento visual para dispositivos maiores */
+        @media (min-width: 1024px) {
+            h1 {
+                font-size: 3.5rem;
+            }
+            .container {
+                max-width: 1200px;
+                padding: 2rem;
+            }
+            .p-4 {
+                padding: 2rem;
+            }
+            .bg-white {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             }
         }
     </style>
 </head>
-
-<body class="bg-gradient-to-r from-blue-50 via-white to-blue-50 text-gray-700 min-h-screen flex items-center justify-center font-roboto">
-    <div class="container">
-        <div class="card">
+<body class="h-full font-roboto text-gray-700 flex items-center justify-center">
+    <div class="container mx-auto px-4 py-8 w-full max-w-4xl">
+        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
             <div class="text-center mb-6">
-                <h1 class="text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
+                <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
             </div>
-
             <div id="verificacaoIcon" class="hidden fixed top-4 right-4 text-green-500" title="Aplicativo Verificado">
                 <i class="fas fa-check-circle text-3xl"></i>
             </div>
-
             <div class="space-y-4">
-                <div class="flex items-center space-x-2">
-                    <select id="clienteSelect" class="form-control" onchange="onClienteChange()">
+                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <select id="clienteSelect" class="w-full sm:flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
                         <option value="">Selecione um cliente</option>
                     </select>
-                    <button id="addNewClienteBtn" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i>
+                    <button id="addNewClienteBtn" class="w-full sm:w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
+                        <i class="fas fa-user-plus"></i> Adicionar Cliente
                     </button>
                 </div>
-
                 <div id="editIconContainer" class="hidden flex justify-end space-x-2">
-                    <button onclick="abrirPopup('editar')" class="btn btn-secondary">
+                    <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button onclick="confirmClearMedidas()" class="btn btn-secondary">
+                    <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-sm">
                         <i class="fas fa-trash-alt"></i>
                     </button>
-                    <button onclick="abrirPopupUsuario()" class="btn btn-secondary">
+                    <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
                         <i class="fas fa-user-cog"></i>
                     </button>
                 </div>
-                <div id="medidasContainer" class="space-y-4"></div>
-
-                <div id="resultado" class="text-right text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total:
-                    R$ 0,00</div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn btn-primary" onclick="addMedidaGroup(true)">
+                <div id="medidasContainer" class="space-y-4 w-full"></div>
+                <div id="resultado" class="text-right text-xl sm:text-2xl font-bold text-green-500">Total M²: 0,00 | Preço Total: R$ 0,00</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="addMedidaGroup(true)" class="w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 shadow-md">
                         Adicionar Medida
                     </button>
-                    <button class="btn btn-secondary" onclick="duplicarMedidas()">
+                    <button onclick="duplicarMedidas()" class="w-full p-4 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300 shadow-md">
                         Duplicar Medidas
                     </button>
-                    <button class="btn btn-primary" id="generatePdfButton">
+                    <button id="generatePdfButton" class="w-full p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 shadow-md">
                         Gerar PDF
                     </button>
-                    <button class="btn btn-secondary" onclick="copyShareURL()">
+                    <button onclick="copyShareURL()" class="w-full p-4 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 shadow-md">
                         Compartilhar URL
                     </button>
                 </div>
@@ -206,72 +99,70 @@
         </div>
     </div>
 
-    <!-- Modal para Informações do Usuário -->
-    <div id="popupUsuario" class="popup">
-        <div class="popup-content">
+    <div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
             <h2 class="text-xl font-semibold mb-4">Cadastro de Usuário</h2>
             <form id="userForm" class="space-y-4">
-                <div class="form-group">
-                    <label for="logo">Logotipo:</label>
-                    <input type="file" id="logo" accept="image/*" class="form-control">
-                    <img id="logoPreview" src="" alt="Preview do logotipo" style="display: none;">
+                <div>
+                    <label for="logo" class="block text-sm font-medium text-gray-700">Logotipo:</label>
+                    <input type="file" id="logo" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                    <img id="logoPreview" src="" alt="Preview do logotipo" class="mt-2 hidden max-h-20">
                 </div>
-                <div class="form-group">
-                    <label>Cores:</label>
-                    <div class="flex items-center space-x-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Cores:</label>
+                    <div class="flex items-center space-x-4 mt-1">
                         <div>
-                            <span>Primária:</span>
-                            <div id="primaryColorPreview" class="color-preview"></div>
-                            <input type="color" id="primaryColor" style="display: none;">
+                            <span class="text-sm text-gray-500">Primária:</span>
+                            <div id="primaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"></div>
+                            <input type="color" id="primaryColor" class="hidden">
                         </div>
                         <div>
-                            <span>Secundária:</span>
-                            <div id="secondaryColorPreview" class="color-preview"></div>
-                            <input type="color" id="secondaryColor" style="display: none;">
+                            <span class="text-sm text-gray-500">Secundária:</span>
+                            <div id="secondaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"></div>
+                            <input type="color" id="secondaryColor" class="hidden">
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="name">Nome:</label>
-                    <input type="text" id="name" required class="form-control">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nome:</label>
+                    <input type="text" id="name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <div class="form-group">
-                    <label for="companyName">Nome da empresa:</label>
-                    <input type="text" id="companyName" required class="form-control">
+                <div>
+                    <label for="companyName" class="block text-sm font-medium text-gray-700">Nome da empresa:</label>
+                    <input type="text" id="companyName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <div class="form-group">
-                    <label for="phone">Telefone:</label>
-                    <input type="tel" id="phone" required class="form-control">
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefone:</label>
+                    <input type="tel" id="phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" required class="form-control">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                    <input type="email" id="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <div class="form-group">
-                    <label for="address">Endereço:</label>
-                    <input type="text" id="address" required class="form-control">
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Endereço:</label>
+                    <input type="text" id="address" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <div class="form-group">
-                    <label for="cpfCnpj">CPF/CNPJ:</label>
-                    <input type="text" id="cpfCnpj" required class="form-control">
+                <div>
+                    <label for="cpfCnpj" class="block text-sm font-medium text-gray-700">CPF/CNPJ:</label>
+                    <input type="text" id="cpfCnpj" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
-                <button type="submit" class="btn btn-primary w-full">Salvar</button>
+                <button type="submit" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal para Adicionar/Editar Cliente -->
-    <div id="popupCliente" class="popup">
-        <div class="popup-content">
-            <span class="close text-2xl font-bold cursor-pointer absolute top-2 right-2" onclick="fecharPopup()">&times;</span>
+    <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+            <span class="absolute top-2 right-2 text-2xl font-bold cursor-pointer" onclick="fecharPopup()">&times;</span>
             <h2 id="popupTitulo" class="text-xl font-semibold mb-4">Adicionar Novo Cliente</h2>
             <form id="clienteForm" class="space-y-4">
-                <input type="text" id="popupClienteNome" class="form-control" placeholder="Nome do Cliente" required>
-                <input type="tel" id="popupClienteTelefone" class="form-control" placeholder="Telefone" inputmode="tel" required>
-                <input type="text" id="popupClienteEndereco" class="form-control" placeholder="Endereço" required>
-                <input type="text" id="popupClienteCPF" class="form-control" placeholder="CPF" inputmode="numeric">
-                <input type="text" id="popupClienteCNPJ" class="form-control" placeholder="CNPJ" inputmode="numeric">
-                <button type="submit" id="popupClienteBtnSalvar" class="btn btn-primary w-full">
+                <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Nome do Cliente" required>
+                <input type="tel" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Telefone" inputmode="tel" required>
+                <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Endereço" required>
+                <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md" placeholder="CPF" inputmode="numeric">
+                <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md" placeholder="CNPJ" inputmode="numeric">
+                <button type="submit" id="popupClienteBtnSalvar" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
                     Salvar Cliente
                 </button>
             </form>
@@ -289,6 +180,44 @@
                     console.log('Falha ao registrar o Service Worker:', error);
                 });
         }
+
+
+        function atualizarIconeVerificacao(status) {
+            const icone = document.getElementById('verificacaoIcon');
+            if (status === 'ativado') {
+                icone.classList.remove('hidden');
+            } else {
+                icone.classList.add('hidden');
+            }
+        }
+
+        // Service Worker diretamente no HTML
+        self.addEventListener('install', function (event) {
+            event.waitUntil(
+                caches.open('app-cache').then(function (cache) {
+                    return cache.addAll([
+                        '/',
+                        '/index.html',
+                        'http://fumejp.com.br/wp-content/uploads/2024/07/cloud_icon.png'
+                    ]);
+                })
+            );
+        });
+
+        self.addEventListener('fetch', function (event) {
+            event.respondWith(
+                caches.match(event.request).then(function (response) {
+                    return response || fetch(event.request);
+                })
+            );
+        });
+
+        // Inicializa máscaras nos campos
+        $(document).ready(function () {
+            $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
+            $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
+            $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
+        });
 
         // Lista de películas e clientes
         const peliculas = [
@@ -310,17 +239,10 @@
         let clienteSelecionado = '';
         const clienteSelect = document.getElementById('clienteSelect');
 
-        function atualizarIconeVerificacao(status) {
-            const icone = document.getElementById('verificacaoIcon');
-            if (status === 'ativado') {
-                icone.classList.remove('hidden');
-            } else {
-                icone.classList.add('hidden');
-            }
-        }
-
+        // Função para abrir o popup de adicionar ou editar cliente
         function abrirPopup(acao) {
-            fecharTodosPopups();
+            console.log("abrirPopup chamada com ação:", acao);
+
             const popupCliente = document.getElementById('popupCliente');
             const popupTitulo = document.getElementById('popupTitulo');
 
@@ -339,14 +261,8 @@
                 clienteSelecionado = clienteSelect.value;
             }
 
+            popupCliente.classList.remove('hidden');
             popupCliente.style.display = 'flex';
-        }
-
-        function fecharTodosPopups() {
-            const popups = document.querySelectorAll('.popup');
-            popups.forEach(popup => {
-                popup.style.display = 'none';
-            });
         }
 
         function limparCamposPopup() {
@@ -355,6 +271,12 @@
             document.getElementById('popupClienteEndereco').value = '';
             document.getElementById('popupClienteCPF').value = '';
             document.getElementById('popupClienteCNPJ').value = '';
+        }
+
+        function abrirPopupUsuario() {
+            const popupUsuario = document.getElementById('popupUsuario');
+            popupUsuario.classList.remove('hidden');
+            carregarInformacoesUsuario();
         }
 
         async function carregarInformacoesUsuario() {
@@ -383,12 +305,10 @@
         }
 
         function fecharPopupUsuario() {
-            document.getElementById('popupUsuario').style.display = 'none';
+            document.getElementById('popupUsuario').classList.add('hidden');
         }
 
-        async function salvarInformacoesUsuario(event) {
-            event.preventDefault();
-
+        async function salvarInformacoesUsuario() {
             const nome = document.getElementById('name').value;
             const empresa = document.getElementById('companyName').value;
             const telefone = document.getElementById('phone').value;
@@ -510,114 +430,56 @@
             });
         }
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', async () => {
-            await carregarClientes();
-            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
-
-            const status = await verificarStatusAplicativo();
-            atualizarStatusAplicativoSilenciosamente(status);
-
-            const userForm = document.getElementById('userForm');
-            if (userForm) {
-                userForm.addEventListener('submit', salvarInformacoesUsuario);
+        document.addEventListener('DOMContentLoaded', function () {
+            const salvarInfoUsuarioBtn = document.getElementById('saveButton');
+            if (salvarInfoUsuarioBtn) {
+                salvarInfoUsuarioBtn.addEventListener('click', salvarInformacoesUsuario);
             }
 
             const addNewClienteBtn = document.getElementById('addNewClienteBtn');
             if (addNewClienteBtn) {
-                addNewClienteBtn.addEventListener('click', () => abrirPopup('adicionar'));
-            }
-
-            const clienteForm = document.getElementById('clienteForm');
-            if (clienteForm) {
-                clienteForm.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    await salvarCliente();
+                addNewClienteBtn.addEventListener('click', function () {
+                    abrirPopup('adicionar');
                 });
             }
 
-            setupColorPickers();
-            setupInputMasks();
-            setupLogoInput();
-            setupCloseButtons();
-
-            clienteSelect.addEventListener('change', onClienteChange);
-        });
-
-        function atualizarStatusAplicativoSilenciosamente(status) {
-            switch (status.status) {
-                case 'novo':
-                    iniciarTesteGratis();
-                    atualizarIconeVerificacao('nao_ativado');
-                    break;
-                case 'em_teste':
-                    atualizarIconeVerificacao('nao_ativado');
-                    // Opcionalmente, atualizar algum elemento da UI para mostrar os dias restantes
-                    break;
-                case 'expirado':
-                    atualizarIconeVerificacao('nao_ativado');
-                    // Opcionalmente, atualizar a UI para indicar que o teste expirou
-                    break;
-                case 'ativado':
-                    atualizarIconeVerificacao('ativado');
-                    break;
-                default:
-                    console.error('Erro ao verificar o status do aplicativo');
-                    atualizarIconeVerificacao('nao_ativado');
-            }
-        }
-
-        function setupColorPickers() {
-            const primaryColorInput = document.getElementById('primaryColor');
-            const secondaryColorInput = document.getElementById('secondaryColor');
-            const primaryColorPreview = document.getElementById('primaryColorPreview');
-            const secondaryColorPreview = document.getElementById('secondaryColorPreview');
-
-            if (primaryColorInput && primaryColorPreview) {
-                primaryColorInput.addEventListener('input', (e) => {
-                    primaryColorPreview.style.backgroundColor = e.target.value;
-                });
-                primaryColorPreview.addEventListener('click', () => primaryColorInput.click());
-            }
-
-            if (secondaryColorInput && secondaryColorPreview) {
-                secondaryColorInput.addEventListener('input', (e) => {
-                    secondaryColorPreview.style.backgroundColor = e.target.value;
-                });
-                secondaryColorPreview.addEventListener('click', () => secondaryColorInput.click());
-            }
-        }
-
-        function setupInputMasks() {
-            $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
-            $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
-            $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
-        }
-
-        function setupLogoInput() {
-            const logoInput = document.getElementById('logo');
-            if (logoInput) {
-                logoInput.addEventListener('change', function(event) {
+            const logoUsuario = document.getElementById('logo');
+            if (logoUsuario) {
+                logoUsuario.addEventListener('change', function (event) {
                     const file = event.target.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const logoPreview = document.getElementById('logoPreview');
-                            logoPreview.src = e.target.result;
-                            logoPreview.style.display = 'block';
+                        reader.onload = function (e) {
+                            const previewLogo = document.getElementById('logoPreview');
+                            previewLogo.src = e.target.result;
+                            previewLogo.style.display = 'block';
                         }
                         reader.readAsDataURL(file);
                     }
                 });
             }
-        }
 
-        function setupCloseButtons() {
-            const closeButtons = document.querySelectorAll('.close');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', fecharTodosPopups);
+            carregarClientes();
+            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+
+            const primaryColorPreview = document.getElementById('primaryColorPreview');
+            const secondaryColorPreview = document.getElementById('secondaryColorPreview');
+            const primaryColorInput = document.getElementById('primaryColor');
+            const secondaryColorInput = document.getElementById('secondaryColor');
+
+            primaryColorPreview.addEventListener('click', () => primaryColorInput.click());
+            secondaryColorPreview.addEventListener('click', () => secondaryColorInput.click());
+
+            primaryColorInput.addEventListener('change', (e) => {
+                primaryColorPreview.style.backgroundColor = e.target.value;
             });
-        }
+
+            secondaryColorInput.addEventListener('change', (e) => {
+                secondaryColorPreview.style.backgroundColor = e.target.value;
+            });
+
+            carregarClientes();
+        });
 
         async function carregarDadosCliente() {
             const cliente = await obterClienteDoIndexedDB(clienteSelect.value);
@@ -640,27 +502,22 @@
             if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
                 const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
-                try {
-                    if (clienteSelecionado) {
-                        await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                        const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                        if (medidasExistentes) {
-                            await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                            if (nome !== clienteSelecionado) {
-                                await removerMedidasDoIndexedDB(clienteSelecionado);
-                            }
+                if (clienteSelecionado) {
+                    await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+                    const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
+                    if (medidasExistentes) {
+                        await salvarMedidasNoIndexedDB(nome, medidasExistentes);
+                        if (nome !== clienteSelecionado) {
+                            await removerMedidasDoIndexedDB(clienteSelecionado);
                         }
-                    } else {
-                        await salvarClienteNoIndexedDB(novoCliente);
                     }
-
-                    await carregarClientes(nome);
-                    fecharPopup();
-                    alert("Cliente salvo com sucesso!");
-                } catch (error) {
-                    console.error("Erro ao salvar cliente:", error);
-                    alert("Ocorreu um erro ao salvar o cliente. Por favor, tente novamente.");
+                } else {
+                    await salvarClienteNoIndexedDB(novoCliente);
                 }
+
+                await carregarClientes(nome);
+                fecharPopup();
+                alert("Cliente salvo com sucesso!");
             } else {
                 alert("O nome do cliente já existe ou não foi informado.");
             }
@@ -668,7 +525,7 @@
 
         async function carregarClientes(clienteSelecionado = '') {
             clientes = await obterTodosClientesDoIndexedDB();
-            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clienteSelect.innerHTML = '';
             if (clientes.length > 0) {
                 clienteSelect.classList.remove('hidden');
                 clientes.forEach(cliente => {
@@ -680,7 +537,7 @@
 
                 if (clienteSelecionado) {
                     clienteSelect.value = clienteSelecionado;
-                } else if (clientes.length > 0) {
+                } else {
                     clienteSelect.value = clientes[0].nome;
                 }
 
@@ -712,9 +569,13 @@
         }
 
         function fecharPopup() {
+            console.log("Tentando fechar o popup");
             const popupCliente = document.getElementById('popupCliente');
             if (popupCliente) {
+                popupCliente.classList.add('hidden');
                 popupCliente.style.display = 'none';
+            } else {
+                console.error("Elemento popupCliente não encontrado");
             }
         }
 
@@ -783,27 +644,27 @@
         function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
             const container = document.getElementById('medidasContainer');
             const medidaGroup = document.createElement('div');
-            medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-4', 'space-y-2', 'mb-4');
+            medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-4', 'space-y-2');
 
             medidaGroup.innerHTML = `
-                <div class="flex items-center space-x-2 mb-2">
-                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
-                    <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this)" maxlength="3">
-                    <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this)" maxlength="3">
-                    <input type="number" placeholder="Q" value="${quantidade}" class="w-1/4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 quantidade-input" oninput="atualizarTotal(this)" maxlength="3">
-                    <input type="text" placeholder="M²" disabled class="w-1/4 p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600">
-                </div>
                 <div class="flex items-center space-x-2">
-                    <select class="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 pelicula-select" onchange="calculateTotal()">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
+                    <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this, event)" maxlength="3">
+                    <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this, event)" maxlength="3">
+                    <input type="number" placeholder="Q" value="${quantidade}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 quantidade-input" oninput="atualizarTotal(this, event)" maxlength="3">
+                    <input type="text" placeholder="M²" disabled class="w-1/4 p-1 border border-gray-300 rounded-md bg-gray-100 text-gray-600">
+                </div>
+                <div class="flex items-center space-x-1">
+                    <select class="flex-grow min-w-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 pelicula-select" onchange="calculateTotal()">
                         ${peliculas.map(p => `<option value="${p.nome}" ${p.nome === peliculaSelecionada ? 'selected' : ''}>${p.nome}</option>`).join('')}
                     </select>
-                    <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md" onclick="duplicarGrupo(this)">
+                    <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <button class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md" onclick="toggleAdditionalFields(this)">
+                    <button class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="toggleAdditionalFields(this)">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md" onclick="deleteMedidaGroup(this)">
+                    <button class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="deleteMedidaGroup(this)">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -852,7 +713,7 @@
             calculateTotal();
         }
 
-        function atualizarTotal(input) {
+        function atualizarTotal(input, event) {
             const group = input.closest('.bg-white');
             const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
             const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
@@ -960,339 +821,352 @@
             url.searchParams.set('cliente', cliente);
             const shareURL = url.toString();
 
-            navigator.clipboard.writeText(shareURL).then(() => {
-                alert('URL copiada para a área de transferência!');
-            }, (err) => {
-                console.error('Erro ao copiar a URL: ', err);
-            });
-        }
+navigator.clipboard.writeText(shareURL).then(() => {
+    alert('URL copiada para a área de transferência!');
+}, (err) => {
+    console.error('Erro ao copiar a URL: ', err);
+});
+}
 
-        const DURACAO_TESTE_GRATIS = 7 * 24 * 60 * 60 * 1000; // 7 dias em milissegundos
+const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
 
-        async function verificarStatusAplicativo() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readonly');
-            const objectStore = transaction.objectStore('verificacao');
-            const request = objectStore.get('status');
+async function verificarStatusAplicativo() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readonly');
+const objectStore = transaction.objectStore('verificacao');
+const request = objectStore.get('status');
 
-            return new Promise((resolve) => {
-                request.onsuccess = event => {
-                    const result = event.target.result;
-                    if (result) {
-                        if (result.ativado) {
-                            resolve({ status: 'ativado' });
-                        } else if (result.inicioTeste) {
-                            const agora = new Date().getTime();
-                            const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
-                            if (agora < fimTeste) {
-                                resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
-                            } else {
-                                resolve({ status: 'expirado' });
-                            }
-                        } else {
-                            resolve({ status: 'novo' });
-                        }
-                    } else {
-                        resolve({ status: 'novo' });
-                    }
-                };
-                request.onerror = () => resolve({ status: 'erro' });
-            });
-        }
-
-        async function iniciarTesteGratis() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
-        }
-
-        async function ativarAplicativo() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: true });
-            atualizarIconeVerificacao('ativado');
-        }
-
-        async function salvarClienteNoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            return objectStore.put(cliente);
-        }
-
-        async function obterTodosClientesDoIndexedDB() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.getAll();
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function verificarClienteExistente(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(!!event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            await objectStore.delete(clienteSelecionado);
-            return objectStore.put(novoCliente);
-        }
-
-        async function obterClienteDoIndexedDB(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function removerClienteDoIndexedDB(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            return objectStore.delete(nome);
-        }
-
-        async function salvarMedidasNoIndexedDB(cliente, medidas) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.put({ cliente, medidas });
-        }
-
-        async function obterMedidasDoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readonly');
-            const objectStore = transaction.objectStore('medidas');
-            const request = objectStore.get(cliente);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result ? event.target.result.medidas : null);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function removerMedidasDoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.delete(cliente);
-        }
-
-        function generatePDF_v3_0() {
-            try {
-                const clienteNome = clienteSelect.value;
-                if (!clienteNome) {
-                    alert('Selecione um cliente.');
-                    return;
+return new Promise((resolve) => {
+    request.onsuccess = event => {
+        const result = event.target.result;
+        if (result) {
+            if (result.ativado) {
+                resolve({ status: 'ativado' });
+            } else if (result.inicioTeste) {
+                const agora = new Date().getTime();
+                const fimTeste = new Date(result.inicioTeste).getTime() + DURACAO_TESTE_GRATIS;
+                if (agora < fimTeste) {
+                    resolve({ status: 'em_teste', diasRestantes: Math.ceil((fimTeste - agora) / (24 * 60 * 60 * 1000)) });
+                } else {
+                    resolve({ status: 'expirado' });
                 }
+            } else {
+                resolve({ status: 'novo' });
+            }
+        } else {
+            resolve({ status: 'novo' });
+        }
+    };
+    request.onerror = () => resolve({ status: 'erro' });
+});
+}
 
-                const cliente = clientes.find(c => c.nome === clienteNome);
-                if (!cliente) {
-                    alert('Informações do cliente não encontradas.');
-                    return;
-                }
+async function resetarStatusTeste() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: false, inicioTeste: null });
+console.log("Status do teste resetado. Recarregue a página para iniciar um novo teste.");
+}
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
+async function iniciarTesteGratis() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
+}
 
-                const pageWidth = doc.internal.pageSize.width;
-                const pageHeight = doc.internal.pageSize.height;
-                const margin = 15;
+async function ativarAplicativo() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['verificacao'], 'readwrite');
+const objectStore = transaction.objectStore('verificacao');
+await objectStore.put({ id: 'status', ativado: true });
+atualizarIconeVerificacao('ativado');
+}
 
-                const colors = {
-                    primary: [28, 4, 56],
-                    secondary: [242, 182, 3],
-                    text: [44, 62, 80],
-                    lightGray: [236, 240, 241],
-                    header: [0, 51, 102]
-                };
+async function salvarClienteNoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+return objectStore.put(cliente);
+}
 
-                function addCover() {
-                    doc.setFillColor(245, 245, 245);
-                    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+async function obterTodosClientesDoIndexedDB() {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.getAll();
 
-                    const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
-                    const barWidth = pageWidth / barColors.length;
-                    barColors.forEach((color, index) => {
-                        doc.setFillColor(color);
-                        doc.rect(index * barWidth, 0, barWidth, 40, 'F');
-                    });
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                    doc.setTextColor(44, 62, 80);
-                    doc.setFont("helvetica", 'bold');
-                    doc.setFontSize(18);
-                    doc.text(`Cliente: ${cliente.nome}`, margin, 70);
+async function verificarClienteExistente(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.get(nome);
 
-                    doc.setFont("helvetica", 'normal');
-                    doc.setFontSize(12);
-                    doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
-                    doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
-                    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(!!event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                    doc.text("VÁLIDO POR 90 DIAS", margin, 135);
+async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+await objectStore.delete(clienteSelecionado);
+return objectStore.put(novoCliente);
+}
 
-                    doc.setDrawColor(41, 128, 185);
-                    doc.setLineWidth(1);
-                    doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+async function obterClienteDoIndexedDB(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readonly');
+const objectStore = transaction.objectStore('clientes');
+const request = objectStore.get(nome);
 
-                    doc.setTextColor(41, 128, 185);
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", 'italic');
-                    doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
-                }
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                function addFooter() {
-                    const footerHeight = 20;
-                    const footerY = pageHeight - footerHeight;
+async function removerClienteDoIndexedDB(nome) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['clientes'], 'readwrite');
+const objectStore = transaction.objectStore('clientes');
+return objectStore.delete(nome);
+}
 
-                    doc.setFillColor(...colors.primary);
-                    doc.rect(0, footerY, pageWidth, footerHeight, 'F');
+async function salvarMedidasNoIndexedDB(cliente, medidas) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readwrite');
+const objectStore = transaction.objectStore('medidas');
+return objectStore.put({ cliente, medidas });
+}
 
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", 'normal');
-                    doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
+async function obterMedidasDoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readonly');
+const objectStore = transaction.objectStore('medidas');
+const request = objectStore.get(cliente);
 
-                    doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
-                }
+return new Promise((resolve, reject) => {
+    request.onsuccess = event => {
+        resolve(event.target.result ? event.target.result.medidas : null);
+    };
+    request.onerror = event => {
+        reject(event);
+    };
+});
+}
 
-                function addPage() {
-                    doc.addPage();
-                    addFooter();
-                    return margin + 20;
-                }
+async function removerMedidasDoIndexedDB(cliente) {
+const db = await abrirIndexedDB();
+const transaction = db.transaction(['medidas'], 'readwrite');
+const objectStore = transaction.objectStore('medidas');
+return objectStore.delete(cliente);
+}
 
-                function addContent() {
-                    let y = addPage();
+function generatePDF_v3_0() {
+try {
+    const clienteNome = clienteSelect.value;
+    if (!clienteNome) {
+        alert('Selecione um cliente.');
+        return;
+    }
 
-                    function addSectionTitle(title) {
-                        if (y > pageHeight - 40) y = addPage();
-                        doc.setFillColor(...colors.header);
-                        doc.rect(0, y, pageWidth, 30, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(12);
-                        doc.setFont("helvetica", 'bold');
-                        doc.text(title, margin, y + 12);
-                        y += 15;
-                    }
+    const cliente = clientes.find(c => c.nome === clienteNome);
+    if (!cliente) {
+        alert('Informações do cliente não encontradas.');
+        return;
+    }
 
-                    function addTableHeader() {
-                        const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
 
-                        doc.setFillColor(...colors.primary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(9);
-                        doc.setFont("helvetica", 'bold');
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
 
-                        let xOffset = margin;
-                        headers.forEach((header, index) => {
-                            doc.text(header, xOffset + 2, y + 6.5);
-                            xOffset += colWidths[index];
-                        });
+    const colors = {
+        primary: [28, 4, 56],
+        secondary: [242, 182, 3],
+        text: [44, 62, 80],
+        lightGray: [236, 240, 241],
+        header: [0, 51, 102]
+    };
 
-                        y += 12;
-                    }
+    function addCover() {
+        // Fundo da página
+        doc.setFillColor(245, 245, 245);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-                    function addMedidaItem(medida, index) {
-                        if (y > pageHeight - 40) {
-                            y = addPage();
-                            addTableHeader();
-                        }
+        // Barras graduais no topo
+        const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
+        const barWidth = pageWidth / barColors.length;
+        barColors.forEach((color, index) => {
+            doc.setFillColor(color);
+            doc.rect(index * barWidth, 0, barWidth, 40, 'F');
+        });
 
-                        const largura = medida.querySelector('.largura-input').value || '0';
-                        const altura = medida.querySelector('.altura-input').value || '0';
-                        const quantidade = medida.querySelector('.quantidade-input').value || '0';
-                        const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
-                        const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
-                        const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
-                        const peliculaNome = medida.querySelector('.pelicula-select').value || '';
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+        // Informações do cliente
+        doc.setTextColor(44, 62, 80);
+        doc.setFont("helvetica", 'bold');
+        doc.setFontSize(18);
+        doc.text(`Cliente: ${cliente.nome}`, margin, 70);
 
-                        const colWidths = [15, 30, 35, 30, 30, 20, 25];
-                        let xOffset = margin;
+        doc.setFont("helvetica", 'normal');
+        doc.setFontSize(12);
+        doc.text(`Telefone: ${cliente.telefone}`, margin, 90);
+        doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
+        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
 
-                        if (index % 2 === 0) {
-                            doc.setFillColor(...colors.lightGray);
-                        } else {
-                            doc.setFillColor(255, 255, 255);
-                        }
-                        doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+        // Adicionar "VÁLIDO POR 90 DIAS"
+        doc.text("VÁLIDO POR 90 DIAS", margin, 135);
 
-                        doc.setTextColor(...colors.text);
-                        doc.setFontSize(8);
-                        doc.setFont("helvetica", 'normal');
+        // Rodapé
+        doc.setDrawColor(41, 128, 185);
+        doc.setLineWidth(1);
+        doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
 
-                        doc.text(`${index}`, xOffset + 2, y + 4);
-                        xOffset += colWidths[0];
-                        doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-                        xOffset += colWidths[1];
-                        doc.text(peliculaNome, xOffset + 2, y + 4);
-                        xOffset += colWidths[2];
-                        doc.text(ambiente, xOffset + 2, y + 4);
-                        xOffset += colWidths[3];
-                        doc.text(tipoAplicacao, xOffset + 2, y + 4);
-                        xOffset += colWidths[4];
-                        doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
-                        xOffset += colWidths[5];
+        doc.setTextColor(41, 128, 185);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", 'italic');
+        doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, pageHeight - 25, { align: 'center' });
+    }
 
-                        if (pelicula) {
-                            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                            doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
-                        }
+    function addFooter() {
+        const footerHeight = 20;
+        const footerY = pageHeight - footerHeight;
 
-                        y += 12;
-                    }
+        doc.setFillColor(...colors.primary);
+        doc.rect(0, footerY, pageWidth, footerHeight, 'F');
 
-                    function addTotalSection(peliculaNome, total) {
-                        if (y > pageHeight - 30) y = addPage();
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont("helvetica", 'normal');
+        doc.text("FUME JP | (83) 99301-5765 | www.fumejp.com.br", margin, footerY + 8);
 
-                        doc.setFillColor(...colors.secondary);
-                        doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+        doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, footerY + 8, { align: 'right' });
+    }
 
-                        doc.setTextColor(255, 255, 255);
+    function addPage() {
+        doc.addPage();
+        addFooter();
+        return margin + 20;
+    }
+
+    function addContent() {
+        let y = addPage();
+
+        function addSectionTitle(title) {
+            if (y > pageHeight - 40) y = addPage();
+            doc.setFillColor(...colors.header);
+            doc.rect(0, y, pageWidth, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", 'bold');
+            doc.text(title, margin, y + 12);
+            y += 15;
+        }
+
+        function addTableHeader() {
+            const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
+            const colWidths = [15, 30, 35, 30, 30, 20, 25];
+
+            doc.setFillColor(...colors.primary);
+            doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.setFont("helvetica", 'bold');
+
+            let xOffset = margin;
+            headers.forEach((header, index) => {
+                doc.text(header, xOffset + 2, y + 6.5);
+                xOffset += colWidths[index];
+            });
+
+            y += 12;
+        }
+
+        function addMedidaItem(medida, index) {
+            if (y > pageHeight - 40) {
+                y = addPage();
+                addTableHeader();
+            }
+
+            const largura = medida.querySelector('.largura-input').value || '0';
+            const altura = medida.querySelector('.altura-input').value || '0';
+            const quantidade = medida.querySelector('.quantidade-input').value || '0';
+            const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
+            const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
+            const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
+            const peliculaNome = medida.querySelector('.pelicula-select').value || '';
+            const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+            const colWidths = [15, 30, 35, 30, 30, 20, 25];
+            let xOffset = margin;
+
+            if (index % 2 === 0) {
+                doc.setFillColor(...colors.lightGray);
+            } else {
+                doc.setFillColor(255, 255, 255);
+            }
+            doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
+
+            doc.setTextColor(...colors.text);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", 'normal');
+
+            doc.text(`${index}`, xOffset + 2, y + 4);
+            xOffset += colWidths[0];
+            doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+            xOffset += colWidths[1];
+            doc.text(peliculaNome, xOffset + 2, y + 4);
+            xOffset += colWidths[2];
+            doc.text(ambiente, xOffset + 2, y + 4);
+            xOffset += colWidths[3];
+            doc.text(tipoAplicacao, xOffset + 2, y + 4);
+            xOffset += colWidths[4];
+            doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
+            xOffset += colWidths[5];
+
+            if (pelicula) {
+                const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
+            }
+
+            y += 12;
+        }
+
+        function addTotalSection(peliculaNome, total) {
+            if (y > pageHeight - 30) y = addPage();
+
+            doc.setFillColor(...colors.secondary);
+            doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
+
+            doc.setTextColor(255, 255, 255);
                         doc.setFontSize(11);
                         doc.setFont("helvetica", 'bold');
                         doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
@@ -1423,8 +1297,8 @@
             const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
 
             const popupHTML = `
-                <div id="popupVerificacao" class="popup">
-                    <div class="popup-content">
+                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
                         <h2 class="text-xl font-semibold mb-4 text-gray-800">Período de Teste Expirado</h2>
                         <p>Seu período de teste gratuito expirou. Para continuar usando o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
                         <ol class="list-decimal list-inside mb-4">
@@ -1437,15 +1311,12 @@
             `;
             document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-            const popupVerificacao = document.getElementById('popupVerificacao');
-            popupVerificacao.style.display = 'flex';
-
             document.getElementById('verificarCodigo').addEventListener('click', async () => {
                 const codigoUsuario = document.getElementById('codigoAtivacao').value;
                 if (verificarCodigo(codigoUsuario, frasesGeradas)) {
                     await ativarAplicativo();
                     alert('Código correto! Aplicativo ativado com sucesso.');
-                    popupVerificacao.remove();
+                    document.getElementById('popupVerificacao').remove();
                 } else {
                     alert('Código incorreto. Tente novamente.');
                 }
@@ -1461,13 +1332,77 @@
             }
         }
 
-        function abrirPopupUsuario() {
-            fecharTodosPopups();
-            const popupUsuario = document.getElementById('popupUsuario');
-            popupUsuario.style.display = 'flex';
-            carregarInformacoesUsuario();
+        async function salvarVerificacaoNoIndexedDB(verificado) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            return objectStore.put({ id: 'status', verificado });
         }
 
+        async function obterStatusVerificacao() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readonly');
+            const objectStore = transaction.objectStore('verificacao');
+            const request = objectStore.get('status');
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result ? event.target.result.verificado : false);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        // Inicialização quando o documento estiver carregado
+        document.addEventListener('DOMContentLoaded', async () => {
+            await carregarClientes();
+            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
+
+            const status = await verificarStatusAplicativo();
+            switch (status.status) {
+                case 'novo':
+                    await iniciarTesteGratis();
+                    alert('Bem-vindo! Seu período de teste gratuito de 7 dias começou.');
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'em_teste':
+                    alert(`Você está no período de teste gratuito. Dias restantes: ${status.diasRestantes}`);
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'expirado':
+                    mostrarPopupVerificacao();
+                    atualizarIconeVerificacao('nao_ativado');
+                    break;
+                case 'ativado':
+                    console.log('Aplicativo ativado');
+                    atualizarIconeVerificacao('ativado');
+                    break;
+                default:
+                    console.error('Erro ao verificar o status do aplicativo');
+                    atualizarIconeVerificacao('nao_ativado');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+            if (popupClienteBtnSalvar) {
+                popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+            }
+
+            const closeButtons = document.querySelectorAll('.close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const popup = this.closest('.fixed');
+                    if (popup) {
+                        popup.classList.add('hidden');
+                    }
+                });
+            });
+
+            clienteSelect.addEventListener('change', onClienteChange);
+        });
     </script>
 </body>
 </html>
