@@ -23,7 +23,7 @@
 
         .container {
             max-height: 100vh; /* Define altura máxima baseada na viewport */
-            overflow-y: auto; /* Ativa scroll vertical para o contêiner principal */
+            overflow-y: auto; /* Ativa o scroll vertical para o contêiner principal */
             padding: 2rem;
         }
 
@@ -707,7 +707,9 @@
                     </select>
                 </div>
             `;
-            container.appendChild(medidaGroup);
+
+            // Adiciona o novo grupo de medidas no início do container
+            container.insertBefore(medidaGroup, container.firstChild);
 
             const larguraInput = medidaGroup.querySelector('.largura-input');
             const alturaInput = medidaGroup.querySelector('.altura-input');
@@ -756,13 +758,21 @@
             const tipoAplicacao = group.querySelector('.additional-fields select:nth-of-type(2)').value || '';
             const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
 
-            addMedidaGroup(false, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
-            calculateTotal();
+            // Adicionar a medida duplicada no topo
+            addMedidaGroup(true, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
+
+            // Focar na nova medida duplicada
+            const container = document.getElementById('medidasContainer');
+            const firstGroup = container.firstChild;
+            const larguraInput = firstGroup.querySelector('.largura-input');
+            larguraInput.focus();
         }
 
         function duplicarMedidas() {
-            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
-            medidaGroups.forEach(group => {
+            const medidaGroups = Array.from(document.querySelectorAll('#medidasContainer > div'));
+
+            // Duplicar cada grupo de medidas e adicionar no topo
+            medidaGroups.reverse().forEach(group => {
                 const largura = group.querySelector('.largura-input').value || '';
                 const altura = group.querySelector('.altura-input').value || '';
                 const quantidade = group.querySelector('.quantidade-input').value || '';
@@ -772,6 +782,13 @@
 
                 addMedidaGroup(false, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
             });
+
+            // Focar na primeira nova medida duplicada
+            const container = document.getElementById('medidasContainer');
+            const firstGroup = container.firstChild;
+            const larguraInput = firstGroup.querySelector('.largura-input');
+            larguraInput.focus();
+
             calculateTotal();
         }
 
