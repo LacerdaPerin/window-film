@@ -235,28 +235,29 @@
         let clienteSelecionado = '';
         const clienteSelect = document.getElementById('clienteSelect');
 
-        function abrirPopup(acao) {
-            const popupCliente = document.getElementById('popupCliente');
-            const popupTitulo = document.getElementById('popupTitulo');
+        async function abrirPopup(acao) {
+    const popupCliente = document.getElementById('popupCliente');
+    const popupTitulo = document.getElementById('popupTitulo');
 
-            if (!popupCliente || !popupTitulo) {
-                console.error("Elementos do popup não encontrados");
-                return;
-            }
+    if (!popupCliente || !popupTitulo) {
+        console.error("Elementos do popup não encontrados");
+        return;
+    }
 
-            if (acao === 'adicionar') {
-                popupTitulo.innerText = 'Adicionar Novo Cliente';
-                limparCamposPopup();
-                clienteSelecionado = '';
-            } else if (acao === 'editar') {
-                popupTitulo.innerText = 'Editar Cliente';
-                carregarDadosCliente();
-                clienteSelecionado = clienteSelect.value;
-            }
+    if (acao === 'adicionar') {
+        popupTitulo.innerText = 'Adicionar Novo Cliente';
+        limparCamposPopup();
+        clienteSelecionado = '';
+    } else if (acao === 'editar') {
+        popupTitulo.innerText = 'Editar Cliente';
+        clienteSelecionado = clienteSelect.value;
+        console.log("Editando cliente:", clienteSelecionado);
+        await carregarDadosCliente(clienteSelecionado);
+    }
 
-            popupCliente.classList.remove('hidden');
-            popupCliente.style.display = 'flex';
-        }
+    popupCliente.classList.remove('hidden');
+    popupCliente.style.display = 'flex';
+}
 
         function limparCamposPopup() {
             document.getElementById('popupClienteNome').value = '';
@@ -474,69 +475,73 @@
             carregarClientes();
         });
 
-        async function carregarDadosCliente() {
-            const cliente = await obterClienteDoIndexedDB(clienteSelect.value);
-            if (cliente) {
-                document.getElementById('popupClienteNome').value = cliente.nome;
-                document.getElementById('popupClienteTelefone').value = cliente.telefone;
-                document.getElementById('popupClienteEndereco').value = cliente.endereco;
-                document.getElementById('popupClienteCPF').value = cliente.cpf;
-                document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
-            }
+        async function carregarDadosCliente(clienteId) {
+    const cliente = await obterClienteDoIndexedDB(clienteId);
+    if (cliente) {
+        document.getElementById('popupClienteNome').value = cliente.nome;
+        document.getElementById('popupClienteTelefone').value = cliente.telefone;
+        document.getElementById('popupClienteEndereco').value = cliente.endereco;
+        document.getElementById('popupClienteCPF').value = cliente.cpf;
+        document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
+    }
+}
+
+async function salvarCliente(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('popupClienteNome').value.trim();
+    const telefone = document.getElementById('popupClienteTelefone').value.trim();
+    const endereco = document.getElementById('popupClienteEndereco').value.trim();
+    const cpf = document.getElementById('popupClienteCPF').value.trim();
+    const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
+
+    const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+
+    try {
+        if (clienteSelecionado) {
+            // Atualizar cliente existente
+            await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+            console.log("Cliente atualizado:", clienteSelecionado, novoCliente);
+        } else {
+            // Adicionar novo cliente
+            clienteSelecionado = await salvarClienteNoIndexedDB(novoCliente);
+            console.log("Novo cliente adicionado:", clienteSelecionado);
         }
 
-        async function salvarCliente() {
-            const nome = document.getElementById('popupClienteNome').value.trim();
-            const telefone = document.getElementById('popupClienteTelefone').value.trim();
-            const endereco = document.getElementById('popupClienteEndereco').value.trim();
-            const cpf = document.getElementById('popupClienteCPF').value.trim();
-            const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
+        await carregarClientes(clienteSelecionado);
+        fecharPopup();
+        alert("Cliente salvo com sucesso!");
+    } catch (error) {
+        console.error("Erro ao salvar cliente:", error);
+        alert("Ocorreu um erro ao salvar o cliente. Por favor, tente novamente.");
+    }
+}
 
-            const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+async function carregarClientes(clienteSelecionado = '') {
+    clientes = await obterTodosClientesDoIndexedDB();
+    clienteSelect.innerHTML = '';
+    if (clientes.length > 0) {
+        clienteSelect.classList.remove('hidden');
+        clientes.forEach(cliente => {
+            const option = document.createElement('option');
+            option.value = cliente.id; // Certifique-se de que está usando o ID aqui
+            option.textContent = cliente.nome;
+            clienteSelect.appendChild(option);
+        });
 
-            if (clienteSelecionado) {
-                await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                if (medidasExistentes) {
-                    await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                    if (nome !== clienteSelecionado) {
-                        await removerMedidasDoIndexedDB(clienteSelecionado);
-                    }
-                }
-            } else {
-                await salvarClienteNoIndexedDB(novoCliente);
-            }
-
-            await carregarClientes(nome);
-            fecharPopup();
-            alert("Cliente salvo com sucesso!");
+        if (clienteSelecionado) {
+            clienteSelect.value = clienteSelecionado;
+        } else {
+            clienteSelect.value = clientes[0].id;
         }
 
-        async function carregarClientes(clienteSelecionado = '') {
-            clientes = await obterTodosClientesDoIndexedDB();
-            clienteSelect.innerHTML = '';
-            if (clientes.length > 0) {
-                clienteSelect.classList.remove('hidden');
-                clientes.forEach(cliente => {
-                    const option = document.createElement('option');
-                    option.value = cliente.id; // Use o ID como valor
-                    option.textContent = cliente.nome; // O nome será exibido
-                    clienteSelect.appendChild(option);
-                });
-
-                if (clienteSelecionado) {
-                    clienteSelect.value = clienteSelecionado;
-                } else {
-                    clienteSelect.value = clientes[0].id;
-                }
-
-                loadMedidas();
-                mostrarEditIconContainer(true);
-            } else {
-                clienteSelect.classList.add('hidden');
-                mostrarEditIconContainer(false);
-            }
-        }
+        onClienteChange();
+        mostrarEditIconContainer(true);
+    } else {
+        clienteSelect.classList.add('hidden');
+        mostrarEditIconContainer(false);
+    }
+}
 
         function onClienteChange() {
             clienteSelecionado = clienteSelect.value;
@@ -923,29 +928,32 @@
             });
         }
 
-        async function atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            await objectStore.delete(clienteSelecionado);
-            return objectStore.put(novoCliente);
-        }
+        async function atualizarClienteNoIndexedDB(clienteId, novoCliente) {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['clientes'], 'readwrite');
+    const objectStore = transaction.objectStore('clientes');
+    
+    // Mantém o ID original
+    novoCliente.id = parseInt(clienteId);
+    
+    return objectStore.put(novoCliente);
+}
 
-        async function obterClienteDoIndexedDB(id) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(id);
+async function obterClienteDoIndexedDB(id) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['clientes'], 'readonly');
+        const objectStore = transaction.objectStore('clientes');
+        const request = objectStore.get(parseInt(id));
 
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+        request.onerror = event => {
+            reject(event);
+        };
+    });
+}
 
         async function removerClienteDoIndexedDB(id) {
             const db = await abrirIndexedDB();
@@ -1352,35 +1360,6 @@
             const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
             if (popupClienteBtnSalvar) {
                 popupClienteBtnSalvar.addEventListener('click', salvarCliente);
-            }
-
-            async function salvarCliente(event) {
-                event.preventDefault();
-
-                const nome = document.getElementById('popupClienteNome').value.trim();
-                const telefone = document.getElementById('popupClienteTelefone').value.trim();
-                const endereco = document.getElementById('popupClienteEndereco').value.trim();
-                const cpf = document.getElementById('popupClienteCPF').value.trim();
-                const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
-
-                const novoCliente = { nome, telefone, endereco, cpf, cnpj };
-
-                if (clienteSelecionado) {
-                    await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                    const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                    if (medidasExistentes) {
-                        await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                        if (nome !== clienteSelecionado) {
-                            await removerMedidasDoIndexedDB(clienteSelecionado);
-                        }
-                    }
-                } else {
-                    await salvarClienteNoIndexedDB(novoCliente);
-                }
-
-                await carregarClientes(nome);
-                fecharPopup();
-                alert("Cliente salvo com sucesso!");
             }
 
             const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
