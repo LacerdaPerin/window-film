@@ -32,13 +32,13 @@
                 <!-- Cabeçalho -->
     <div class="mb-4">
         <div class="text-center mb-2">
-            <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Calculadora de M² e Orçamento</h1>
+            <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Peliqueiros</h1>
         </div>
         <div class="flex items-center space-x-2">
             <select id="clienteSelect" class="flex-grow p-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
                 <option value="">Selecione um cliente</option>
             </select>
-            <button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden" onclick="abrirPopup('adicionar')">
+            <button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden">
                 <i class="fas fa-user-plus"></i>
             </button>
             <button id="addNewClienteBtnDesktop" class="hidden sm:block w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
@@ -433,11 +433,19 @@
             }
 
             const addNewClienteBtn = document.getElementById('addNewClienteBtn');
-            if (addNewClienteBtn) {
-                addNewClienteBtn.addEventListener('click', function () {
-                    abrirPopup('adicionar');
-                });
-            }
+    const addNewClienteBtnDesktop = document.getElementById('addNewClienteBtnDesktop');
+
+    if (addNewClienteBtn) {
+        addNewClienteBtn.addEventListener('click', function () {
+            abrirPopup('adicionar');
+        });
+    }
+
+    if (addNewClienteBtnDesktop) {
+        addNewClienteBtnDesktop.addEventListener('click', function () {
+            abrirPopup('adicionar');
+        });
+    }
 
             const logoUsuario = document.getElementById('logo');
             if (logoUsuario) {
@@ -907,12 +915,13 @@ function updateResultado(m2, preco) {
         }
 
         async function ativarAplicativo() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            await objectStore.put({ id: 'status', ativado: true });
-            atualizarIconeVerificacao('ativado');
-        }
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['verificacao'], 'readwrite');
+    const objectStore = transaction.objectStore('verificacao');
+    await objectStore.put({ id: 'status', ativado: true });
+    atualizarIconeVerificacao('ativado');
+}
+        
 
         async function salvarClienteNoIndexedDB(cliente) {
     const db = await abrirIndexedDB();
@@ -1317,54 +1326,71 @@ async function obterClienteDoIndexedDB(id) {
         }
 
         function verificarCodigo(codigoUsuario, frasesOriginais) {
-            const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
+    const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
 
-            if (codigoUsuario === '987410') {
-                return true;
-            }
+    if (codigoUsuario === '987410') {
+        return true;
+    }
 
-            return codigoUsuario === codigoCorreto;
+    return codigoUsuario === codigoCorreto;
+}
+async function mostrarPopupVerificacao() {
+    const frasesGeradas = gerarFrasesAleatorias();
+    const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+
+    const popupHTML = `
+        <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Acesso Bloqueado</h2>
+                <p>Para usar o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
+                <ol class="list-decimal list-inside mb-4">
+                    ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
+                </ol>
+                <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
+                <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+    document.getElementById('verificarCodigo').addEventListener('click', async () => {
+        const codigoUsuario = document.getElementById('codigoAtivacao').value;
+        console.log('Código inserido:', codigoUsuario); // Log adicionado
+
+        if (verificarCodigo(codigoUsuario, frasesGeradas)) {
+            console.log('Código verificado com sucesso'); // Log adicionado
+            await ativarAplicativo();
+            console.log('Aplicativo ativado'); // Log adicionado
+            alert('Código correto! Aplicativo ativado com sucesso.');
+            document.getElementById('popupVerificacao').remove();
+            document.body.style.pointerEvents = 'auto'; // Reabilitar interações
+            location.reload(); // Recarrega a página para aplicar a ativação
+        } else {
+            console.log('Código incorreto'); // Log adicionado
+            alert('Código incorreto. Tente novamente.');
         }
+    });
+}
 
-        async function mostrarPopupVerificacao() {
-            const frasesGeradas = gerarFrasesAleatorias();
-            const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+async function verificarAtivacaoAntes(acao) {
+    const status = await verificarStatusAplicativo();
+    if (status.status === 'ativado') {
+        acao();
+    } else {
+        mostrarPopupVerificacao();
+    }
+}
 
-            const popupHTML = `
-                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Período de Teste Expirado</h2>
-                        <p>Seu período de teste gratuito expirou. Para continuar usando o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
-                        <ol class="list-decimal list-inside mb-4">
-                            ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
-                        </ol>
-                        <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
-                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', popupHTML);
-
-            document.getElementById('verificarCodigo').addEventListener('click', async () => {
-                const codigoUsuario = document.getElementById('codigoAtivacao').value;
-                if (verificarCodigo(codigoUsuario, frasesGeradas)) {
-                    await ativarAplicativo();
-                    alert('Código correto! Aplicativo ativado com sucesso.');
-                    document.getElementById('popupVerificacao').remove();
-                } else {
-                    alert('Código incorreto. Tente novamente.');
-                }
-            });
-        }
-
-        async function verificarAtivacaoAntes(acao) {
-            const status = await verificarStatusAplicativo();
-            if (status.status === 'ativado' || status.status === 'em_teste') {
-                acao();
-            } else {
-                mostrarPopupVerificacao();
-            }
-        }
+async function verificarStatusInicial() {
+    const status = await verificarStatusAplicativo();
+    if (status.status !== 'ativado') {
+        mostrarPopupVerificacao();
+        // Desabilitar todas as interações com a página
+        document.body.style.pointerEvents = 'none';
+        // Exceto o popup de verificação
+        document.getElementById('popupVerificacao').style.pointerEvents = 'auto';
+    }
+}
 
         async function salvarVerificacaoNoIndexedDB(verificado) {
             const db = await abrirIndexedDB();
@@ -1390,15 +1416,17 @@ async function obterClienteDoIndexedDB(id) {
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
-            if (popupClienteBtnSalvar) {
-                popupClienteBtnSalvar.addEventListener('click', salvarCliente);
-            }
+    verificarStatusInicial(); // Adicione esta linha
 
-            const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
-            if (fecharPopupBtn) {
-                fecharPopupBtn.addEventListener('click', fecharPopup);
-            }
+    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+    if (popupClienteBtnSalvar) {
+        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    }
+
+    const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
+    if (fecharPopupBtn) {
+        fecharPopupBtn.addEventListener('click', fecharPopup);
+    }
         });
     </script>
 </body>
