@@ -18,22 +18,20 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: auto; /* Assegura que o scroll está ativado */
+            overflow: auto;
         }
 
         .container {
-            max-height: 100vh; /* Define altura máxima baseada na viewport */
-            overflow-y: auto; /* Ativa o scroll vertical para o contêiner principal */
+            max-height: 100vh;
+            overflow-y: auto;
             padding: 2rem;
         }
 
-        /* Ajusta o contêiner de medidas para ter um scroll interno se necessário */
         #medidasContainer {
-            max-height: 60vh; /* Define a altura máxima do contêiner de medidas */
-            overflow-y: auto; /* Ativa o scroll interno */
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
-        /* Aumentando a área clicável e melhorando a acessibilidade */
         button, input, select {
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -42,7 +40,6 @@
             box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
         }
 
-        /* Aumentando o tamanho do botão em dispositivos móveis */
         @media (max-width: 640px) {
             button, input, select {
                 padding: 1rem;
@@ -53,7 +50,6 @@
             }
         }
 
-        /* Aperfeiçoamento visual para dispositivos maiores */
         @media (min-width: 1024px) {
             h1 {
                 font-size: 3.5rem;
@@ -214,35 +210,12 @@
             }
         }
 
-        // Service Worker diretamente no HTML
-        self.addEventListener('install', function (event) {
-            event.waitUntil(
-                caches.open('app-cache').then(function (cache) {
-                    return cache.addAll([
-                        '/',
-                        '/index.html',
-                        'http://fumejp.com.br/wp-content/uploads/2024/07/cloud_icon.png'
-                    ]);
-                })
-            );
-        });
-
-        self.addEventListener('fetch', function (event) {
-            event.respondWith(
-                caches.match(event.request).then(function (response) {
-                    return response || fetch(event.request);
-                })
-            );
-        });
-
-        // Inicializa máscaras nos campos
         $(document).ready(function () {
             $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
             $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
             $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
         });
 
-        // Lista de películas e clientes
         const peliculas = [
             { nome: "Window Blue Performance", preco: 240 },
             { nome: "Window BLUE 70", preco: 200 },
@@ -262,10 +235,7 @@
         let clienteSelecionado = '';
         const clienteSelect = document.getElementById('clienteSelect');
 
-        // Função para abrir o popup de adicionar ou editar cliente
         function abrirPopup(acao) {
-            console.log("abrirPopup chamada com ação:", acao);
-
             const popupCliente = document.getElementById('popupCliente');
             const popupTitulo = document.getElementById('popupTitulo');
 
@@ -405,7 +375,7 @@
                         db.createObjectStore('usuario', { keyPath: 'id' });
                     }
                     if (!db.objectStoreNames.contains('clientes')) {
-                        db.createObjectStore('clientes', { keyPath: 'nome' });
+                        db.createObjectStore('clientes', { keyPath: 'id', autoIncrement: true }); // Atualizado para usar ID
                     }
                     if (!db.objectStoreNames.contains('medidas')) {
                         db.createObjectStore('medidas', { keyPath: 'cliente' });
@@ -522,28 +492,24 @@
             const cpf = document.getElementById('popupClienteCPF').value.trim();
             const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
 
-            if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
-                const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+            const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
-                if (clienteSelecionado) {
-                    await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                    const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                    if (medidasExistentes) {
-                        await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                        if (nome !== clienteSelecionado) {
-                            await removerMedidasDoIndexedDB(clienteSelecionado);
-                        }
+            if (clienteSelecionado) {
+                await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+                const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
+                if (medidasExistentes) {
+                    await salvarMedidasNoIndexedDB(nome, medidasExistentes);
+                    if (nome !== clienteSelecionado) {
+                        await removerMedidasDoIndexedDB(clienteSelecionado);
                     }
-                } else {
-                    await salvarClienteNoIndexedDB(novoCliente);
                 }
-
-                await carregarClientes(nome);
-                fecharPopup();
-                alert("Cliente salvo com sucesso!");
             } else {
-                alert("O nome do cliente já existe ou não foi informado.");
+                await salvarClienteNoIndexedDB(novoCliente);
             }
+
+            await carregarClientes(nome);
+            fecharPopup();
+            alert("Cliente salvo com sucesso!");
         }
 
         async function carregarClientes(clienteSelecionado = '') {
@@ -553,15 +519,15 @@
                 clienteSelect.classList.remove('hidden');
                 clientes.forEach(cliente => {
                     const option = document.createElement('option');
-                    option.value = cliente.nome;
-                    option.textContent = cliente.nome;
+                    option.value = cliente.id; // Use o ID como valor
+                    option.textContent = cliente.nome; // O nome será exibido
                     clienteSelect.appendChild(option);
                 });
 
                 if (clienteSelecionado) {
                     clienteSelect.value = clienteSelecionado;
                 } else {
-                    clienteSelect.value = clientes[0].nome;
+                    clienteSelect.value = clientes[0].id;
                 }
 
                 loadMedidas();
@@ -592,7 +558,6 @@
         }
 
         function fecharPopup() {
-            console.log("Tentando fechar o popup");
             const popupCliente = document.getElementById('popupCliente');
             if (popupCliente) {
                 popupCliente.classList.add('hidden');
@@ -622,7 +587,7 @@
             document.getElementById('medidasContainer').innerHTML = '';
 
             if (clientes.length > 0) {
-                clienteSelect.value = clientes[0].nome;
+                clienteSelect.value = clientes[0].id;
                 loadMedidas();
             } else {
                 clienteSelect.value = '';
@@ -708,7 +673,6 @@
                 </div>
             `;
 
-            // Adiciona o novo grupo de medidas no início do container
             container.insertBefore(medidaGroup, container.firstChild);
 
             const larguraInput = medidaGroup.querySelector('.largura-input');
@@ -758,10 +722,8 @@
             const tipoAplicacao = group.querySelector('.additional-fields select:nth-of-type(2)').value || '';
             const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
 
-            // Adicionar a medida duplicada no topo
             addMedidaGroup(true, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
 
-            // Focar na nova medida duplicada
             const container = document.getElementById('medidasContainer');
             const firstGroup = container.firstChild;
             const larguraInput = firstGroup.querySelector('.largura-input');
@@ -771,7 +733,6 @@
         function duplicarMedidas() {
             const medidaGroups = Array.from(document.querySelectorAll('#medidasContainer > div'));
 
-            // Duplicar cada grupo de medidas e adicionar no topo
             medidaGroups.reverse().forEach(group => {
                 const largura = group.querySelector('.largura-input').value || '';
                 const altura = group.querySelector('.altura-input').value || '';
@@ -783,7 +744,6 @@
                 addMedidaGroup(false, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
             });
 
-            // Focar na primeira nova medida duplicada
             const container = document.getElementById('medidasContainer');
             const firstGroup = container.firstChild;
             const larguraInput = firstGroup.querySelector('.largura-input');
@@ -868,7 +828,7 @@
             });
         }
 
-        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000; // 2 minutos em milissegundos
+        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000;
 
         async function verificarStatusAplicativo() {
             const db = await abrirIndexedDB();
@@ -971,11 +931,11 @@
             return objectStore.put(novoCliente);
         }
 
-        async function obterClienteDoIndexedDB(nome) {
+        async function obterClienteDoIndexedDB(id) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readonly');
             const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
+            const request = objectStore.get(id);
 
             return new Promise((resolve, reject) => {
                 request.onsuccess = event => {
@@ -987,11 +947,11 @@
             });
         }
 
-        async function removerClienteDoIndexedDB(nome) {
+        async function removerClienteDoIndexedDB(id) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['clientes'], 'readwrite');
             const objectStore = transaction.objectStore('clientes');
-            return objectStore.delete(nome);
+            return objectStore.delete(id);
         }
 
         async function salvarMedidasNoIndexedDB(cliente, medidas) {
@@ -1032,7 +992,7 @@
                     return;
                 }
 
-                const cliente = clientes.find(c => c.nome === clienteNome);
+                const cliente = clientes.find(c => c.id == clienteNome);
                 if (!cliente) {
                     alert('Informações do cliente não encontradas.');
                     return;
@@ -1058,11 +1018,9 @@
                 };
 
                 function addCover() {
-                    // Fundo da página
                     doc.setFillColor(245, 245, 245);
                     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-                    // Barras graduais no topo
                     const barColors = ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e6e6e6'];
                     const barWidth = pageWidth / barColors.length;
                     barColors.forEach((color, index) => {
@@ -1070,7 +1028,6 @@
                         doc.rect(index * barWidth, 0, barWidth, 40, 'F');
                     });
 
-                    // Informações do cliente
                     doc.setTextColor(44, 62, 80);
                     doc.setFont("helvetica", 'bold');
                     doc.setFontSize(18);
@@ -1082,10 +1039,8 @@
                     doc.text(`Endereço: ${cliente.endereco}`, margin, 105);
                     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 120);
 
-                    // Adicionar "VÁLIDO POR 90 DIAS"
                     doc.text("VÁLIDO POR 90 DIAS", margin, 135);
 
-                    // Rodapé
                     doc.setDrawColor(41, 128, 185);
                     doc.setLineWidth(1);
                     doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
@@ -1276,10 +1231,10 @@
         function gerarFrasesAleatorias() {
             const frases = [];
             for (let i = 0; i < 7; i++) {
-                const tamanho = Math.floor(Math.random() * 4) + 5; // 5 a 8 caracteres
+                const tamanho = Math.floor(Math.random() * 4) + 5;
                 let frase = '';
                 for (let j = 0; j < tamanho; j++) {
-                    frase += String.fromCharCode(Math.floor(Math.random() * 94) + 33); // Caracteres ASCII imprimíveis
+                    frase += String.fromCharCode(Math.floor(Math.random() * 94) + 33);
                 }
                 frases.push(frase);
             }
@@ -1289,37 +1244,30 @@
         function extrairCodigoAtivacao(frases) {
             let codigo = '';
 
-            // Sequência 1: Penúltimo caractere (se for letra, incluir também o primeiro)
             let seq1 = frases[0][frases[0].length - 2];
             if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
             codigo += seq1;
 
-            // Sequência 2: Segundo caractere (se for símbolo ou letra minúscula usar terceiro)
             let seq2 = frases[1][1];
             if (seq2.match(/[^a-zA-Z0-9]/) || seq2.match(/[a-z]/)) seq2 = frases[1][2] || '';
             codigo += seq2;
 
-            // Sequência 3: Primeiro caractere (se for número, incluir o segundo)
             let seq3 = frases[2][0];
             if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
             codigo += seq3;
 
-            // Sequência 4: Último caractere (se for número usar o penúltimo)
             let seq4 = frases[3][frases[3].length - 1];
             if (seq4.match(/[0-9]/)) seq4 = frases[3][frases[3].length - 2] || '';
             codigo += seq4;
 
-            // Sequência 5: Segundo caractere (se for letra, incluir o terceiro)
             let seq5 = frases[4][1];
             if (seq5.match(/[a-zA-Z]/)) seq5 += frases[4][2] || '';
             codigo += seq5;
 
-            // Sequência 6: Quinto caractere (se for símbolo, usar o primeiro)
             let seq6 = frases[5][4] || '';
             if (seq6.match(/[^a-zA-Z0-9]/)) seq6 = frases[5][0] || '';
             codigo += seq6;
 
-            // Sequência 7: Quarto caractere (se for letra maiúscula, incluir o último)
             let seq7 = frases[6][3] || '';
             if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
             codigo += seq7;
@@ -1330,12 +1278,10 @@
         function verificarCodigo(codigoUsuario, frasesOriginais) {
             const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
 
-            // Adiciona verificação para a senha alternativa "987410"
             if (codigoUsuario === '987410') {
-                return true; // Senha alternativa correta
+                return true;
             }
 
-            // Verifica o código gerado a partir das frases
             return codigoUsuario === codigoCorreto;
         }
 
@@ -1402,17 +1348,14 @@
             });
         }
 
-
-
         document.addEventListener('DOMContentLoaded', function () {
             const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
             if (popupClienteBtnSalvar) {
                 popupClienteBtnSalvar.addEventListener('click', salvarCliente);
             }
 
-            // Função para salvar o cliente no IndexedDB
             async function salvarCliente(event) {
-                event.preventDefault(); // Impede o comportamento padrão de envio do formulário
+                event.preventDefault();
 
                 const nome = document.getElementById('popupClienteNome').value.trim();
                 const telefone = document.getElementById('popupClienteTelefone').value.trim();
@@ -1420,28 +1363,24 @@
                 const cpf = document.getElementById('popupClienteCPF').value.trim();
                 const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
 
-                if (nome && (clienteSelecionado === '' || nome === clienteSelecionado || !(await verificarClienteExistente(nome)))) {
-                    const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+                const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
-                    if (clienteSelecionado) {
-                        await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-                        const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
-                        if (medidasExistentes) {
-                            await salvarMedidasNoIndexedDB(nome, medidasExistentes);
-                            if (nome !== clienteSelecionado) {
-                                await removerMedidasDoIndexedDB(clienteSelecionado);
-                            }
+                if (clienteSelecionado) {
+                    await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
+                    const medidasExistentes = await obterMedidasDoIndexedDB(clienteSelecionado);
+                    if (medidasExistentes) {
+                        await salvarMedidasNoIndexedDB(nome, medidasExistentes);
+                        if (nome !== clienteSelecionado) {
+                            await removerMedidasDoIndexedDB(clienteSelecionado);
                         }
-                    } else {
-                        await salvarClienteNoIndexedDB(novoCliente);
                     }
-
-                    await carregarClientes(nome);
-                    fecharPopup();
-                    alert("Cliente salvo com sucesso!");
                 } else {
-                    alert("O nome do cliente já existe ou não foi informado.");
+                    await salvarClienteNoIndexedDB(novoCliente);
                 }
+
+                await carregarClientes(nome);
+                fecharPopup();
+                alert("Cliente salvo com sucesso!");
             }
 
             const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
