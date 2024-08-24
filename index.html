@@ -498,17 +498,15 @@ async function salvarCliente(event) {
     const novoCliente = { nome, telefone, endereco, cpf, cnpj };
 
     try {
+        let clienteId;
         if (clienteSelecionado) {
-            // Atualizar cliente existente
             await atualizarClienteNoIndexedDB(clienteSelecionado, novoCliente);
-            console.log("Cliente atualizado:", clienteSelecionado, novoCliente);
+            clienteId = clienteSelecionado;
         } else {
-            // Adicionar novo cliente
-            clienteSelecionado = await salvarClienteNoIndexedDB(novoCliente);
-            console.log("Novo cliente adicionado:", clienteSelecionado);
+            clienteId = await salvarClienteNoIndexedDB(novoCliente);
         }
 
-        await carregarClientes(clienteSelecionado);
+        await carregarClientes(clienteId, true); // Adicionado 'true' aqui
         fecharPopup();
         alert("Cliente salvo com sucesso!");
     } catch (error) {
@@ -517,14 +515,23 @@ async function salvarCliente(event) {
     }
 }
 
-async function carregarClientes(clienteSelecionado = '') {
+async function carregarClientes(clienteSelecionado = '', moverParaTopo = false) {
     clientes = await obterTodosClientesDoIndexedDB();
+    
+    if (moverParaTopo && clienteSelecionado) {
+        const clienteIndex = clientes.findIndex(c => c.id == clienteSelecionado);
+        if (clienteIndex > -1) {
+            const cliente = clientes.splice(clienteIndex, 1)[0];
+            clientes.unshift(cliente);
+        }
+    }
+
     clienteSelect.innerHTML = '';
     if (clientes.length > 0) {
         clienteSelect.classList.remove('hidden');
         clientes.forEach(cliente => {
             const option = document.createElement('option');
-            option.value = cliente.id; // Certifique-se de que está usando o ID aqui
+            option.value = cliente.id;
             option.textContent = cliente.nome;
             clienteSelect.appendChild(option);
         });
@@ -543,15 +550,15 @@ async function carregarClientes(clienteSelecionado = '') {
     }
 }
 
-        function onClienteChange() {
-            clienteSelecionado = clienteSelect.value;
-            loadMedidas();
-            if (clienteSelecionado) {
-                mostrarEditIconContainer(true);
-            } else {
-                mostrarEditIconContainer(false);
-            }
-        }
+function onClienteChange() {
+    clienteSelecionado = clienteSelect.value;
+    loadMedidas();
+    if (clienteSelecionado) {
+        mostrarEditIconContainer(true);
+    } else {
+        mostrarEditIconContainer(false);
+    }
+}
 
         function mostrarEditIconContainer(exibir) {
             const editIconContainer = document.getElementById('editIconContainer');
@@ -890,11 +897,19 @@ async function carregarClientes(clienteSelecionado = '') {
         }
 
         async function salvarClienteNoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readwrite');
-            const objectStore = transaction.objectStore('clientes');
-            return objectStore.put(cliente);
-        }
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['clientes'], 'readwrite');
+    const objectStore = transaction.objectStore('clientes');
+    const request = objectStore.add(cliente);
+    return new Promise((resolve, reject) => {
+        request.onsuccess = event => {
+            resolve(event.target.result); // Retorna o ID gerado
+        };
+        request.onerror = event => {
+            reject(event);
+        };
+    });
+}
 
         async function obterTodosClientesDoIndexedDB() {
             const db = await abrirIndexedDB();
