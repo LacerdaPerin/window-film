@@ -1046,11 +1046,382 @@ async function obterClienteDoIndexedDB(id) {
 
 
 
-
           //Função generatePDF_v3_0 Completa e Atualizada
 
          
+
           async function generatePDF_v3_0() {
+    try {
+        const clienteNome = clienteSelect.value;
+        if (!clienteNome) {
+            alert('Selecione um cliente.');
+            return;
+        }
+
+        const cliente = clientes.find(c => c.id == clienteNome);
+        if (!cliente) {
+            alert('Informações do cliente não encontradas.');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Configurações de página e cores
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 15;
+        const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+        
+        const colors = {
+            primary: hexToRgb(infoUsuario?.cores?.primaria || '#2980b9'),
+            secondary: hexToRgb(infoUsuario?.cores?.secundaria || '#e67e22'),
+            text: [52, 73, 94],
+            lightGray: [236, 240, 241],
+            white: [255, 255, 255]
+        };
+
+        // Funções auxiliares
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
+        }
+
+        async function addLogo(x, y, width, height) {
+            if (infoUsuario?.logo) {
+                try {
+                    await doc.addImage(infoUsuario.logo, 'PNG', x, y, width, height, undefined, 'FAST');
+                } catch (error) {
+                    console.error("Erro ao adicionar logo:", error);
+                    doc.setFontSize(10);
+                    doc.text("LOGO", x + width / 2, y + height / 2, { align: 'center', baseline: 'middle' });
+                }
+            } else {
+                doc.setFontSize(10);
+                doc.text("LOGO", x + width / 2, y + height / 2, { align: 'center', baseline: 'middle' });
+            }
+        }
+
+        function addFooter() {
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFontSize(8);
+            addLogo(margin, pageHeight - 13, 10, 10);
+            doc.text(infoUsuario?.empresa || '', margin + 15, pageHeight - 9);
+            doc.text(infoUsuario?.telefone || '', pageWidth / 2, pageHeight - 9, { align: 'center' });
+            doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+        }
+
+        function addPage() {
+            doc.addPage();
+            addFooter();
+            return margin + 5;
+        }
+
+        function addSectionTitle(title, y) {
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, y, pageWidth, 10, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(14);
+            doc.text(title, margin, y + 7);
+            return y + 15;
+        }
+
+        // Capa
+        async function addCover() {
+            doc.setFillColor(...colors.lightGray);
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+            // Barra superior
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, 0, pageWidth, 60, 'F');
+
+            // Logo
+            await addLogo(margin, 15, 40, 40);
+
+            // Título da proposta
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(24);
+            doc.text("PROPOSTA DE ORÇAMENTO", pageWidth / 2, 45, { align: 'center' });
+
+            // Informações da empresa e do cliente
+            const boxWidth = (pageWidth - 3 * margin) / 2;
+            addInfoBox("CONTRATADA:", infoUsuario, margin, 70, boxWidth);
+            addInfoBox("CONTRATANTE:", cliente, pageWidth / 2 + margin / 2, 70, boxWidth);
+
+            // Data e número da proposta
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, 150);
+            doc.text(`Proposta Nº: ${Math.floor(Math.random() * 10000)}`, pageWidth - margin, 150, { align: 'right' });
+
+            // Introdução
+            let y = 160;
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(...colors.text);
+            const introText = "Prezado cliente, é com grande satisfação que apresentamos nossa proposta de serviços em películas de alta qualidade. Nosso compromisso é oferecer soluções personalizadas que atendam às suas necessidades específicas, garantindo excelência e durabilidade.";
+            const introLines = doc.splitTextToSize(introText, pageWidth - 2 * margin);
+            doc.text(introLines, margin, y);
+            y += introLines.length * 7 + 10;
+
+            addFooter();
+        }
+
+        function addInfoBox(title, data, x, y, width) {
+            const lineHeight = 6;
+            const maxWidth = width - 10;
+            let boxHeight = 70;
+
+            doc.setFillColor(...colors.white);
+            doc.roundedRect(x, y, width, boxHeight, 3, 3, 'F');
+
+            doc.setFillColor(...colors.primary);
+            doc.rect(x, y, width, 8, 'F');
+
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(11);
+            doc.text(title, x + 5, y + 6);
+
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            let yOffset = y + 15;
+
+            Object.entries(data).forEach(([key, value]) => {
+                if (key !== 'id' && key !== 'logo' && key !== 'cores') {
+                    const text = `${key}: ${value || 'N/A'}`;
+                    const lines = doc.splitTextToSize(text, maxWidth);
+                    lines.forEach(line => {
+                        doc.text(line, x + 5, yOffset);
+                        yOffset += lineHeight;
+                    });
+                }
+            });
+
+            doc.roundedRect(x, y, width, boxHeight, 3, 3);
+        }
+
+        // Conteúdo principal
+        function addContent() {
+            let y = addPage();
+
+            // Cálculos de Orçamento
+            y = addSectionTitle("Cálculos de Orçamento", y);
+            y += 5;
+
+            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+            const medidasPorPelicula = {};
+            const totaisGerais = { totalM2: 0, precoTotal: 0 };
+
+            medidaGroups.forEach(group => {
+                const peliculaNome = group.querySelector('.pelicula-select').value || 'Sem Película';
+                if (!medidasPorPelicula[peliculaNome]) {
+                    medidasPorPelicula[peliculaNome] = [];
+                }
+                medidasPorPelicula[peliculaNome].push(group);
+
+                const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+                const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+                const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+                const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                const area = largura * altura * quantidade;
+                const preco = pelicula ? area * pelicula.preco : 0;
+
+                totaisGerais.totalM2 += area;
+                totaisGerais.precoTotal += preco;
+            });
+
+            function addMedidasTable(medidas, peliculaNome) {
+                const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
+                const colWidths = [15, 30, 40, 40, 20, 30];
+                
+                doc.setFillColor(...colors.primary);
+                doc.rect(margin, y, pageWidth - 2 * margin, 8, 'F');
+                doc.setTextColor(...colors.white);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(10);
+
+                let xOffset = margin;
+                headers.forEach((header, index) => {
+                    doc.text(header, xOffset + 2, y + 6);
+                    xOffset += colWidths[index];
+                });
+                y += 10;
+
+                doc.setFont("helvetica", 'normal');
+                doc.setFontSize(9);
+
+                medidas.forEach((group, index) => {
+                    if (y > pageHeight - 30) {
+                        y = addPage();
+                        // Repetir cabeçalho da tabela
+                        doc.setFillColor(...colors.primary);
+                        doc.rect(margin, y, pageWidth - 2 * margin, 8, 'F');
+                        doc.setTextColor(...colors.white);
+                        doc.setFont("helvetica", 'bold');
+                        doc.setFontSize(10);
+                        xOffset = margin;
+                        headers.forEach((header, index) => {
+                            doc.text(header, xOffset + 2, y + 6);
+                            xOffset += colWidths[index];
+                        });
+                        y += 10;
+                        doc.setFont("helvetica", 'normal');
+                        doc.setFontSize(9);
+                    }
+
+                    const largura = group.querySelector('.largura-input').value || '0';
+                    const altura = group.querySelector('.altura-input').value || '0';
+                    const quantidade = group.querySelector('.quantidade-input').value || '0';
+                    const totalM2 = group.querySelector('input[placeholder="M²"]').value || '0';
+                    const ambiente = group.querySelector('.additional-fields select:first-child').value || '';
+                    const tipoAplicacao = group.querySelector('.additional-fields select:last-child').value || '';
+                    const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+                    doc.setTextColor(...colors.text);
+
+                    if (index % 2 === 0) {
+                        doc.setFillColor(...colors.lightGray);
+                        doc.rect(margin, y - 2, pageWidth - 2 * margin, 8, 'F');
+                    }
+
+                    xOffset = margin;
+                    doc.text(`${index + 1}`, xOffset + 2, y + 4);
+                    xOffset += colWidths[0];
+                    doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+                    xOffset += colWidths[1];
+                    doc.text(ambiente, xOffset + 2, y + 4);
+                    xOffset += colWidths[2];
+                    doc.text(tipoAplicacao, xOffset + 2, y + 4);
+                    xOffset += colWidths[3];
+                    doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
+                    xOffset += colWidths[4];
+
+                    if (pelicula) {
+                        const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                        doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
+                    }
+
+                    y += 8;
+                });
+
+                return y;
+            }
+
+            Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
+                if (index > 0) y = addPage();
+                y = addSectionTitle(`Orçamento para: ${peliculaNome}`, y);
+                y += 5;
+                y = addMedidasTable(medidas, peliculaNome);
+                
+                const totalPelicula = {
+                    totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0), 0),
+                    precoTotal: medidas.reduce((sum, group) => {
+                        const area = parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0;
+                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                        return sum + (pelicula ? area * pelicula.preco : 0);
+                    }, 0)
+                };
+
+                y += 5;
+                doc.setFillColor(...colors.secondary);
+                doc.rect(margin, y, pageWidth - 2 * margin, 12, 'F');
+                doc.setTextColor(...colors.white);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(10);
+                doc.text(`Subtotal ${peliculaNome}:`, margin + 5, y + 8);
+                doc.text(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 8);
+                doc.text(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 8, { align: 'right' });
+
+                y += 20;
+            });
+
+            // Total Geral
+            y = addSectionTitle("Total Geral do Orçamento", y);
+            y += 5;
+            doc.setFillColor(...colors.primary);
+            doc.rect(margin, y, pageWidth - 2 * margin, 15, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(12);
+            doc.text("Total Geral:", margin + 5, y + 6);
+            doc.text(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin + 5, y + 12);
+            doc.text(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 12, { align: 'right' });
+
+            y += 25;
+        }
+
+        // Adiciona as condições gerais na última página
+        function addFinalPage() {
+            addPage();
+            let y = margin + 5;
+
+            // Condições Gerais
+            y = addSectionTitle("Condições Gerais", y);
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            const condicoes = [
+                "1. Validade da proposta: 30 dias",
+                "2. Prazo de execução: a combinar",
+                "3. Forma de pagamento: 50% de entrada e 50% na conclusão",
+                "4. Garantia: 5 anos para defeitos de fabricação",
+                "5. Esta proposta não inclui serviços adicionais não especificados"
+            ];
+            condicoes.forEach(condicao => {
+                const lines = doc.splitTextToSize(condicao, pageWidth - 2 * margin);
+                lines.forEach(line => {
+                    doc.text(line, margin, y);
+                    y += 6;
+                });
+                y += 2; // Espaçamento entre itens
+            });
+
+            // Assinatura e Contato
+            y += 25;
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth / 2 - 10, y);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(10);
+            doc.text("Alex Perin Lacerda", margin, y + 5);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(9);
+            doc.text("Películas Brasil - Soluções Solares", margin, y + 10);
+            doc.text("(83) 9 9674-6052", margin, y + 15);
+            doc.text("alexlacerdaperin@gmail.com", margin, y + 20);
+        }
+
+        await addCover();
+        addContent();
+        addFinalPage(); // Adiciona a página final
+
+        doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+        alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
+    }
+}
+
+
+
+
+
+
+
+//PDF
+
+async function generatePDF_v3_0() {
     try {
         const clienteNome = clienteSelect.value;
         if (!clienteNome) {
@@ -1076,255 +1447,147 @@ async function obterClienteDoIndexedDB(id) {
         const margin = 15;
 
         const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
-        
-        // Definir cores da marca
-        const brandColors = {
-            primary: infoUsuario.cores?.primaria || '#2980b9', // Azul padrão se não definido
-            secondary: infoUsuario.cores?.secundaria || '#e67e22', // Laranja padrão se não definido
-            text: [52, 73, 94],
-            lightGray: [236, 240, 241],
+
+        const colors = {
+            primary: hexToRgb(infoUsuario.cores?.primaria || '#0056b3'),
+            secondary: hexToRgb(infoUsuario.cores?.secundaria || '#17a2b8'),
+            text: [33, 37, 41],
+            lightGray: [248, 249, 250],
             white: [255, 255, 255]
         };
 
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? [
-                parseInt(result[1], 16),
-                parseInt(result[2], 16),
-                parseInt(result[3], 16)
-            ] : null;
+            return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
         }
 
-        const colors = {
-            primary: hexToRgb(brandColors.primary),
-            secondary: hexToRgb(brandColors.secondary),
-            text: brandColors.text,
-            lightGray: brandColors.lightGray,
-            white: brandColors.white
-        };
+        function safeText(text, x, y, options = {}) {
+            if (typeof text !== 'string') text = String(text);
+            if (typeof x !== 'number' || typeof y !== 'number') {
+                console.error('Coordenadas inválidas:', x, y);
+                return;
+            }
+            try {
+                doc.text(text, x, y, options);
+            } catch (error) {
+                console.error('Erro ao adicionar texto:', error, 'Texto:', text, 'Coordenadas:', x, y);
+            }
+        }
+
+        async function addLogo(x, y, width, height) {
+            if (infoUsuario.logo) {
+                try {
+                    await doc.addImage(infoUsuario.logo, 'PNG', x, y, width, height, undefined, 'FAST');
+                } catch (error) {
+                    console.error("Erro ao adicionar logo:", error);
+                    doc.setFontSize(12);
+                    safeText("LOGO", x + width / 2, y + height / 2, { align: 'center', baseline: 'middle' });
+                }
+            } else {
+                doc.setFontSize(12);
+                safeText("LOGO", x + width / 2, y + height / 2, { align: 'center', baseline: 'middle' });
+            }
+        }
+
+        function addFooter(pageNumber) {
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, pageHeight - 10, pageWidth, 10, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFontSize(8);
+            safeText(infoUsuario.empresa, margin, pageHeight - 3);
+            safeText(infoUsuario.telefone, pageWidth / 2, pageHeight - 3, { align: 'center' });
+            safeText(`Página ${pageNumber}`, pageWidth - margin, pageHeight - 3, { align: 'right' });
+        }
+
+        function addPage(pageNumber) {
+            doc.addPage();
+            addFooter(pageNumber);
+            return margin + 10;
+        }
+
+        function addSectionTitle(title, y) {
+            doc.setFillColor(...colors.primary);
+            doc.rect(0, y, pageWidth, 12, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(14);
+            safeText(title, margin, y + 8.5);
+            return y + 20;
+        }
 
         async function addCover() {
-            // Fundo branco
+            // Fundo
             doc.setFillColor(...colors.white);
             doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-            // Barra superior com cor primária da marca
+            // Barra lateral
             doc.setFillColor(...colors.primary);
-            doc.rect(0, 0, pageWidth, 40, 'F');
+            doc.rect(0, 0, 60, pageHeight, 'F');
 
-            // Adicionando a logo
-            if (infoUsuario && infoUsuario.logo) {
-                try {
-                    const img = new Image();
-                    img.src = infoUsuario.logo;
-                    await new Promise((resolve, reject) => {
-                        img.onload = resolve;
-                        img.onerror = reject;
-                    });
-
-                    const aspectRatio = img.width / img.height;
-                    let logoWidth = 40;
-                    let logoHeight = 40 / aspectRatio;
-
-                    doc.addImage(img, 'PNG', margin, 45, logoWidth, logoHeight);
-                    console.log("Logo adicionada com sucesso");
-                } catch (error) {
-                    console.error("Erro ao adicionar a logo:", error);
-                    doc.setTextColor(...colors.primary);
-                    doc.setFontSize(12);
-                    doc.text("LOGO", margin + 20, 60, { align: 'center' });
-                }
-            } else {
-                console.log("Nenhuma logo encontrada nas informações do usuário");
-                doc.setTextColor(...colors.primary);
-                doc.setFontSize(12);
-                doc.text("LOGO", margin + 20, 60, { align: 'center' });
-            }
+            // Logo
+            await addLogo(10, 20, 40, 40);
 
             // Título
-            doc.setTextColor(...colors.white);
-            doc.setFontSize(24);
-            doc.setFont("helvetica", 'bold');
-            doc.text("PROPOSTA DE ORÇAMENTO", 45, 25);
-
-            // Informações da empresa e do cliente
-            addInfoBox("CONTRATADA:", infoUsuario, margin, 90, (pageWidth - 3*margin) / 2);
-            addInfoBox("CONTRATANTE:", cliente, pageWidth/2 + margin/2, 90, (pageWidth - 3*margin) / 2);
-
-            const boxWidth = (pageWidth - 3*margin) / 2;
-const startY = 90;
-
-const contratadaHeight = addInfoBox("CONTRATADA:", infoUsuario, margin, startY, boxWidth);
-const contratanteHeight = addInfoBox("CONTRATANTE:", cliente, pageWidth/2 + margin/2, startY, boxWidth);
-
-// Ajustar a posição da linha decorativa e do texto de rodapé
-const maxBoxHeight = Math.max(contratadaHeight, contratanteHeight);
-const lineY = startY + maxBoxHeight + 20;
-
-      
-// Linha decorativa
-doc.setDrawColor(...colors.primary);
-doc.setLineWidth(0.5);
-doc.line(margin, lineY, pageWidth - margin, lineY);
-
-// Texto de rodapé
-doc.setTextColor(...colors.primary);
-doc.setFontSize(12);
-doc.setFont("helvetica", 'italic');
-doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, lineY + 20, { align: 'center' });
-        }
-
-        function addInfoBox(title, data, x, y, width) {
-    const lineHeight = 10;
-    const maxWidth = width - 10; // Margem interna de 5 em cada lado
-    let boxHeight = 10; // Altura inicial para o título
-
-    // Título da caixa
-    doc.setFillColor(...colors.primary);
-    doc.rect(x, y, width, lineHeight, 'F');
-    doc.setTextColor(...colors.white);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", 'bold');
-    doc.text(title, x + 5, y + 7);
-
-    // Conteúdo da caixa
-    doc.setTextColor(...colors.text);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", 'normal');
-    let yOffset = y + lineHeight + 5;
-
-    Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'logo' && key !== 'cores') {
-            const text = `${key}: ${value || 'N/A'}`;
-            const lines = doc.splitTextToSize(text, maxWidth);
-            lines.forEach(line => {
-                doc.text(line, x + 5, yOffset);
-                yOffset += lineHeight;
-                boxHeight += lineHeight;
-            });
-        }
-    });
-
-    // Ajustar altura da caixa e desenhar borda
-    doc.setDrawColor(...colors.primary);
-    doc.setLineWidth(0.1);
-    doc.rect(x, y, width, boxHeight);
-
-    return boxHeight; // Retornar a altura total da caixa
-}
-        function addFooter() {
-            doc.setDrawColor(...colors.primary);
-            doc.setLineWidth(0.5);
-            doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
             doc.setTextColor(...colors.primary);
-            doc.setFontSize(8);
-            doc.text(`Página ${doc.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
-        }
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(24);
+            safeText("PROPOSTA DE", 70, 40);
+            safeText("ORÇAMENTO", 70, 55);
 
-        function addPage() {
-            doc.addPage();
-            addFooter();
-            return margin + 20;
+            // Subtítulo
+            doc.setTextColor(...colors.secondary);
+            doc.setFont("helvetica", 'italic');
+            doc.setFontSize(14);
+            safeText("Soluções em Películas de Alta Qualidade", 70, 70);
+
+            // Data e número do orçamento
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            safeText(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth - margin, 40, { align: 'right' });
+            safeText(`Orçamento Nº: ${Math.floor(Math.random() * 10000)}`, pageWidth - margin, 48, { align: 'right' });
+
+            // Informações da Contratada
+            doc.setFillColor(...colors.lightGray);
+            doc.roundedRect(70, 90, pageWidth - 85, 60, 3, 3, 'F');
+            doc.setTextColor(...colors.primary);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(12);
+            safeText("CONTRATADA", 75, 102);
+
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            safeText(`Empresa: ${infoUsuario.empresa}`, 75, 115);
+            safeText(`Telefone: ${infoUsuario.telefone}`, 75, 125);
+            safeText(`Email: ${infoUsuario.email}`, 75, 135);
+            safeText(`CNPJ/CPF: ${infoUsuario.cpfCnpj}`, 75, 145);
+
+            // Informações do Cliente
+            doc.setFillColor(...colors.lightGray);
+            doc.roundedRect(70, 160, pageWidth - 85, 60, 3, 3, 'F');
+            doc.setTextColor(...colors.primary);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(12);
+            safeText("CLIENTE", 75, 172);
+
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            safeText(`Nome: ${cliente.nome}`, 75, 185);
+            safeText(`Telefone: ${cliente.telefone}`, 75, 195);
+            safeText(`Email: ${cliente.email || 'N/A'}`, 75, 205);
+            safeText(`CNPJ/CPF: ${cliente.cpfCnpj || cliente.cpf || cliente.cnpj || 'N/A'}`, 75, 215);
+
+            addFooter(1);
         }
 
         function addContent() {
-            let y = addPage();
+            let y = addPage(2);
+            let pageNumber = 2;
 
-            function addSectionTitle(title) {
-                if (y > pageHeight - 60) y = addPage();
-                doc.setFillColor(...colors.primary);
-                doc.rect(0, y, pageWidth, 20, 'F');
-                doc.setTextColor(...colors.white);
-                doc.setFontSize(14);
-                doc.setFont("helvetica", 'bold');
-                doc.text(title, margin, y + 14);
-                y += 25;
-            }
-
-            function addTableHeader() {
-                const headers = ["Item", "Dimensões", "Película", "Ambiente", "Tipo", "Área", "Preço"];
-                const colWidths = [15, 30, 35, 30, 30, 20, 25];
-
-                doc.setFillColor(...colors.primary);
-                doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                doc.setTextColor(...colors.white);
-                doc.setFontSize(9);
-                doc.setFont("helvetica", 'bold');
-
-                let xOffset = margin;
-                headers.forEach((header, index) => {
-                    doc.text(header, xOffset + 2, y + 7);
-                    xOffset += colWidths[index];
-                });
-
-                y += 12;
-            }
-
-            function addMedidaItem(medida, index) {
-                if (y > pageHeight - 40) {
-                    y = addPage();
-                    addTableHeader();
-                }
-
-                const largura = medida.querySelector('.largura-input').value || '0';
-                const altura = medida.querySelector('.altura-input').value || '0';
-                const quantidade = medida.querySelector('.quantidade-input').value || '0';
-                const totalM2 = medida.querySelector('input[placeholder="M²"]').value || '0';
-                const ambiente = medida.querySelector('.additional-fields select:first-child').value || '';
-                const tipoAplicacao = medida.querySelector('.additional-fields select:last-child').value || '';
-                const peliculaNome = medida.querySelector('.pelicula-select').value || '';
-                const pelicula = peliculas.find(p => p.nome === peliculaNome);
-
-                const colWidths = [15, 30, 35, 30, 30, 20, 25];
-                let xOffset = margin;
-
-                if (index % 2 === 0) {
-                    doc.setFillColor(...colors.lightGray);
-                } else {
-                    doc.setFillColor(...colors.white);
-                }
-                doc.rect(margin, y - 2, pageWidth - 2 * margin, 10, 'F');
-
-                doc.setTextColor(...colors.text);
-                doc.setFontSize(8);
-                doc.setFont("helvetica", 'normal');
-
-                doc.text(`${index}`, xOffset + 2, y + 4);
-                xOffset += colWidths[0];
-                doc.text(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-                xOffset += colWidths[1];
-                doc.text(peliculaNome, xOffset + 2, y + 4);
-                xOffset += colWidths[2];
-                doc.text(ambiente, xOffset + 2, y + 4);
-                xOffset += colWidths[3];
-                doc.text(tipoAplicacao, xOffset + 2, y + 4);
-                xOffset += colWidths[4];
-                doc.text(`${totalM2} m²`, xOffset + 2, y + 4);
-                xOffset += colWidths[5];
-
-                if (pelicula) {
-                    const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                    doc.text(`R$ ${preco}`, xOffset + 2, y + 4);
-                }
-
-                y += 12;
-            }
-
-            function addTotalSection(peliculaNome, total) {
-                if (y > pageHeight - 40) y = addPage();
-
-                doc.setFillColor(...colors.secondary);
-                doc.rect(margin, y, pageWidth - 2 * margin, 20, 'F');
-
-                doc.setTextColor(...colors.white);
-                doc.setFontSize(11);
-                doc.setFont("helvetica", 'bold');
-                doc.text(`Total para ${peliculaNome}:`, margin + 5, y + 8);
-                doc.text(`Área Total: ${total.totalM2.toFixed(2)} m²`, margin + 5, y + 15);
-                doc.text(`Preço Total: R$ ${total.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 15, { align: 'right' });
-
-                y += 25;
-            }
+            y = addSectionTitle("Orçamento Detalhado", y);
+            y += 10;
 
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
             const medidasPorPelicula = {};
@@ -1348,14 +1611,89 @@ doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, lineY + 20
                 totaisGerais.precoTotal += preco;
             });
 
-            Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
-                if (index > 0) y = addPage();
-                addSectionTitle(`Orçamento para: ${peliculaNome}`);
-                addTableHeader();
-                medidas.forEach((group, idx) => {
-                    addMedidaItem(group, idx + 1);
+            function addMedidasTable(medidas, peliculaNome) {
+                const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
+                const colWidths = [15, 30, 40, 40, 20, 30];
+                
+                doc.setFillColor(...colors.primary);
+                doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+                doc.setTextColor(...colors.white);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(10);
+
+                let xOffset = margin;
+                headers.forEach((header, index) => {
+                    safeText(header, xOffset + 2, y + 7);
+                    xOffset += colWidths[index];
+                });
+                y += 12;
+
+                doc.setFont("helvetica", 'normal');
+                doc.setFontSize(9);
+
+                medidas.forEach((group, index) => {
+                    if (y > pageHeight - 30) {
+                        y = addPage(++pageNumber);
+                        // Repetir cabeçalho da tabela
+                        doc.setFillColor(...colors.primary);
+                        doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+                        doc.setTextColor(...colors.white);
+                        doc.setFont("helvetica", 'bold');
+                        doc.setFontSize(10);
+                        xOffset = margin;
+                        headers.forEach((header, index) => {
+                            safeText(header, xOffset + 2, y + 7);
+                            xOffset += colWidths[index];
+                        });
+                        y += 12;
+                        doc.setFont("helvetica", 'normal');
+                        doc.setFontSize(9);
+                    }
+
+                    const largura = group.querySelector('.largura-input').value || '0';
+                    const altura = group.querySelector('.altura-input').value || '0';
+                    const quantidade = group.querySelector('.quantidade-input').value || '0';
+                    const totalM2 = group.querySelector('input[placeholder="M²"]').value || '0';
+                    const ambiente = group.querySelector('.additional-fields select:first-child').value || '';
+                    const tipoAplicacao = group.querySelector('.additional-fields select:last-child').value || '';
+                    const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+                    doc.setTextColor(...colors.text);
+
+                    if (index % 2 === 0) {
+                        doc.setFillColor(...colors.lightGray);
+                        doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
+                    }
+
+                    xOffset = margin;
+                    safeText(`${index + 1}`, xOffset + 2, y + 4);
+                    xOffset += colWidths[0];
+                    safeText(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
+                    xOffset += colWidths[1];
+                    safeText(ambiente, xOffset + 2, y + 4);
+                    xOffset += colWidths[2];
+                    safeText(tipoAplicacao, xOffset + 2, y + 4);
+                    xOffset += colWidths[3];
+                    safeText(`${totalM2} m²`, xOffset + 2, y + 4);
+                    xOffset += colWidths[4];
+
+                    if (pelicula) {
+                        const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+                        safeText(`R$ ${preco}`, xOffset + 2, y + 4);
+                    }
+
+                    y += 10;
                 });
 
+                return y;
+            }
+
+            Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
+                if (index > 0) y = addPage(++pageNumber);
+                y = addSectionTitle(`Orçamento para: ${peliculaNome}`, y);
+                y += 5;
+                y = addMedidasTable(medidas, peliculaNome);
+                
                 const totalPelicula = {
                     totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0), 0),
                     precoTotal: medidas.reduce((sum, group) => {
@@ -1365,12 +1703,92 @@ doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, lineY + 20
                     }, 0)
                 };
 
-                addTotalSection(peliculaNome, totalPelicula);
+                y += 5;
+                doc.setFillColor(...colors.secondary);
+                doc.rect(margin, y, pageWidth - 2*margin, 15, 'F');
+                doc.setTextColor(...colors.white);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(11);
+                safeText(`Subtotal ${peliculaNome}:`, margin + 5, y + 10);
+                safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
+                safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 10, { align: 'right' });
+
+                y += 25;
             });
 
-            y = addPage();
-            addSectionTitle("Total Geral do Orçamento");
-            addTotalSection("Todas as Películas", totaisGerais);
+            // Total Geral
+            y = addSectionTitle("Total Geral do Orçamento", y);
+            y += 10;
+            doc.setFillColor(...colors.primary);
+            doc.rect(margin, y, pageWidth - 2*margin, 20, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(14);
+            safeText("Total Geral:", margin + 5, y + 8);
+            safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin + 5, y + 16);
+            safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 16, { align: 'right' });
+
+            y += 30;
+
+            // Página de Condições de Pagamento
+            y = addPage(++pageNumber);
+            y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
+            y += 10;
+
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+
+            const condicoesPagamento = [
+                "1. Formas de Pagamento Aceitas:",
+                "   • Transferência bancária",
+                "   • Cartão de crédito (em até 3x sem juros)",
+                "   • Boleto bancário",
+                "",
+                "2. Cronograma de Pagamento:",
+                "   • 50% do valor total na aprovação do orçamento",
+                "   • 50% restantes após a conclusão dos serviços",
+                "",
+                "3. Prazo de Instalação:",
+                "   • A ser definido em comum acordo, conforme disponibilidade",
+                "",
+                "4. Validade da Proposta:",
+                "   • Esta proposta é válida por 30 dias a partir da data de emissão",
+                "",
+                "5. Garantia:",
+                "   • 5 anos contra defeitos de fabricação e instalação",
+                "",
+                "6. Observações Importantes:",
+                "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
+                "   • A instalação está sujeita às condições climáticas favoráveis",
+                "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
+            ];
+
+            const lineHeight = 6;
+            condicoesPagamento.forEach((condicao, index) => {
+                if (y > pageHeight - 40) {
+                    y = addPage(++pageNumber);
+                    y = addSectionTitle("Condições de Pagamento (continuação)", y);
+                    y += 10;
+                }
+                safeText(condicao, margin, y);
+                y += lineHeight;
+            });
+
+            // Assinatura e Contato
+            y += 20;
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth / 2 - 10, y);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(11);
+            safeText(infoUsuario.nome, margin, y + 6);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            safeText(infoUsuario.empresa, margin, y + 12);
+            safeText(infoUsuario.telefone, margin, y + 18);
+            safeText(infoUsuario.email, margin, y + 24);
+            safeText(infoUsuario.website, margin, y + 30);
         }
 
         await addCover();
@@ -1395,6 +1813,17 @@ doc.text("Soluções em Películas de Alta Qualidade", pageWidth / 2, lineY + 20
 
 
 
+
+
+
+
+
+
+
+
+
+
+          
 
 
 
