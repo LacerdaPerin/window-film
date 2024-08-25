@@ -270,35 +270,43 @@
         }
 
         function abrirPopupUsuario() {
-            const popupUsuario = document.getElementById('popupUsuario');
-            popupUsuario.classList.remove('hidden');
-            carregarInformacoesUsuario();
-        }
+    const popupUsuario = document.getElementById('popupUsuario');
+    popupUsuario.classList.remove('hidden');
+    carregarInformacoesUsuario();
+}
 
         async function carregarInformacoesUsuario() {
-            const info = await obterInformacoesUsuarioDoIndexedDB();
-            if (info) {
-                document.getElementById('name').value = info.nome || '';
-                document.getElementById('companyName').value = info.empresa || '';
-                document.getElementById('phone').value = info.telefone || '';
-                document.getElementById('email').value = info.email || '';
-                document.getElementById('address').value = info.endereco || '';
-                document.getElementById('cpfCnpj').value = info.cpfCnpj || '';
+    try {
+        const info = await obterInformacoesUsuarioDoIndexedDB();
+        if (info) {
+            console.log('Informações do usuário encontradas no IndexedDB:', info);
+            
+            document.getElementById('name').value = info.nome || '';
+            document.getElementById('companyName').value = info.empresa || '';
+            document.getElementById('phone').value = info.telefone || '';
+            document.getElementById('email').value = info.email || '';
+            document.getElementById('address').value = info.endereco || '';
+            document.getElementById('cpfCnpj').value = info.cpfCnpj || '';
 
-                if (info.logo) {
-                    const logoPreview = document.getElementById('logoPreview');
-                    logoPreview.src = info.logo;
-                    logoPreview.style.display = 'block';
-                }
-
-                if (info.cores) {
-                    document.getElementById('primaryColorPreview').style.backgroundColor = info.cores.primaria;
-                    document.getElementById('secondaryColorPreview').style.backgroundColor = info.cores.secundaria;
-                    document.getElementById('primaryColor').value = info.cores.primaria;
-                    document.getElementById('secondaryColor').value = info.cores.secundaria;
-                }
+            if (info.logo) {
+                const logoPreview = document.getElementById('logoPreview');
+                logoPreview.src = info.logo;
+                logoPreview.style.display = 'block';
             }
+
+            if (info.cores) {
+                document.getElementById('primaryColorPreview').style.backgroundColor = info.cores.primaria;
+                document.getElementById('secondaryColorPreview').style.backgroundColor = info.cores.secundaria;
+                document.getElementById('primaryColor').value = info.cores.primaria;
+                document.getElementById('secondaryColor').value = info.cores.secundaria;
+            }
+        } else {
+            console.log('Nenhuma informação de usuário encontrada no IndexedDB');
         }
+    } catch (error) {
+        console.error('Erro ao carregar informações do usuário:', error);
+    }
+}
 
         function fecharPopupUsuario() {
             document.getElementById('popupUsuario').classList.add('hidden');
@@ -1333,8 +1341,16 @@ async function obterClienteDoIndexedDB(id) {
     }
 
     return codigoUsuario === codigoCorreto;
+    
 }
+
 async function mostrarPopupVerificacao() {
+
+     // Remover qualquer popup existente antes de criar um novo
+     const existingPopup = document.getElementById('popupVerificacao');
+    if (existingPopup) {
+        existingPopup.parentNode.removeChild(existingPopup);
+    }
     const frasesGeradas = gerarFrasesAleatorias();
     const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
 
@@ -1354,22 +1370,33 @@ async function mostrarPopupVerificacao() {
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
     document.getElementById('verificarCodigo').addEventListener('click', async () => {
-        const codigoUsuario = document.getElementById('codigoAtivacao').value;
-        console.log('Código inserido:', codigoUsuario); // Log adicionado
+    const codigoUsuario = document.getElementById('codigoAtivacao').value;
 
-        if (verificarCodigo(codigoUsuario, frasesGeradas)) {
-            console.log('Código verificado com sucesso'); // Log adicionado
-            await ativarAplicativo();
-            console.log('Aplicativo ativado'); // Log adicionado
-            alert('Código correto! Aplicativo ativado com sucesso.');
-            document.getElementById('popupVerificacao').remove();
-            document.body.style.pointerEvents = 'auto'; // Reabilitar interações
-            location.reload(); // Recarrega a página para aplicar a ativação
-        } else {
-            console.log('Código incorreto'); // Log adicionado
-            alert('Código incorreto. Tente novamente.');
+    if (verificarCodigo(codigoUsuario, frasesGeradas)) {
+        console.log('Código correto! Aplicativo ativado com sucesso');
+        
+        await ativarAplicativo();
+
+        // Fechar o popup de maneira confiável
+        const popup = document.getElementById('popupVerificacao');
+        if (popup) {
+            popup.style.display = 'none'; // Esconde o popup imediatamente
+            popup.parentNode.removeChild(popup); // Remove o popup do DOM
         }
-    });
+
+        // Liberar o acesso à página
+        document.body.style.pointerEvents = 'auto';
+
+        alert('Código correto! Aplicativo ativado com sucesso.');
+
+        // Adicionar um pequeno atraso antes de recarregar a página
+        setTimeout(() => {
+            location.reload();
+        }, 500); // 500ms de atraso
+    } else {
+        alert('Código incorreto. Tente novamente.');
+    }
+});
 }
 
 async function verificarAtivacaoAntes(acao) {
@@ -1391,7 +1418,6 @@ async function verificarStatusInicial() {
         document.getElementById('popupVerificacao').style.pointerEvents = 'auto';
     }
 }
-
         async function salvarVerificacaoNoIndexedDB(verificado) {
             const db = await abrirIndexedDB();
             const transaction = db.transaction(['verificacao'], 'readwrite');
@@ -1417,17 +1443,25 @@ async function verificarStatusInicial() {
 
         document.addEventListener('DOMContentLoaded', function () {
     verificarStatusInicial(); // Adicione esta linha
-
+    
     const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
     if (popupClienteBtnSalvar) {
         popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    }
+
+    const userForm = document.getElementById('userForm');
+    if (userForm) {
+        userForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            salvarInformacoesUsuario();
+        });
     }
 
     const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
     if (fecharPopupBtn) {
         fecharPopupBtn.addEventListener('click', fecharPopup);
     }
-        });
+});
     </script>
 </body>
 </html>
