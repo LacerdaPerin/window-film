@@ -1061,10 +1061,21 @@ async function removerClienteDoIndexedDB(id) {
 
 
 
-          //Função generatePDF_v3_0 Completa e Atualizada
 
 
-async function generatePDF_v3_0() {
+
+
+
+
+
+
+
+
+
+
+                           //Função generatePDF_v3_0 Completa e Atualizada
+
+                           async function generatePDF_v3_0() {
     try {
         const clienteNome = clienteSelect.value;
         if (!clienteNome) {
@@ -1121,18 +1132,14 @@ async function generatePDF_v3_0() {
                 try {
                     const img = new Image();
                     img.src = infoUsuario.logo;
-
                     await new Promise((resolve, reject) => {
                         img.onload = resolve;
                         img.onerror = reject;
                     });
-
                     let imgWidth = img.width;
                     let imgHeight = img.height;
-
                     const imgRatio = imgWidth / imgHeight;
                     const boxRatio = maxWidth / maxHeight;
-
                     if (imgRatio > boxRatio) {
                         imgWidth = maxWidth;
                         imgHeight = maxWidth / imgRatio;
@@ -1140,12 +1147,9 @@ async function generatePDF_v3_0() {
                         imgHeight = maxHeight;
                         imgWidth = maxHeight * imgRatio;
                     }
-
                     const offsetX = x + (maxWidth - imgWidth) / 2;
                     const offsetY = y + (maxHeight - imgHeight) / 2;
-
                     await doc.addImage(infoUsuario.logo, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
-
                 } catch (error) {
                     console.error("Erro ao adicionar a logo:", error);
                     doc.setFontSize(12);
@@ -1174,48 +1178,42 @@ async function generatePDF_v3_0() {
         }
 
         function addSectionTitle(title, y) {
-            doc.setFillColor(...colors.primary);
-            doc.rect(0, y, pageWidth, 12, 'F');
-            doc.setTextColor(...colors.white);
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth - margin, y);
+            doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(14);
-            safeText(title, margin, y + 8.5);
+            safeText(title, margin, y + 10);
             return y + 20;
         }
 
         async function addCover() {
             doc.setFillColor(...colors.white);
             doc.rect(0, 0, pageWidth, pageHeight, 'F');
-
             doc.setFillColor(...colors.primary);
             doc.rect(0, 0, 60, pageHeight, 'F');
-
             await addLogo(10, 20, 40, 40);
-
             doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(24);
             safeText("PROPOSTA DE", 70, 40);
             safeText("ORÇAMENTO", 70, 55);
-
             doc.setTextColor(...colors.secondary);
             doc.setFont("helvetica", 'italic');
             doc.setFontSize(14);
             safeText("Soluções em Películas de Alta Qualidade", 70, 70);
-
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
             safeText(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth - margin, 40, { align: 'right' });
             safeText(`Orçamento Nº: ${Math.floor(Math.random() * 10000)}`, pageWidth - margin, 48, { align: 'right' });
-
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 90, pageWidth - 85, 60, 3, 3, 'F');
             doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(12);
             safeText("CONTRATADA", 75, 102);
-
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
@@ -1223,14 +1221,12 @@ async function generatePDF_v3_0() {
             safeText(`Telefone: ${infoUsuario.telefone}`, 75, 125);
             safeText(`Email: ${infoUsuario.email}`, 75, 135);
             safeText(`CNPJ/CPF: ${infoUsuario.cpfCnpj}`, 75, 145);
-
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 160, pageWidth - 85, 60, 3, 3, 'F');
             doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(12);
             safeText("CLIENTE", 75, 172);
-
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
@@ -1238,7 +1234,6 @@ async function generatePDF_v3_0() {
             safeText(`Telefone: ${cliente.telefone}`, 75, 195);
             safeText(`Email: ${cliente.email || 'N/A'}`, 75, 205);
             safeText(`CNPJ/CPF: ${cliente.cpfCnpj || cliente.cpf || cliente.cnpj || 'N/A'}`, 75, 215);
-
             addFooter(1);
         }
 
@@ -1254,65 +1249,83 @@ async function generatePDF_v3_0() {
             const totaisGerais = { totalM2: 0, precoTotal: 0 };
 
             medidaGroups.forEach(group => {
-        const isChecked = group.querySelector('input[type="checkbox"]').checked;
-        const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
-        const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
-        const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+                const isChecked = group.querySelector('input[type="checkbox"]').checked;
+                const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+                const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+                const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
 
-        if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
-            const peliculaNome = group.querySelector('.pelicula-select').value;
-            if (!medidasPorPelicula[peliculaNome]) {
-                medidasPorPelicula[peliculaNome] = [];
-            }
-            medidasPorPelicula[peliculaNome].push(group);
+                if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
+                    const peliculaNome = group.querySelector('.pelicula-select').value;
+                    if (!medidasPorPelicula[peliculaNome]) {
+                        medidasPorPelicula[peliculaNome] = [];
+                    }
+                    medidasPorPelicula[peliculaNome].push(group);
 
-            const pelicula = peliculas.find(p => p.nome === peliculaNome);
-            const area = largura * altura * quantidade;
-            const preco = pelicula ? area * pelicula.preco : 0;
+                    const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                    const area = largura * altura * quantidade;
+                    const preco = pelicula ? area * pelicula.preco : 0;
 
-            totaisGerais.totalM2 += area;
-            totaisGerais.precoTotal += preco;
-        }
-    });
+                    totaisGerais.totalM2 += area;
+                    totaisGerais.precoTotal += preco;
+                }
+            });
 
             function addMedidasTable(medidas, peliculaNome) {
                 const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
                 const colWidths = [15, 30, 40, 40, 20, 30];
                 
+                // Título da tabela
+                doc.setTextColor(...colors.primary);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(12);
+                safeText(peliculaNome, margin, y);
+                y += 10;
+
+                // Cabeçalho da tabela
                 doc.setFillColor(...colors.primary);
-                doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+                doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                 doc.setTextColor(...colors.white);
                 doc.setFont("helvetica", 'bold');
-                doc.setFontSize(10);
+                doc.setFontSize(9);
 
                 let xOffset = margin;
                 headers.forEach((header, index) => {
-                    safeText(header, xOffset + 2, y + 7);
+                    safeText(header, xOffset + 2, y + 6);
                     xOffset += colWidths[index];
                 });
-                y += 12;
+                y += 10;
 
                 doc.setFont("helvetica", 'normal');
-                doc.setFontSize(9);
+                doc.setFontSize(8);
+
+                // Cores para o efeito zebrado
+                const zebraColor1 = [255, 255, 255]; // Branco
+                const zebraColor2 = [245, 245, 245]; // Cinza muito claro
 
                 medidas.forEach((group, index) => {
-                    // Verificação da altura disponível antes de adicionar conteúdo
-                    if (y > pageHeight - 60) { // Ajustado para garantir que o rodapé e o total geral não sejam sobrepostos
+                    if (y > pageHeight - 60) {
                         y = addPage(++pageNumber);
+                        // Repetir cabeçalho da tabela na nova página
                         doc.setFillColor(...colors.primary);
-                        doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+                        doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                         doc.setTextColor(...colors.white);
                         doc.setFont("helvetica", 'bold');
-                        doc.setFontSize(10);
+                        doc.setFontSize(9);
                         xOffset = margin;
                         headers.forEach((header, index) => {
-                            safeText(header, xOffset + 2, y + 7);
+                            safeText(header, xOffset + 2, y + 6);
                             xOffset += colWidths[index];
                         });
-                        y += 12;
+                        y += 10;
                         doc.setFont("helvetica", 'normal');
-                        doc.setFontSize(9);
+                        doc.setFontSize(8);
                     }
+
+                    // Efeito zebrado
+                    doc.setFillColor(...(index % 2 === 0 ? zebraColor1 : zebraColor2));
+                    doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
+
+                    doc.setTextColor(...colors.text);
 
                     const largura = group.querySelector('.largura-input').value || '0';
                     const altura = group.querySelector('.altura-input').value || '0';
@@ -1321,13 +1334,6 @@ async function generatePDF_v3_0() {
                     const ambiente = group.querySelector('.additional-fields select:first-child').value || '';
                     const tipoAplicacao = group.querySelector('.additional-fields select:last-child').value || '';
                     const pelicula = peliculas.find(p => p.nome === peliculaNome);
-
-                    doc.setTextColor(...colors.text);
-
-                    if (index % 2 === 0) {
-                        doc.setFillColor(...colors.lightGray);
-                        doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
-                    }
 
                     xOffset = margin;
                     safeText(`${index + 1}`, xOffset + 2, y + 4);
@@ -1346,7 +1352,7 @@ async function generatePDF_v3_0() {
                         safeText(`R$ ${preco}`, xOffset + 2, y + 4);
                     }
 
-                    y += 10;
+                    y += 10; // Espaçamento entre linhas
                 });
 
                 return y;
@@ -1354,8 +1360,6 @@ async function generatePDF_v3_0() {
 
             Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
                 if (index > 0) y = addPage(++pageNumber);
-                y = addSectionTitle(`Orçamento para: ${peliculaNome}`, y);
-                y += 5;
                 y = addMedidasTable(medidas, peliculaNome);
                 
                 const totalPelicula = {
@@ -1368,34 +1372,34 @@ async function generatePDF_v3_0() {
                 };
 
                 y += 5;
-                doc.setFillColor(...colors.secondary);
-                doc.rect(margin, y, pageWidth - 2*margin, 15, 'F');
-                doc.setTextColor(...colors.white);
+                doc.setDrawColor(...colors.secondary);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth - margin, y);
+                doc.setTextColor(...colors.secondary);
                 doc.setFont("helvetica", 'bold');
-                doc.setFontSize(11);
-                safeText(`Subtotal ${peliculaNome}:`, margin + 5, y + 10);
+                doc.setFontSize(10);
+                safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
                 safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
-                safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 10, { align: 'right' });
-
-                y += 25;
+                safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
+                y += 15;
             });
 
-            // Verificar altura disponível antes de adicionar o Total Geral
             if (y > pageHeight - 60) {
                 y = addPage(++pageNumber);
             }
 
             y = addSectionTitle("Total Geral do Orçamento", y);
             y += 10;
-            doc.setFillColor(...colors.primary);
-            doc.rect(margin, y, pageWidth - 2*margin, 20, 'F');
-            doc.setTextColor(...colors.white);
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(1);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 5;
+            doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
-            doc.setFontSize(14);
-            safeText("Total Geral:", margin + 5, y + 8);
-            safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin + 5, y + 16);
-            safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin - 5, y + 16, { align: 'right' });
-
+            doc.setFontSize(12);
+            safeText("Total Geral:", margin, y + 10);
+            safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
+            safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
             y += 30;
 
             y = addPage(++pageNumber);
@@ -1406,33 +1410,31 @@ async function generatePDF_v3_0() {
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
 
-            
             const condicoesPagamento = [
-                        "1. Formas de Pagamento Aceitas:",
-                        "   • Transferência bancária e Pix",
-                        "   • Cartão de crédito (em até 3x sem juros)",
-                        "   • Boleto bancário",
-                        "",
-                        "2. Cronograma de Pagamento:",
-                        "   • 50% do valor quando acima de R$ 2.500 na aprovação do orçamento",
-                        "   • 50% restantes após a conclusão dos serviços",
-                        "",
-                        "3. Prazo de Instalação:",
-                        "   • A ser definido em comum acordo, conforme disponibilidade",
-                        "",
-                        "4. Validade da Proposta:",
-                        "   • Esta proposta é válida por 60 dias a partir da data de emissão",
-                        "",
-                        "5. Garantia:",
-                        "   • 2 a 10 anos contra defeitos de fabricação",
-                        "   • 10 semanas contra defeitos de aplicação",
-                        "",
-                        "6. Observações Importantes:",
-                        "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
-                        "   • A instalação está sujeita às condições climáticas favoráveis",
-                        "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
-                    ];
-            
+                "1. Formas de Pagamento Aceitas:",
+                "   • Transferência bancária e Pix",
+                "   • Cartão de crédito (em até 3x sem juros)",
+                "   • Boleto bancário",
+                "",
+                "2. Cronograma de Pagamento:",
+                "   • 50% do valor quando acima de R$ 2.500 na aprovação do orçamento",
+                "   • 50% restantes após a conclusão dos serviços",
+                "",
+                "3. Prazo de Instalação:",
+                "   • A ser definido em comum acordo, conforme disponibilidade",
+                "",
+                "4. Validade da Proposta:",
+                "   • Esta proposta é válida por 60 dias a partir da data de emissão",
+                "",
+                "5. Garantia:",
+                "   • 2 a 10 anos contra defeitos de fabricação",
+                "   • 10 semanas contra defeitos de aplicação",
+                "",
+                "6. Observações Importantes:",
+                "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
+                "   • A instalação está sujeita às condições climáticas favoráveis",
+                "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
+            ];
 
             const lineHeight = 6;
             condicoesPagamento.forEach((condicao, index) => {
@@ -1448,7 +1450,7 @@ async function generatePDF_v3_0() {
             y += 20;
             doc.setDrawColor(...colors.primary);
             doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth / 2 - 10, y);
+            doc.line(margin, y, pageWidth / 2 - 20, y);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(11);
             safeText(infoUsuario.nome, margin, y + 6);
@@ -1457,13 +1459,13 @@ async function generatePDF_v3_0() {
             safeText(infoUsuario.empresa, margin, y + 12);
             safeText(infoUsuario.telefone, margin, y + 18);
             safeText(infoUsuario.email, margin, y + 24);
-            safeText(infoUsuario.website, margin, y + 30);
         }
 
         await addCover();
         addContent();
 
         doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+        console.log('PDF gerado com sucesso!');
     } catch (error) {
         console.error("Erro ao gerar PDF:", error);
         alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
@@ -1472,23 +1474,26 @@ async function generatePDF_v3_0() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-//PDF FINAL
+                           //PDF FINAL
 
 
 
        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
