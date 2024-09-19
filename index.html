@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-gradient-to-r from-blue-50 via-white to-blue-50">
 <head>
@@ -11,8 +12,29 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
-    <link rel="manifest" href="/teste-pwa/manifest.json">
+    <link rel="manifest" href="/peliqueiros-br/manifest.json">
     <meta name="theme-color" content="#000000">
+    <style>
+        /* Certificando que o popup será sempre visível */
+        #popupCliente, #popupUsuario {
+            z-index: 10000; /* Elevando o nível do popup */
+        }
+
+          /* Animação de carregamento */
+    .loader {
+        border: 8px solid #f3f3f3; /* Light grey */
+        border-top: 8px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -30,33 +52,57 @@
         <div class="container mx-auto px-2 py-6 w-full max-w-4xl">
             <div class="bg-white rounded-xl shadow-lg p-2 sm:p-4 mb-6">
                 <!-- Cabeçalho -->
-    <div class="mb-4">
-        <div class="text-center mb-2">
-            <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Dos_Peliqueiros</h1>
-        </div>
-        <div class="flex items-center space-x-2">
-            <select id="clienteSelect" class="flex-grow p-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
-                <option value="">Selecione um cliente</option>
-            </select>
-            <button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden">
-                <i class="fas fa-user-plus"></i>
-            </button>
-            <button id="addNewClienteBtnDesktop" class="hidden sm:block w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
-                <i class="fas fa-user-plus mr-2"></i> Adicionar Cliente
-            </button>
-        </div>
-        <div id="editIconContainer" class="hidden flex justify-end space-x-2 mt-2">
-            <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-sm">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-            <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
-                <i class="fas fa-user-cog"></i>
-            </button>
-        </div>
+                <div class="mb-4">
+                    <div class="text-center mb-2">
+                        <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Los_PelikoSs</h1>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="clienteSelect" class="flex-grow p-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                      <!-- Botão para adicionar novo cliente -->
+<button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden" onclick="abrirPopup('adicionar')">
+    <i class="fas fa-user-plus"></i>
+</button>
+                        <button id="addNewClienteBtnDesktop" class="hidden sm:block w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
+                            <i class="fas fa-user-plus mr-2"></i> Adicionar Cliente
+                        </button>
+                    </div>
+
+     <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
+<div id="splash-screen" class="fixed inset-0 bg-black flex items-center justify-center z-50">
+    <div class="flex flex-col items-center">
+        <!-- Animação de carregamento -->
+        <div class="loader"></div>
     </div>
+</div>
+
+<!-- Contêiner principal -->
+<div class="flex items-center justify-between mt-2">
+    <!-- Ícone de Localização à Esquerda -->
+    <div class="flex items-center">
+        <button onclick="abrirMapa()" class="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-300 shadow-sm">
+            <i class="fas fa-map-marker-alt"></i>
+        </button>
+    </div>
+
+    <!-- Ícones à Direita -->
+    <div id="editIconContainer" class="flex items-center space-x-2">
+        <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-sm">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+        <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
+            <i class="fas fa-user-cog"></i>
+        </button>
+    </div>
+</div>
+
+    
+                    
+                </div>
 
                 <!-- Conteúdo scrollável (grupos de medidas) -->
                 <div id="medidasContainer" class="space-y-2 w-full pb-20 sm:pb-0">
@@ -85,123 +131,683 @@
         </div>
     </div>
 
-<!-- Rodapé fixo para mobile -->
-<div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white bg-opacity-85 shadow-lg border-t border-gray-800">
-    <div class="container mx-auto px-2 py-3">
-        <div id="resultadoMobile" class="text-center text-lg font-bold text-black-100 mb-2">Total M²: 0,00 | R$ 0,00</div>
-        <div class="flex justify-around items-center">
-            <button onclick="addMedidaGroup(true)" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
-                <i class="fas fa-plus-circle text-2xl"></i>
+    <!-- Rodapé fixo para mobile -->
+    <div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white bg-opacity-85 shadow-lg border-t border-gray-800">
+        <div class="container mx-auto px-2 py-3">
+            <div id="resultadoMobile" class="text-center text-lg font-bold text-black-100 mb-2">Total M²: 0,00 | R$ 0,00</div>
+            <div class="flex justify-around items-center">
+                <button onclick="addMedidaGroup(true)" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
+                    <i class="fas fa-plus-circle text-2xl"></i>
+                </button>
+                <button onclick="duplicarMedidas()" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
+                    <i class="fas fa-copy text-2xl"></i>
+                </button>
+                <button id="generatePdfButtonMobile" class="p-2 text-black-100 hover:text-yellow-300  transition duration-300">
+                    <i class="fas fa-file-pdf text-2xl"></i>
+                </button>
+                <button onclick="copyShareURL()" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
+                    <i class="fas fa-share-alt text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+ <!-- Popup de Cadastro de Usuário -->
+  
+<div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-lg w-full mx-4 sm:mx-0">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Cadastro de Usuário</h2>
+            <button onclick="fecharPopupUsuario()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </button>
-            <button onclick="duplicarMedidas()" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
-                <i class="fas fa-copy text-2xl"></i>
+        </div>
+        <!-- Dentro do Popup de Cadastro de Usuário -->
+<div class="p-6 space-y-6 max-h-70vh overflow-y-auto">
+    <form id="userForm" class="space-y-4">
+        <!-- Campos existentes... -->
+
+        <!-- Botão para abrir as Configurações de Formas de Pagamento -->
+        <div>
+            <button type="button" onclick="abrirPopupPaymentMethods()" class="w-full p-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300">
+                Configurar Formas de Pagamento
             </button>
-            <button id="generatePdfButtonMobile" class="p-2 text-black-100 hover:text-yellow-300  transition duration-300">
-                <i class="fas fa-file-pdf text-2xl"></i>
-            </button>
-            <button onclick="copyShareURL()" class="p-2 text-black-100 hover:text-yellow-300 transition duration-300">
-                <i class="fas fa-share-alt text-2xl"></i>
+        </div>
+    </form>
+</div>
+
+        <div class="p-6 space-y-6 max-h-70vh overflow-y-auto">
+            <form id="userForm" class="space-y-4">
+                <div>
+                    <label for="logo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Logotipo</label>
+                    <input type="file" id="logo" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 dark:bg-gray-700 dark:text-gray-100">
+                    <img id="logoPreview" src="" alt="Preview do logotipo" class="mt-2 hidden max-h-20 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cores</label>
+                    <div class="flex items-center space-x-6 mt-2">
+                        <div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Primária</span>
+                            <div id="primaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer mt-1" onclick="document.getElementById('primaryColor').click()"></div>
+                            <input type="color" id="primaryColor" class="hidden">
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Secundária</span>
+                            <div id="secondaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer mt-1" onclick="document.getElementById('secondaryColor').click()"></div>
+                            <input type="color" id="secondaryColor" class="hidden">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
+                    <input type="text" id="name" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+                <div>
+                    <label for="companyName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome da Empresa</label>
+                    <input type="text" id="companyName" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefone</label>
+                    <input type="tel" id="phone" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    <input type="email" id="email" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Endereço</label>
+                    <input type="text" id="address" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+                <div>
+                    <label for="cpfCnpj" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CPF/CNPJ</label>
+                    <input type="text" id="cpfCnpj" required class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                </div>
+            </form>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <button id="saveUserInfoButton" type="submit" form="userForm" class="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
+                Salvar
             </button>
         </div>
     </div>
 </div>
 
-    <div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto py-5">
-        <div class="bg-white rounded-lg shadow-lg relative w-full max-w-md m-2">
-            <div class="p-6">
-                <h2 class="text-xl font-semibold mb-4">Cadastro de Usuário</h2>
-                <div class="max-h-70vh overflow-y-auto pr-2">
-                    <form id="userForm" class="space-y-4">
-                        <div>
-                            <label for="logo" class="block text-sm font-medium text-gray-700">Logotipo:</label>
-                            <input type="file" id="logo" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                            <img id="logoPreview" src="" alt="Preview do logotipo" class="mt-2 hidden max-h-20">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Cores:</label>
-                            <div class="flex items-center space-x-4 mt-1">
-                                <div>
-                                    <span class="text-sm text-gray-500">Primária:</span>
-                                    <div id="primaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"></div>
-                                    <input type="color" id="primaryColor" class="hidden">
-                                </div>
-                                <div>
-                                    <span class="text-sm text-gray-500">Secundária:</span>
-                                    <div id="secondaryColorPreview" class="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"></div>
-                                    <input type="color" id="secondaryColor" class="hidden">
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">Nome:</label>
-                            <input type="text" id="name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="companyName" class="block text-sm font-medium text-gray-700">Nome da empresa:</label>
-                            <input type="text" id="companyName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Telefone:</label>
-                            <input type="tel" id="phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
-                            <input type="email" id="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="address" class="block text-sm font-medium text-gray-700">Endereço:</label>
-                            <input type="text" id="address" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="cpfCnpj" class="block text-sm font-medium text-gray-700">CPF/CNPJ:</label>
-                            <input type="text" id="cpfCnpj" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        </div>
-                    </form>
+    <!-- Popup de Formas de Pagamento -->
+<div id="popupPaymentMethods" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Configurar Formas de Pagamento</h2>
+            <button onclick="fecharPopupPaymentMethods()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="paymentMethodsForm" class="p-6 space-y-4">
+            <!-- Pix -->
+            <div class="flex items-center">
+                <input type="checkbox" id="pix" name="payment_methods" value="pix" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="pix" class="ml-2 text-gray-700 dark:text-gray-300">Pix</label>
+            </div>
+            <!-- Boleto -->
+            <div class="flex items-center">
+                <input type="checkbox" id="boleto" name="payment_methods" value="boleto" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="boleto" class="ml-2 text-gray-700 dark:text-gray-300">Boleto</label>
+            </div>
+            <!-- Até 12x sem Juros -->
+            <div class="flex items-center">
+                <input type="checkbox" id="parcelado_sem_juros" name="payment_methods" value="parcelado_sem_juros" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="parcelado_sem_juros" class="ml-2 text-gray-700 dark:text-gray-300">Até 12x sem Juros</label>
+            </div>
+            <div class="ml-6">
+                <label for="parcelas_sem_juros" class="block text-sm text-gray-700 dark:text-gray-300">Número de Parcelas:</label>
+                <input type="number" id="parcelas_sem_juros" name="parcelas_sem_juros" min="1" max="12" placeholder="Até 12" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <!-- 12x com Juros -->
+            <div class="flex items-center">
+                <input type="checkbox" id="parcelado_com_juros" name="payment_methods" value="parcelado_com_juros" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="parcelado_com_juros" class="ml-2 text-gray-700 dark:text-gray-300">12x com Juros</label>
+            </div>
+            <div class="ml-6">
+                <label for="parcelas_com_juros" class="block text-sm text-gray-700 dark:text-gray-300">Número de Parcelas:</label>
+                <input type="number" id="parcelas_com_juros" name="parcelas_com_juros" min="1" max="12" placeholder="Até 12" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <div class="ml-6">
+                <label for="taxa_juros" class="block text-sm text-gray-700 dark:text-gray-300">Taxa de Juros (%):</label>
+                <input type="number" id="taxa_juros" name="taxa_juros" step="0.01" min="0" placeholder="Ex: 2.5" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <button type="submit" class="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
+                Salvar
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Popup de Cadastro de Cliente -->
+<div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 id="popupTitulo" class="text-xl font-semibold text-gray-800 dark:text-gray-100">Adicionar Novo Cliente</h2>
+            <button onclick="fecharPopupCliente()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+        </div>
+        <form id="clienteForm" class="p-6 space-y-4">
+            <div>
+                <label for="popupClienteNome" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Cliente</label>
+                <input type="text" id="popupClienteNome" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Nome do Cliente" required>
+            </div>
+            <div>
+                <label for="popupClienteTelefone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefone</label>
+                <input type="tel" id="popupClienteTelefone" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Telefone" inputmode="tel" required>
+            </div>
+            <div>
+                <label for="popupClienteEndereco" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Endereço</label>
+                <input type="text" id="popupClienteEndereco" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Endereço" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="popupClienteCPF" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CPF</label>
+                    <input type="text" id="popupClienteCPF" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="CPF" inputmode="numeric">
+                </div>
+                <div>
+                    <label for="popupClienteCNPJ" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CNPJ</label>
+                    <input type="text" id="popupClienteCNPJ" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="CNPJ" inputmode="numeric">
                 </div>
             </div>
-            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200">
-                <button type="submit" form="userForm" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar</button>
+            <!-- Novo Campo de Email -->
+            <div>
+                <label for="popupClienteEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                <input type="email" id="popupClienteEmail" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Email" required>
             </div>
-        </div>
+            <button type="submit" id="popupClienteBtnSalvar" class="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
+                Salvar Cliente
+            </button>
+        </form>
     </div>
+</div>
 
-    <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
-            <span class="absolute top-2 right-2 text-2xl font-bold cursor-pointer" onclick="fecharPopup()">&times;</span>
-            <h2 id="popupTitulo" class="text-xl font-semibold mb-4">Adicionar Novo Cliente</h2>
-            <form id="clienteForm" class="space-y-4">
-                <input type="text" id="popupClienteNome" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Nome do Cliente" required>
-                <input type="tel" id="popupClienteTelefone" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Telefone" inputmode="tel" required>
-                <input type="text" id="popupClienteEndereco" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Endereço" required>
-                <input type="text" id="popupClienteCPF" class="w-full p-2 border border-gray-300 rounded-md" placeholder="CPF" inputmode="numeric">
-                <input type="text" id="popupClienteCNPJ" class="w-full p-2 border border-gray-300 rounded-md" placeholder="CNPJ" inputmode="numeric">
-                <button type="submit" id="popupClienteBtnSalvar" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
-                    Salvar Cliente
-                </button>
-            </form>
-        </div>
-    </div>
+
 
     <script>
         // Registro do Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/teste-pwa/service-worker.js')
-                .then(function (registration) {
-                    console.log('Service Worker registrado com sucesso:', registration);
-                })
-                .catch(function (error) {
-                    console.log('Falha ao registrar o Service Worker:', error);
-                });
+    navigator.serviceWorker.register('/peliqueiros-br/service-worker.js')
+    .then((registration) => {
+        // Verifica se há um service worker esperando para ser ativado
+        if (registration.waiting) {
+            notifyUserAboutUpdate(registration.waiting);
+            return;
         }
 
-        // Adicione esta função ao seu JavaScript existente
-    function updateResultado(m2, preco) {
-        const resultadoDesktop = document.getElementById('resultadoDesktop');
-        const resultadoMobile = document.getElementById('resultadoMobile');
-        
-        resultadoDesktop.textContent = `Total M²: ${m2.toFixed(2)} | Preço Total: R$ ${preco.toFixed(2)}`;
-        resultadoMobile.textContent = `Total M²: ${m2.toFixed(2)} | R$ ${preco.toFixed(2)}`;
+        // Escuta atualizações no service worker
+        registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed') {
+                    // Se o novo service worker foi instalado e já está esperando
+                    if (navigator.serviceWorker.controller) {
+                        notifyUserAboutUpdate(newWorker);
+                    }
+                }
+            });
+        });
+    })
+    .catch((error) => {
+        console.error('Erro ao registrar o service worker:', error);
+    });
+}
+
+    // Remover a splash screen após o carregamento do aplicativo
+    window.addEventListener('load', () => {
+        const splashScreen = document.getElementById('splash-screen');
+        splashScreen.style.display = 'none'; // ou use uma animação para fade-out
+    });
+    
+
+        // Array de películas predefinidas
+        const peliculasPredefinidas = [
+            { nome: "Color Stable", preco: 220 },
+            { nome: "Origin Carbon", preco: 120 },
+            { nome: "Window Blue Performance", preco: 240 },
+            { nome: "Silver 10 Externa", preco: 280 },
+            { nome: "Vinil Blackout", preco: 130 },
+            { nome: "Vinil Jateado", preco: 120 },
+        ];
+
+        let peliculas = [...peliculasPredefinidas];
+        let clientes = [];
+        let clienteSelecionado = '';
+
+  
+// Arrays para ambientes e tipos de aplicação
+const ambientes = [
+    "Desconhecido", "Academia", "Adega", "Área de Lazer", "Área de Serviço", "Área Externa", "Auditório", 
+    "Banheiro", "Balcão", "Barbearia", "Biblioteca", "Churrasqueira", "Cinema", "Closet", "Copa", "Corredor", 
+    "Cozinha", "Depósito", "Despensa", "Elevador", "Escada", "Escritorio", "Estúdio", "Garagem", "Garita", 
+    "Garita fundo", "Hall de Entrada", "Jardim", "Lavanderia", "Loja", "Piscina", "Portaria", "Porão", 
+    "Quarto", "Quintal", "Recepção", "Refeitorio", "Sala", "Sotão", "Spa", "Terraço", "Varanda"
+];
+
+const tiposAplicacao = [
+    "Desconhecido", "Armário", "Balcão", "Basculante", "Box de banheiro", "Cobogó de Vidro",
+    "Cobertura de Vidro", "Divisória de Vidro", "Espelho", "Fachada", "Guarda-corpo",
+    "Janela Basculante", "Janela de correr", "Janela Integrada", "Janela pivotante", "Painel de Vidro", 
+    "Parede divisória", "Parapeito", "Porta", "Porta Balcão", "Porta de Corre", "Porta Dupla",
+    "Porta Dupla C/P e F", "Sacada de Vidro", "Tampo de mesa", "Teto", "Toldo de Vidro", "Veneziana", "Vidro Fixo", "Vitrine"
+];
+
+
+//ABRIR GOOGLE MAPS
+function abrirMapa() {
+    const clienteId = document.getElementById('clienteSelect').value;
+    if (!clienteId) {
+        alert('Selecione um cliente.');
+        return;
     }
+
+    obterClienteDoIndexedDB(clienteId).then(cliente => {
+        if (cliente && cliente.endereco) {
+            const endereco = encodeURIComponent(cliente.endereco);
+            const url = `https://www.google.com/maps/search/?api=1&query=${endereco}`;
+            window.open(url, '_blank');
+        } else {
+            alert('Endereço não encontrado para este cliente.');
+        }
+    }).catch(error => {
+        console.error('Erro ao abrir o mapa:', error);
+    });
+}
+
+
+// Função para abrir o popup de Formas de Pagamento
+function abrirPopupPaymentMethods() {
+    const popupPaymentMethods = document.getElementById('popupPaymentMethods');
+    if (popupPaymentMethods) {
+        popupPaymentMethods.classList.remove('hidden');
+        const modalContent = popupPaymentMethods.querySelector('div');
+        modalContent.classList.add('scale-95');
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }, 10);
+        carregarFormasPagamento(); // Carrega as formas de pagamento ao abrir
+    }
+}
+
+// Função para fechar o popup de Formas de Pagamento
+function fecharPopupPaymentMethods() {
+    const popupPaymentMethods = document.getElementById('popupPaymentMethods');
+    if (popupPaymentMethods) {
+        const modalContent = popupPaymentMethods.querySelector('div');
+        modalContent.classList.add('scale-95');
+        modalContent.classList.remove('scale-100');
+        setTimeout(() => {
+            popupPaymentMethods.classList.add('hidden');
+        }, 300); // Tempo deve coincidir com a duração da transição
+    }
+}
+
+// Função para carregar as formas de pagamento do IndexedDB
+async function carregarFormasPagamento() {
+    console.log("Carregando formas de pagamento...");
+    const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+    console.log("Informações do usuário:", infoUsuario);
+    const formasPagamento = infoUsuario.payment_methods || [];
+
+    // Resetar todos os checkboxes
+    document.getElementById('pix').checked = false;
+    document.getElementById('boleto').checked = false;
+    document.getElementById('parcelado_sem_juros').checked = false;
+    document.getElementById('parcelado_com_juros').checked = false;
+
+    // Resetar os campos adicionais
+    document.getElementById('parcelas_sem_juros').value = '';
+    document.getElementById('parcelas_com_juros').value = '';
+    document.getElementById('taxa_juros').value = '';
+
+    // Iterar sobre as formas de pagamento e marcar as selecionadas
+    formasPagamento.forEach(method => {
+        console.log("Processando método de pagamento:", method);
+        if (method.tipo === 'pix') {
+            document.getElementById('pix').checked = method.ativo;
+        } else if (method.tipo === 'boleto') {
+            document.getElementById('boleto').checked = method.ativo;
+        } else if (method.tipo === 'parcelado_sem_juros') {
+            document.getElementById('parcelado_sem_juros').checked = method.ativo;
+            document.getElementById('parcelas_sem_juros').value = method.parcelas_max || '';
+        } else if (method.tipo === 'parcelado_com_juros') {
+            document.getElementById('parcelado_com_juros').checked = method.ativo;
+            document.getElementById('parcelas_com_juros').value = method.parcelas_max || '';
+            document.getElementById('taxa_juros').value = method.juros || '';
+        }
+    });
+}
+
+
+// Função para salvar as formas de pagamento no IndexedDB
+async function salvarFormasPagamento(event) {
+    event.preventDefault();
+
+    const formasPagamento = [];
+
+    // Pix
+    const pixAtivo = document.getElementById('pix').checked;
+    formasPagamento.push({
+        tipo: 'pix',
+        ativo: pixAtivo
+    });
+
+    // Boleto
+    const boletoAtivo = document.getElementById('boleto').checked;
+    formasPagamento.push({
+        tipo: 'boleto',
+        ativo: boletoAtivo
+    });
+
+    // Parcelado sem Juros
+    const parceladoSemJurosAtivo = document.getElementById('parcelado_sem_juros').checked;
+    const parcelasSemJuros = parseInt(document.getElementById('parcelas_sem_juros').value) || null;
+    if (parceladoSemJurosAtivo) {
+        formasPagamento.push({
+            tipo: 'parcelado_sem_juros',
+            ativo: true,
+            parcelas_max: parcelasSemJuros
+        });
+    }
+
+    // Parcelado com Juros
+    const parceladoComJurosAtivo = document.getElementById('parcelado_com_juros').checked;
+    const parcelasComJuros = parseInt(document.getElementById('parcelas_com_juros').value) || null;
+    const taxaJuros = parseFloat(document.getElementById('taxa_juros').value) || null;
+    if (parceladoComJurosAtivo) {
+        formasPagamento.push({
+            tipo: 'parcelado_com_juros',
+            ativo: true,
+            parcelas_max: parcelasComJuros,
+            juros: taxaJuros
+        });
+    }
+
+    // Validações
+    for (let method of formasPagamento) {
+        if (method.tipo === 'parcelado_sem_juros' && (!method.parcelas_max || method.parcelas_max > 12)) {
+            alert('Número de parcelas sem juros deve ser entre 1 e 12.');
+            return;
+        }
+        if (method.tipo === 'parcelado_com_juros') {
+            if (!method.parcelas_max || method.parcelas_max > 12) {
+                alert('Número de parcelas com juros deve ser entre 1 e 12.');
+                return;
+            }
+            if (method.juros === null || method.juros < 0) {
+                alert('Taxa de juros deve ser um valor positivo.');
+                return;
+            }
+        }
+    }
+
+    // Obter informações do usuário
+    const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+    infoUsuario.payment_methods = formasPagamento;
+
+    try {
+        await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
+        fecharPopupPaymentMethods();
+        alert('Formas de pagamento salvas com sucesso!');
+    } catch (error) {
+        console.error('Erro ao salvar formas de pagamento:', error);
+        alert('Ocorreu um erro ao salvar as formas de pagamento. Por favor, tente novamente.');
+    }
+}
+
+
+
+
+// Funções para adicionar opções personalizadas
+function onAmbienteChange(select) {
+    if (select.value === 'Outra') {
+        abrirPopupAmbientePersonalizado();
+    }
+    calculateTotal();
+}
+
+function onTipoAplicacaoChange(select) {
+    if (select.value === 'Outra') {
+        abrirPopupTipoAplicacaoPersonalizado();
+    }
+    calculateTotal();
+}
+
+function notifyUserAboutUpdate(worker) {
+    const updateBar = document.createElement('div');
+    updateBar.innerText = "Nova versão disponível. Clique aqui para atualizar.";
+    updateBar.style.position = 'fixed';
+    updateBar.style.bottom = '0';
+    updateBar.style.left = '0';
+    updateBar.style.width = '100%';
+    updateBar.style.backgroundColor = '#f39c12';
+    updateBar.style.color = 'white';
+    updateBar.style.textAlign = 'center';
+    updateBar.style.padding = '10px';
+    updateBar.style.cursor = 'pointer';
+    updateBar.addEventListener('click', () => {
+        worker.postMessage({ type: 'SKIP_WAITING' });
+        window.location.reload();
+    });
+
+    document.body.appendChild(updateBar);
+}
+
+
+function abrirPopupAmbientePersonalizado() {
+    const popupHTML = `
+        <div id="popupAmbientePersonalizado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                <h2 class="text-xl font-semibold mb-4">Adicionar Ambiente Personalizado</h2>
+                <input type="text" id="nomeAmbientePersonalizado" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Nome do Ambiente">
+                <button id="salvarAmbientePersonalizado" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar Ambiente</button>
+                <button onclick="fecharPopupAmbientePersonalizado()" class="mt-2 w-full p-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    document.getElementById('salvarAmbientePersonalizado').addEventListener('click', salvarAmbientePersonalizado);
+}
+
+function fecharPopupAmbientePersonalizado() {
+    const popup = document.getElementById('popupAmbientePersonalizado');
+    if (popup) {
+        popup.remove();
+    }
+}
+
+
+function abrirPopupTipoAplicacaoPersonalizado() {
+    const popupHTML = `
+        <div id="popupTipoAplicacaoPersonalizado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                <h2 class="text-xl font-semibold mb-4">Adicionar Tipo de Aplicação Personalizado</h2>
+                <input type="text" id="nomeTipoAplicacaoPersonalizado" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Nome do Tipo de Aplicação">
+                <button id="salvarTipoAplicacaoPersonalizado" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar Tipo de Aplicação</button>
+                <button onclick="fecharPopupTipoAplicacaoPersonalizado()" class="mt-2 w-full p-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    document.getElementById('salvarTipoAplicacaoPersonalizado').addEventListener('click', salvarTipoAplicacaoPersonalizado);
+}
+
+function fecharPopupTipoAplicacaoPersonalizado() {
+    const popup = document.getElementById('popupTipoAplicacaoPersonalizado');
+    if (popup) {
+        popup.remove();
+    }
+}
+
+
+async function salvarAmbientePersonalizado() {
+    const nome = document.getElementById('nomeAmbientePersonalizado').value.trim();
+    if (nome) {
+        const ambiente = { nome };
+        await salvarAmbienteNoIndexedDB(ambiente);
+        fecharPopupAmbientePersonalizado();
+        await atualizarSeletoresAmbientes();
+        calculateTotal();
+    } else {
+        alert('Por favor, preencha o campo corretamente.');
+    }
+}
+
+async function salvarTipoAplicacaoPersonalizado() {
+    const nome = document.getElementById('nomeTipoAplicacaoPersonalizado').value.trim();
+    if (nome) {
+        await salvarTipoAplicacaoNoIndexedDB(nome);
+        fecharPopupTipoAplicacaoPersonalizado();
+        await atualizarSeletoresTiposAplicacao();
+        calculateTotal();
+    } else {
+        alert('Por favor, preencha o campo corretamente.');
+    }
+}
+
+
+
+async function salvarAmbienteNoIndexedDB(ambiente) {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['ambientes_personalizados'], 'readwrite');
+    const store = transaction.objectStore('ambientes_personalizados');
+    const request = store.put(ambiente);
+
+    return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+
+async function salvarTipoAplicacaoNoIndexedDB(tipoAplicacao) {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['tipos_aplicacao_personalizados'], 'readwrite');
+    const store = transaction.objectStore('tipos_aplicacao_personalizados');
+    const request = store.put({ nome: tipoAplicacao });
+
+    return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+
+
+async function atualizarSeletoresAmbientes() {
+    const ambientesPersonalizados = await carregarAmbientesPersonalizadosDoIndexedDB();
+    const seletores = document.querySelectorAll('.ambiente-select');
+    seletores.forEach(seletor => {
+        const selectedValue = seletor.value;
+        seletor.innerHTML = [...ambientes, ...ambientesPersonalizados.map(a => a.nome)].map(amb => `<option value="${amb}">${amb}</option>`).join('');
+        seletor.innerHTML += '<option value="Outra">Outra</option>';
+        seletor.value = selectedValue;
+    });
+}
+
+async function atualizarSeletoresTiposAplicacao() {
+    const tiposPersonalizados = await carregarTiposAplicacaoPersonalizadosDoIndexedDB();
+    const seletores = document.querySelectorAll('.tipo-aplicacao-select');
+    seletores.forEach(seletor => {
+        const selectedValue = seletor.value;
+        seletor.innerHTML = [...tiposAplicacao, ...tiposPersonalizados.map(t => t.nome)].map(tipo => `<option value="${tipo}">${tipo}</option>`).join('');
+        seletor.innerHTML += '<option value="Outra">Outra</option>';
+        seletor.value = selectedValue;
+    });
+}
+
+        async function carregarClientes(clienteSelecionado = '', moverParaTopo = false) {
+            try {
+                const clienteSelect = document.getElementById('clienteSelect');
+                if (!clienteSelect) {
+                    console.error("Elemento clienteSelect não encontrado!");
+                    return;
+                }
+
+                clientes = await obterTodosClientesDoIndexedDB();
+
+                if (moverParaTopo && clienteSelecionado) {
+                    const clienteIndex = clientes.findIndex(c => c.id == clienteSelecionado);
+                    if (clienteIndex > -1) {
+                        const cliente = clientes.splice(clienteIndex, 1)[0];
+                        clientes.unshift(cliente);
+                    }
+                }
+
+                clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+
+                if (clientes.length > 0) {
+                    clienteSelect.classList.remove('hidden');
+                    clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.id;
+                        option.textContent = cliente.nome;
+                        clienteSelect.appendChild(option);
+                    });
+
+                    if (clienteSelecionado) {
+                        clienteSelect.value = clienteSelecionado;
+                    } else {
+                        clienteSelect.value = clientes[0].id;
+                    }
+
+                    onClienteChange();
+                    mostrarEditIconContainer(true);
+                } else {
+                    clienteSelect.classList.add('hidden');
+                    mostrarEditIconContainer(false);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar clientes:", error);
+            }
+        }
+
+        function onClienteChange() {
+            clienteSelecionado = document.getElementById('clienteSelect').value;
+            loadMedidas();
+            if (clienteSelecionado) {
+                mostrarEditIconContainer(true);
+            } else {
+                mostrarEditIconContainer(false);
+            }
+        }
+
+        function mostrarEditIconContainer(exibir) {
+            const editIconContainer = document.getElementById('editIconContainer');
+            if (exibir && document.getElementById('clienteSelect').value) {
+                editIconContainer.classList.remove('hidden');
+            } else {
+                editIconContainer.classList.add('hidden');
+            }
+        }
+
+
+
+        function updateResultado(m2, preco) {
+            const resultadoDesktop = document.getElementById('resultadoDesktop');
+            const resultadoMobile = document.getElementById('resultadoMobile');
+            
+            if (resultadoDesktop) {
+                resultadoDesktop.textContent = `Total M²: ${m2.toFixed(2)} | Preço Total: R$ ${preco.toFixed(2)}`;
+            }
+            if (resultadoMobile) {
+                resultadoMobile.textContent = `Total M²: ${m2.toFixed(2)} | R$ ${preco.toFixed(2)}`;
+            }
+        }
 
         function atualizarIconeVerificacao(status) {
             const icone = document.getElementById('verificacaoIcon');
@@ -213,36 +819,63 @@
         }
 
         $(document).ready(function () {
-            $('#popupClienteTelefone, #telefoneClienteInput').mask('(00) 00000-0000');
-            $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
-            $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
+    function formatarTelefone(telefone) {
+        let numeros = telefone.replace(/\D/g, '');
+        if (numeros.startsWith('55') && numeros.length > 11) {
+            numeros = numeros.slice(2);
+        }
+        if (numeros.length === 11) {
+            return `(${numeros.slice(0,2)}) ${numeros.slice(2,7)}-${numeros.slice(7)}`;
+        } else if (numeros.length === 10) {
+            return `(${numeros.slice(0,2)}) ${numeros.slice(2,6)}-${numeros.slice(6)}`;
+        } else {
+            return telefone;
+        }
+    }
+
+    function aplicarMascaraTelefone(elemento) {
+        $(elemento).on('paste', function(e) {
+            e.preventDefault();
+            let texto = (e.originalEvent || e).clipboardData.getData('text/plain');
+            $(this).val(formatarTelefone(texto));
         });
 
-        const peliculas = [
-            { nome: "Window Blue Performance", preco: 240 },
-            { nome: "Window BLUE 70", preco: 200 },
-            { nome: "Carbono Window Usa", preco: 100 },
-            { nome: "Profissional", preco: 90 },
-            { nome: "Silver 10 Externa", preco: 280 },
-            { nome: "Prata Reflecta", preco: 120 },
-            { nome: "Prata Reflecta 15", preco: 120 },
-            { nome: "Origin Carbon", preco: 120 },
-            { nome: "Vinil Blackout", preco: 130 },
-            { nome: "Vinil Jateado", preco: 120 },
-            { nome: "Vinil Perfurado", preco: 85 },
-            { nome: "Window Premium", preco: 160 }
-        ];
+        $(elemento).mask('(00) 00000-0000', {
+            onKeyPress: function(val, e, field, options) {
+                field.mask(val.length > 14 ? '(00) 00000-0000' : '(00) 0000-00009', options);
+            }
+        });
+    }
 
-        let clientes = [];
-        let clienteSelecionado = '';
-        const clienteSelect = document.getElementById('clienteSelect');
+    // Aplicar máscara para campos de telefone
+    aplicarMascaraTelefone('#popupClienteTelefone');
+    aplicarMascaraTelefone('#telefoneClienteInput');
+    aplicarMascaraTelefone('#phone'); // Campo de telefone no popup de usuário
 
-        async function abrirPopup(acao) {
+    // Máscaras para CPF e CNPJ
+    $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
+    $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
+
+    // Máscara para o campo CPF/CNPJ no popup de usuário
+    $('#cpfCnpj').mask('000.000.000-00', {
+        onKeyPress: function(cpfcnpj, e, field, options) {
+            var masks = ['000.000.000-000', '00.000.000/0000-00'];
+            var mask = (cpfcnpj.length > 14) ? masks[1] : masks[0];
+            $('#cpfCnpj').mask(mask, options);
+        }
+    });
+});
+
+ // Função para abrir o popup de Cliente seguindo o padrão do popup de Usuário
+function abrirPopup(acao) {
+    console.log("Popup acionado para:", acao);
+
     const popupCliente = document.getElementById('popupCliente');
     const popupTitulo = document.getElementById('popupTitulo');
+    const clienteSelect = document.getElementById('clienteSelect');
 
-    if (!popupCliente || !popupTitulo) {
-        console.error("Elementos do popup não encontrados");
+    if (!popupCliente || !popupTitulo || !clienteSelect) {
+        console.error("Elementos necessários não encontrados");
         return;
     }
 
@@ -254,11 +887,23 @@
         popupTitulo.innerText = 'Editar Cliente';
         clienteSelecionado = clienteSelect.value;
         console.log("Editando cliente:", clienteSelecionado);
-        await carregarDadosCliente(clienteSelecionado);
+        carregarDadosCliente(clienteSelecionado);
     }
 
+    // Remover a classe 'hidden' para exibir o popup
     popupCliente.classList.remove('hidden');
-    popupCliente.style.display = 'flex';
+
+    // Adicionar classe 'scale-95' para iniciar a animação
+    const modalContent = popupCliente.querySelector('div');
+    modalContent.classList.add('scale-95');
+
+    // Remover 'scale-95' e adicionar 'scale-100' após um breve intervalo para acionar a transição
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95');
+        modalContent.classList.add('scale-100');
+    }, 10);
+
+    console.log("Popup deve aparecer agora:", popupCliente);
 }
 
         function limparCamposPopup() {
@@ -269,48 +914,96 @@
             document.getElementById('popupClienteCNPJ').value = '';
         }
 
-        function abrirPopupUsuario() {
-    const popupUsuario = document.getElementById('popupUsuario');
-    popupUsuario.classList.remove('hidden');
-    carregarInformacoesUsuario();
-}
-
-        async function carregarInformacoesUsuario() {
-    try {
-        const info = await obterInformacoesUsuarioDoIndexedDB();
-        if (info) {
-            console.log('Informações do usuário encontradas no IndexedDB:', info);
-            
-            document.getElementById('name').value = info.nome || '';
-            document.getElementById('companyName').value = info.empresa || '';
-            document.getElementById('phone').value = info.telefone || '';
-            document.getElementById('email').value = info.email || '';
-            document.getElementById('address').value = info.endereco || '';
-            document.getElementById('cpfCnpj').value = info.cpfCnpj || '';
-
-            if (info.logo) {
-                const logoPreview = document.getElementById('logoPreview');
-                logoPreview.src = info.logo;
-                logoPreview.style.display = 'block';
-            }
-
-            if (info.cores) {
-                document.getElementById('primaryColorPreview').style.backgroundColor = info.cores.primaria;
-                document.getElementById('secondaryColorPreview').style.backgroundColor = info.cores.secundaria;
-                document.getElementById('primaryColor').value = info.cores.primaria;
-                document.getElementById('secondaryColor').value = info.cores.secundaria;
-            }
-        } else {
-            console.log('Nenhuma informação de usuário encontrada no IndexedDB');
-        }
-    } catch (error) {
-        console.error('Erro ao carregar informações do usuário:', error);
+        // Função para carregar os dados do cliente no popupCliente (modo editar)
+async function carregarDadosCliente(clienteId) {
+    const cliente = await obterClienteDoIndexedDB(clienteId);
+    if (cliente) {
+        document.getElementById('popupClienteNome').value = cliente.nome;
+        document.getElementById('popupClienteTelefone').value = cliente.telefone;
+        document.getElementById('popupClienteEndereco').value = cliente.endereco;
+        document.getElementById('popupClienteCPF').value = cliente.cpf;
+        document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
     }
 }
 
-        function fecharPopupUsuario() {
-            document.getElementById('popupUsuario').classList.add('hidden');
+// Função para abrir o popupUsuario com animação
+function abrirPopupUsuario() {
+    const popupUsuario = document.getElementById('popupUsuario');
+    popupUsuario.classList.remove('hidden');
+    const modalContent = popupUsuario.querySelector('div');
+    modalContent.classList.add('scale-95');
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95');
+        modalContent.classList.add('scale-100');
+    }, 10);
+    carregarInformacoesUsuario(); // Carrega os dados do usuário ao abrir
+}
+// Função para fechar qualquer popup adicional, se necessário
+
+
+
+        async function carregarInformacoesUsuario() {
+            try {
+                const info = await obterInformacoesUsuarioDoIndexedDB();
+                if (info) {
+                    console.log('Informações do usuário encontradas no IndexedDB:', info);
+                    
+                    document.getElementById('name').value = info.nome || '';
+                    document.getElementById('companyName').value = info.empresa || '';
+                    document.getElementById('phone').value = info.telefone || '';
+                    document.getElementById('email').value = info.email || '';
+                    document.getElementById('address').value = info.endereco || '';
+                    document.getElementById('cpfCnpj').value = info.cpfCnpj || '';
+
+                    if (info.logo) {
+                        const logoPreview = document.getElementById('logoPreview');
+                        logoPreview.src = info.logo;
+                        logoPreview.style.display = 'block';
+                    }
+
+                    if (info.cores) {
+                        document.getElementById('primaryColorPreview').style.backgroundColor = info.cores.primaria;
+                        document.getElementById('secondaryColorPreview').style.backgroundColor = info.cores.secundaria;
+                        document.getElementById('primaryColor').value = info.cores.primaria;
+                        document.getElementById('secondaryColor').value = info.cores.secundaria;
+                    }
+                } else {
+                    console.log('Nenhuma informação de usuário encontrada no IndexedDB');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar informações do usuário:', error);
+            }
         }
+
+        // Função para limpar os campos do popupUsuario, se necessário
+function limparCamposPopupUsuario() {
+    document.getElementById('name').value = '';
+    document.getElementById('companyName').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('address').value = '';
+    document.getElementById('cpfCnpj').value = '';
+    const logoPreview = document.getElementById('logoPreview');
+    logoPreview.src = '';
+    logoPreview.style.display = 'none';
+    document.getElementById('primaryColorPreview').style.backgroundColor = '#0056b3';
+    document.getElementById('secondaryColorPreview').style.backgroundColor = '#17a2b8';
+    document.getElementById('primaryColor').value = '#0056b3';
+    document.getElementById('secondaryColor').value = '#17a2b8';
+}
+
+// Função para fechar o popup de Cliente seguindo o padrão do popup de Usuário
+function fecharPopupCliente() {
+    const popupCliente = document.getElementById('popupCliente');
+    if (popupCliente) {
+        const modalContent = popupCliente.querySelector('div');
+        modalContent.classList.add('scale-95');
+        modalContent.classList.remove('scale-100');
+        setTimeout(() => {
+            popupCliente.classList.add('hidden');
+        }, 300); // Tempo deve coincidir com a duração da transição
+    }
+}
 
         async function salvarInformacoesUsuario() {
             const nome = document.getElementById('name').value;
@@ -357,6 +1050,18 @@
                 alert('Erro ao atualizar informações. Por favor, tente novamente.');
             }
         }
+        // Função para fechar o popupUsuario com animação
+function fecharPopupUsuario() {
+    const popupUsuario = document.getElementById('popupUsuario');
+    if (popupUsuario) {
+        const modalContent = popupUsuario.querySelector('div');
+        modalContent.classList.add('scale-95');
+        modalContent.classList.remove('scale-100');
+        setTimeout(() => {
+            popupUsuario.classList.add('hidden');
+        }, 300); // Tempo deve coincidir com a duração da transição
+    }
+}
 
         function converterImagemParaBase64(file) {
             return new Promise((resolve, reject) => {
@@ -369,7 +1074,7 @@
 
         async function abrirIndexedDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('ClientesDB', 3);
+                const request = indexedDB.open('ClientesDB', 7);
 
                 request.onerror = event => {
                     console.error('Erro ao abrir o IndexedDB:', event);
@@ -382,11 +1087,18 @@
 
                 request.onupgradeneeded = event => {
                     const db = event.target.result;
+                    if (!db.objectStoreNames.contains('ambientes_personalizados')) {
+                db.createObjectStore('ambientes_personalizados', { keyPath: 'nome' });
+            }
+            if (!db.objectStoreNames.contains('tipos_aplicacao_personalizados')) {
+                db.createObjectStore('tipos_aplicacao_personalizados', { keyPath: 'nome' });
+            }
+
                     if (!db.objectStoreNames.contains('usuario')) {
                         db.createObjectStore('usuario', { keyPath: 'id' });
                     }
                     if (!db.objectStoreNames.contains('clientes')) {
-                        db.createObjectStore('clientes', { keyPath: 'id', autoIncrement: true }); // Atualizado para usar ID
+                        db.createObjectStore('clientes', { keyPath: 'id', autoIncrement: true });
                     }
                     if (!db.objectStoreNames.contains('medidas')) {
                         db.createObjectStore('medidas', { keyPath: 'cliente' });
@@ -394,9 +1106,49 @@
                     if (!db.objectStoreNames.contains('verificacao')) {
                         db.createObjectStore('verificacao', { keyPath: 'id' });
                     }
+                    if (!db.objectStoreNames.contains('peliculas_personalizadas')) {
+                        db.createObjectStore('peliculas_personalizadas', { keyPath: 'nome' });
+                    }
+                    // Certifique-se de que o object store para ambientes personalizados seja criado
+                    if (!db.objectStoreNames.contains('ambientes_personalizados')) {
+                        db.createObjectStore('ambientes_personalizados', { keyPath: 'nome' });
+                    }
+                    // Certifique-se de que o object store para tipos de aplicação personalizados seja criado
+                    if (!db.objectStoreNames.contains('tipos_aplicacao_personalizados')) {
+                        db.createObjectStore('tipos_aplicacao_personalizados', { keyPath: 'nome' });
+                    }
                 };
             });
         }
+
+
+        // Funções auxiliares que você já deve ter, mas incluídas aqui para completude
+async function carregarAmbientesPersonalizadosDoIndexedDB() {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['ambientes_personalizados'], 'readonly');
+        const store = transaction.objectStore('ambientes_personalizados');
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['tipos_aplicacao_personalizados'], 'readonly');
+        const store = transaction.objectStore('tipos_aplicacao_personalizados');
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+
+
 
         async function obterInformacoesUsuarioDoIndexedDB() {
             const db = await abrirIndexedDB();
@@ -435,12 +1187,38 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const salvarInfoUsuarioBtn = document.getElementById('saveButton');
-            if (salvarInfoUsuarioBtn) {
-                salvarInfoUsuarioBtn.addEventListener('click', salvarInformacoesUsuario);
-            }
+    // Função para inicializar dados assíncronos
+    async function inicializarDados() {
+        const ambientesPersonalizados = await carregarAmbientesPersonalizadosDoIndexedDB();
+        const tiposAplicacaoPersonalizados = await carregarTiposAplicacaoPersonalizadosDoIndexedDB();
 
-            const addNewClienteBtn = document.getElementById('addNewClienteBtn');
+        ambientes = [...ambientes, ...ambientesPersonalizados.map(a => a.nome)];
+        tiposAplicacao = [...tiposAplicacao, ...tiposAplicacaoPersonalizados.map(t => t.nome)];
+    }
+
+    // Inicializar dados assíncronos
+    inicializarDados();
+
+    // Adicionando evento para o botão de PDF da versão mobile
+    const generatePdfButtonMobile = document.getElementById('generatePdfButtonMobile');
+    if (generatePdfButtonMobile) {
+        document.getElementById('generatePdfButtonMobile').addEventListener('click', generatePDF_v3_0);
+    }
+
+    const salvarInfoUsuarioBtn = document.getElementById('saveUserInfoButton');
+    if (salvarInfoUsuarioBtn) {
+        salvarInfoUsuarioBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Previne o envio do formulário
+            salvarInformacoesUsuario();
+        });
+    }
+
+    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
+    if (popupClienteBtnSalvar) {
+        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
+    }
+
+    const addNewClienteBtn = document.getElementById('addNewClienteBtn');
     const addNewClienteBtnDesktop = document.getElementById('addNewClienteBtnDesktop');
 
     if (addNewClienteBtn) {
@@ -455,56 +1233,68 @@
         });
     }
 
-            const logoUsuario = document.getElementById('logo');
-            if (logoUsuario) {
-                logoUsuario.addEventListener('change', function (event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const previewLogo = document.getElementById('logoPreview');
-                            previewLogo.src = e.target.result;
-                            previewLogo.style.display = 'block';
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                });
+    const logoUsuario = document.getElementById('logo');
+    if (logoUsuario) {
+        logoUsuario.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const previewLogo = document.getElementById('logoPreview');
+                    previewLogo.src = e.target.result;
+                    previewLogo.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
             }
-
-            carregarClientes();
-            document.getElementById('generatePdfButton').addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
-
-            const primaryColorPreview = document.getElementById('primaryColorPreview');
-            const secondaryColorPreview = document.getElementById('secondaryColorPreview');
-            const primaryColorInput = document.getElementById('primaryColor');
-            const secondaryColorInput = document.getElementById('secondaryColor');
-
-            primaryColorPreview.addEventListener('click', () => primaryColorInput.click());
-            secondaryColorPreview.addEventListener('click', () => secondaryColorInput.click());
-
-            primaryColorInput.addEventListener('change', (e) => {
-                primaryColorPreview.style.backgroundColor = e.target.value;
-            });
-
-            secondaryColorInput.addEventListener('change', (e) => {
-                secondaryColorPreview.style.backgroundColor = e.target.value;
-            });
-
-            carregarClientes();
         });
-
-        async function carregarDadosCliente(clienteId) {
-    const cliente = await obterClienteDoIndexedDB(clienteId);
-    if (cliente) {
-        document.getElementById('popupClienteNome').value = cliente.nome;
-        document.getElementById('popupClienteTelefone').value = cliente.telefone;
-        document.getElementById('popupClienteEndereco').value = cliente.endereco;
-        document.getElementById('popupClienteCPF').value = cliente.cpf;
-        document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
     }
-}
 
-async function salvarCliente(event) {
+    carregarClientes();
+    document.getElementById('generatePdfButton').addEventListener('click', generatePDF_v3_0);
+    const primaryColorPreview = document.getElementById('primaryColorPreview');
+    const secondaryColorPreview = document.getElementById('secondaryColorPreview');
+    const primaryColorInput = document.getElementById('primaryColor');
+    const secondaryColorInput = document.getElementById('secondaryColor');
+
+    primaryColorPreview.addEventListener('click', () => primaryColorInput.click());
+    secondaryColorPreview.addEventListener('click', () => secondaryColorInput.click());
+
+    primaryColorInput.addEventListener('change', (e) => {
+        primaryColorPreview.style.backgroundColor = e.target.value;
+    });
+
+    secondaryColorInput.addEventListener('change', (e) => {
+        secondaryColorPreview.style.backgroundColor = e.target.value;
+    });
+
+    carregarClientes();
+    carregarPeliculasPersonalizadas();
+            
+
+    // Inicializar seletores dinâmicos para todos os grupos de medidas existentes
+    const medidasContainer = document.getElementById('medidasContainer');
+    if (medidasContainer) {
+        const gruposMedidas = medidasContainer.querySelectorAll('.bg-white');
+        gruposMedidas.forEach(grupo => {
+            addDynamicSelectorsToMedidaGroup(grupo);
+        });
+    }
+});
+    
+
+        // ... [O código continua com as funções restantes]
+        async function carregarDadosCliente(clienteId) {
+            const cliente = await obterClienteDoIndexedDB(clienteId);
+            if (cliente) {
+                document.getElementById('popupClienteNome').value = cliente.nome;
+                document.getElementById('popupClienteTelefone').value = cliente.telefone;
+                document.getElementById('popupClienteEndereco').value = cliente.endereco;
+                document.getElementById('popupClienteCPF').value = cliente.cpf;
+                document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
+            }
+        }
+
+        async function salvarCliente(event) {
     event.preventDefault();
 
     const nome = document.getElementById('popupClienteNome').value.trim();
@@ -512,8 +1302,9 @@ async function salvarCliente(event) {
     const endereco = document.getElementById('popupClienteEndereco').value.trim();
     const cpf = document.getElementById('popupClienteCPF').value.trim();
     const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
+    const email = document.getElementById('popupClienteEmail').value.trim(); // Novo campo
 
-    const novoCliente = { nome, telefone, endereco, cpf, cnpj };
+    const novoCliente = { nome, telefone, endereco, cpf, cnpj, email }; // Inclui o email
 
     try {
         let clienteId;
@@ -524,7 +1315,7 @@ async function salvarCliente(event) {
             clienteId = await salvarClienteNoIndexedDB(novoCliente);
         }
 
-        await carregarClientes(clienteId, true); // Adicionado 'true' aqui
+        await carregarClientes(clienteId, true);
         fecharPopup();
         alert("Cliente salvo com sucesso!");
     } catch (error) {
@@ -533,116 +1324,108 @@ async function salvarCliente(event) {
     }
 }
 
-async function carregarClientes(clienteSelecionado = '', moverParaTopo = false) {
-    clientes = await obterTodosClientesDoIndexedDB();
-    
-    if (moverParaTopo && clienteSelecionado) {
-        const clienteIndex = clientes.findIndex(c => c.id == clienteSelecionado);
-        if (clienteIndex > -1) {
-            const cliente = clientes.splice(clienteIndex, 1)[0];
-            clientes.unshift(cliente);
-        }
-    }
 
-    clienteSelect.innerHTML = '';
-    if (clientes.length > 0) {
-        clienteSelect.classList.remove('hidden');
-        clientes.forEach(cliente => {
-            const option = document.createElement('option');
-            option.value = cliente.id;
-            option.textContent = cliente.nome;
-            clienteSelect.appendChild(option);
-        });
-
-        if (clienteSelecionado) {
-            clienteSelect.value = clienteSelecionado;
-        } else {
-            clienteSelect.value = clientes[0].id;
-        }
-
-        onClienteChange();
-        mostrarEditIconContainer(true);
-    } else {
-        clienteSelect.classList.add('hidden');
-        mostrarEditIconContainer(false);
-    }
+async function atualizarClienteNoIndexedDB(id, cliente) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['clientes'], 'readwrite');
+        const objectStore = transaction.objectStore('clientes');
+        
+        const getRequest = objectStore.get(parseInt(id));
+        getRequest.onsuccess = (event) => {
+            const existingCliente = event.target.result;
+            if (existingCliente) {
+                const updatedCliente = { ...existingCliente, ...cliente };
+                const putRequest = objectStore.put(updatedCliente);
+                putRequest.onsuccess = () => resolve();
+                putRequest.onerror = (event) => reject(event);
+            } else {
+                reject(new Error("Cliente não encontrado"));
+            }
+        };
+        getRequest.onerror = (event) => reject(event);
+    });
 }
 
-function onClienteChange() {
-    clienteSelecionado = clienteSelect.value;
-    loadMedidas();
-    if (clienteSelecionado) {
-        mostrarEditIconContainer(true);
-    } else {
-        mostrarEditIconContainer(false);
-    }
+
+async function obterClienteDoIndexedDB(id) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['clientes'], 'readonly');
+        const objectStore = transaction.objectStore('clientes');
+        const request = objectStore.get(parseInt(id));
+
+        request.onsuccess = (event) => {
+            resolve(event.target.result);
+        };
+        request.onerror = (event) => {
+            reject(event);
+        };
+    });
 }
 
-        function mostrarEditIconContainer(exibir) {
-            const editIconContainer = document.getElementById('editIconContainer');
-            if (exibir && clienteSelect.value) {
-                editIconContainer.classList.remove('hidden');
-            } else {
-                editIconContainer.classList.add('hidden');
-            }
-        }
+  
 
-        function fecharPopup() {
-            const popupCliente = document.getElementById('popupCliente');
-            if (popupCliente) {
-                popupCliente.classList.add('hidden');
-                popupCliente.style.display = 'none';
-            } else {
-                console.error("Elemento popupCliente não encontrado");
-            }
-        }
+    // Função para fechar o popupCliente com animação
+// Função para fechar o popupCliente com animação
+function fecharPopup() {
+    const popupCliente = document.getElementById('popupCliente');
+    if (popupCliente) {
+        const modalContent = popupCliente.querySelector('div');
+        modalContent.classList.add('scale-95');
+        modalContent.classList.remove('scale-100');
+        setTimeout(() => {
+            popupCliente.classList.add('hidden');
+        }, 300); // Tempo deve coincidir com a duração da transição
+    }
+}
 
         function confirmClearMedidas() {
-    if (confirm("Tem certeza que deseja apagar este cliente e suas medidas?")) {
-        clearMedidas();
-    }
-}
-
-async function clearMedidas() {
-    const clienteId = clienteSelect.value;
-    if (!clienteId) {
-        alert('Selecione um cliente.');
-        return;
-    }
-
-    await removerMedidasDoIndexedDB(clienteId);
-    await removerClienteDoIndexedDB(clienteId);
-
-    await carregarClientes();
-    document.getElementById('medidasContainer').innerHTML = '';
-
-    if (clientes.length > 0) {
-        clienteSelect.value = clientes[0].id;
-        loadMedidas();
-    } else {
-        clienteSelect.value = '';
-    }
-
-    calculateTotal();
-}
-
-
-        async function saveMedidas() {
-            const cliente = clienteSelect.value;
-            if (!cliente) return;
-
-            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
-            const medidas = Array.from(medidaGroups).map(group => ({
-                largura: group.querySelector('.largura-input').value,
-                altura: group.querySelector('.altura-input').value,
-                quantidade: group.querySelector('.quantidade-input').value,
-                ambiente: group.querySelector('.additional-fields select:nth-of-type(1)').value,
-                tipoAplicacao: group.querySelector('.additional-fields select:nth-of-type(2)').value,
-                pelicula: group.querySelector('.pelicula-select').value
-            }));
-
-            await salvarMedidasNoIndexedDB(cliente, medidas);
+            if (confirm("Tem certeza que deseja apagar este cliente e suas medidas?")) {
+                clearMedidas();
+            }
         }
+
+        async function clearMedidas() {
+            const clienteId = clienteSelect.value;
+            if (!clienteId) {
+                alert('Selecione um cliente.');
+                return;
+            }
+
+            await removerMedidasDoIndexedDB(clienteId);
+            await removerClienteDoIndexedDB(clienteId);
+
+            await carregarClientes();
+            document.getElementById('medidasContainer').innerHTML = '';
+
+            if (clientes.length > 0) {
+                clienteSelect.value = clientes[0].id;
+                loadMedidas();
+            } else {
+                clienteSelect.value = '';
+            }
+
+            calculateTotal();
+        }
+
+        // Atualizar a função saveMedidas para usar os novos seletores
+async function saveMedidas() {
+    const cliente = clienteSelect.value;
+    if (!cliente) return;
+
+    const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+    const medidas = Array.from(medidaGroups).map(group => ({
+        largura: group.querySelector('.largura-input').value,
+        altura: group.querySelector('.altura-input').value,
+        quantidade: group.querySelector('.quantidade-input').value,
+        ambiente: group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]').value,
+        tipoAplicacao: group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]').value,
+        pelicula: group.querySelector('.pelicula-select').value
+    }));
+
+    await salvarMedidasNoIndexedDB(cliente, medidas);
+}
 
         async function loadMedidas() {
             const cliente = clienteSelect.value;
@@ -660,128 +1443,259 @@ async function clearMedidas() {
             calculateTotal();
         }
 
-        function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
-            const container = document.getElementById('medidasContainer');
-            const medidaGroup = document.createElement('div');
-            medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2');
 
-            medidaGroup.innerHTML = `
-                <div class="flex items-center space-x-1">
-                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
-                    <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this, event)" maxlength="3">
-                    <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this, event)" maxlength="3">
-                    <input type="number" placeholder="Q" value="${quantidade}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 quantidade-input" oninput="atualizarTotal(this, event)" maxlength="3">
-                    <input type="text" placeholder="M²" disabled class="w-1/4 p-1 border border-gray-300 rounded-md bg-gray-100 text-gray-600">
-                </div>
-                <div class="flex items-center space-x-1">
-                    <select class="flex-grow min-w-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 pelicula-select" onchange="calculateTotal()">
-                        ${peliculas.map(p => `<option value="${p.nome}" ${p.nome === peliculaSelecionada ? 'selected' : ''}>${p.nome}</option>`).join('')}
-                    </select>
-                    <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                    <button class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="toggleAdditionalFields(this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="deleteMedidaGroup(this)">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-                <div class="additional-fields hidden mt-2">
-                    <select onchange="calculateTotal()" class="w-full p-2 mb-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500">
-                        <option value="">Ambiente</option>
-                        <option value="Sala de estar" ${ambiente === "Sala de estar" ? 'selected' : ''}>Sala de estar</option>
-                        <option value="Sala de jantar" ${ambiente === "Sala de jantar" ? 'selected' : ''}>Sala de jantar</option>
-                        <option value="Outros" ${ambiente === "Outros" ? 'selected' : ''}>Outros</option>
-                    </select>
-                    <select onchange="calculateTotal()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500">
-                        <option value="">Tipo de Aplicação</option>
-                        <option value="Vidro Fixo" ${tipoAplicacao === "Vidro Fixo" ? 'selected' : ''}>Vidro Fixo</option>
-                        <option value="Janela Padrão" ${tipoAplicacao === "Janela Padrão" ? 'selected' : ''}>Janela Padrão</option>
-                        <option value="Balcão" ${tipoAplicacao === "Balcão" ? 'selected' : ''}>Balcão</option>
-                        <option value="Outras" ${tipoAplicacao === "Outras" ? 'selected' : ''}>Outras</option>
-                    </select>
-                </div>
-            `;
 
-            container.insertBefore(medidaGroup, container.firstChild);
+      // Função para normalizar o texto (para comparações case-insensitive)
+function normalizeText(text) {
+    return text.toLowerCase().trim();
+}
 
-            const larguraInput = medidaGroup.querySelector('.largura-input');
-            const alturaInput = medidaGroup.querySelector('.altura-input');
-            const quantidadeInput = medidaGroup.querySelector('.quantidade-input');
+// Função para normalizar "banheiro"
+function normalizeBanheiro(value) {
+    return normalizeText(value) === 'banheiro' ? 'Banheiro' : value;
+}
 
-            larguraInput.addEventListener('input', function () {
-                if (larguraInput.value.length >= 4) {
-                    alturaInput.focus();
+// Função para criar um seletor dinâmico
+function createDynamicSelector(type, options, placeholder) {
+    const container = document.createElement('div');
+    container.className = 'relative w-full';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'w-full p-2 border border-gray-300 rounded-md';
+    input.placeholder = placeholder;
+
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
+
+    container.appendChild(input);
+    container.appendChild(dropdown);
+
+    let currentOptions = options;
+
+    input.addEventListener('input', function() {
+        const value = this.value.trim();
+        updateDropdown(value, type);
+    });
+
+    input.addEventListener('focus', function() {
+        updateDropdown(this.value.trim(), type);
+    });
+
+    function updateDropdown(value, type) {
+        dropdown.innerHTML = '';
+        dropdown.classList.remove('hidden');
+
+        const normalizedValue = normalizeText(value);
+        const filteredOptions = currentOptions.filter(option => 
+            normalizeText(option).includes(normalizedValue)
+        );
+
+        if (filteredOptions.length === 0 && value) {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Adicionar "${normalizeBanheiro(value)}"`;
+            listItem.className = 'p-2 hover:bg-gray-100 cursor-pointer';
+            listItem.addEventListener('click', async () => {
+                const normalizedNewValue = normalizeBanheiro(value);
+                if (!currentOptions.some(opt => normalizeText(opt) === normalizeText(normalizedNewValue))) {
+                    await saveNewOption(type, normalizedNewValue);
+                    currentOptions.push(normalizedNewValue);
                 }
+                input.value = normalizedNewValue;
+                dropdown.classList.add('hidden');
+                calculateTotal(); // Atualiza o total após adicionar nova opção
             });
-
-            alturaInput.addEventListener('input', function () {
-                if (alturaInput.value.length >= 4) {
-                    quantidadeInput.focus();
-                    setTimeout(() => {
-                        const length = quantidadeInput.value.length;
-                        quantidadeInput.setSelectionRange(length, length);
-                    }, 0);
-                }
+            dropdown.appendChild(listItem);
+        } else {
+            filteredOptions.forEach(option => {
+                const listItem = document.createElement('li');
+                listItem.textContent = option;
+                listItem.className = 'p-2 hover:bg-gray-100 cursor-pointer';
+                listItem.addEventListener('click', () => {
+                    input.value = option;
+                    dropdown.classList.add('hidden');
+                    calculateTotal(); // Atualiza o total após selecionar uma opção
+                });
+                dropdown.appendChild(listItem);
             });
-
-            if (isFirst) {
-                larguraInput.focus();
-            }
-
-            calculateTotal();
         }
+    }
 
-        function atualizarTotal(input, event) {
-            const group = input.closest('.bg-white');
-            const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
-            const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
-            const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
-            const totalM2 = largura * altura * quantidade;
-
-            group.querySelector('input[placeholder="M²"]').value = totalM2.toFixed(2);
-            calculateTotal();
+    document.addEventListener('click', function(event) {
+        if (!container.contains(event.target)) {
+            dropdown.classList.add('hidden');
         }
+    });
 
-        function duplicarGrupo(button) {
-            const group = button.closest('.bg-white');
-            const largura = group.querySelector('.largura-input').value || '';
-            const altura = group.querySelector('.altura-input').value || '';
-            const quantidade = group.querySelector('.quantidade-input').value || '';
-            const ambiente = group.querySelector('.additional-fields select:nth-of-type(1)').value || '';
-            const tipoAplicacao = group.querySelector('.additional-fields select:nth-of-type(2)').value || '';
-            const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
+    return container;
+}
 
-            addMedidaGroup(true, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
+// Função para salvar nova opção no IndexedDB
+async function saveNewOption(type, value) {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction([`${type}_personalizados`], 'readwrite');
+    const store = transaction.objectStore(`${type}_personalizados`);
+    await store.put({ nome: value });
+}
 
-            const container = document.getElementById('medidasContainer');
-            const firstGroup = container.firstChild;
-            const larguraInput = firstGroup.querySelector('.largura-input');
-            larguraInput.focus();
+// Função para adicionar os seletores dinâmicos ao grupo de medidas
+function addDynamicSelectorsToMedidaGroup(group) {
+    const additionalFields = group.querySelector('.additional-fields');
+    additionalFields.innerHTML = ''; // Limpa os campos existentes
+
+    const ambienteSelector = createDynamicSelector('ambientes', ambientes, 'Selecione ou digite o ambiente');
+    const tipoAplicacaoSelector = createDynamicSelector('tipos_aplicacao', tiposAplicacao, 'Selecione ou digite o tipo de aplicação');
+
+    additionalFields.appendChild(ambienteSelector);
+    additionalFields.appendChild(tipoAplicacaoSelector);
+}
+
+
+
+
+// Atualizar a função addMedidaGroup para usar os novos seletores dinâmicos
+function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isChecked = true, ambiente = '', tipoAplicacao = '', peliculaSelecionada = '') {
+    console.log("Adicionando novo grupo de medidas");
+    const container = document.getElementById('medidasContainer');
+    const medidaGroup = document.createElement('div');
+    medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2');
+    
+    const isZebra = container.children.length % 2 === 0;
+    const zebraClass = isZebra ? 'bg-gray-300' : 'bg-white';
+    
+    medidaGroup.classList.add(zebraClass, 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2', 'mb-2');
+
+    medidaGroup.innerHTML = `
+        <div class="flex items-center space-x-1">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
+            <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this)" maxlength="3">
+            <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this)" maxlength="3">
+            <input type="number" placeholder="Q" value="${quantidade}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 quantidade-input" oninput="atualizarTotal(this)" maxlength="3">
+            <input type="text" placeholder="M²" disabled class="w-1/4 p-1 border border-gray-300 rounded-md bg-gray-100 text-gray-600">
+        </div>
+        <div class="flex items-center space-x-1">
+            <select class="flex-grow min-w-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 pelicula-select" onchange="onPeliculaChange(this)">
+                ${peliculas.map(p => `<option value="${p.nome}" ${p.nome === peliculaSelecionada ? 'selected' : ''}>${p.nome}</option>`).join('')}
+                <option value="Outra">Outra</option>
+            </select>
+            <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="toggleAdditionalFields(this)">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="deleteMedidaGroup(this)">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+        <div class="additional-fields hidden mt-2">
+        </div>
+    `;
+
+    container.insertBefore(medidaGroup, container.firstChild);
+
+    const additionalFields = medidaGroup.querySelector('.additional-fields');
+    addDynamicSelectorsToMedidaGroup(medidaGroup);
+
+    // Definir valores para os seletores dinâmicos
+    if (ambiente) {
+        const ambienteInput = additionalFields.querySelector('input[placeholder="Selecione ou digite o ambiente"]');
+        if (ambienteInput) {
+            ambienteInput.value = ambiente;
+            const event = new Event('input', { bubbles: true });
+            ambienteInput.dispatchEvent(event);
         }
-
-        function duplicarMedidas() {
-            const medidaGroups = Array.from(document.querySelectorAll('#medidasContainer > div'));
-
-            medidaGroups.reverse().forEach(group => {
-                const largura = group.querySelector('.largura-input').value || '';
-                const altura = group.querySelector('.altura-input').value || '';
-                const quantidade = group.querySelector('.quantidade-input').value || '';
-                const ambiente = group.querySelector('.additional-fields select:nth-of-type(1)').value || '';
-                const tipoAplicacao = group.querySelector('.additional-fields select:nth-of-type(2)').value || '';
-                const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
-
-                addMedidaGroup(false, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
-            });
-
-            const container = document.getElementById('medidasContainer');
-            const firstGroup = container.firstChild;
-            const larguraInput = firstGroup.querySelector('.largura-input');
-            larguraInput.focus();
-
-            calculateTotal();
+    }
+    if (tipoAplicacao) {
+        const tipoAplicacaoInput = additionalFields.querySelector('input[placeholder="Selecione ou digite o tipo de aplicação"]');
+        if (tipoAplicacaoInput) {
+            tipoAplicacaoInput.value = tipoAplicacao;
+            const event = new Event('input', { bubbles: true });
+            tipoAplicacaoInput.dispatchEvent(event);
         }
+    }
+
+    const larguraInput = medidaGroup.querySelector('.largura-input');
+    const alturaInput = medidaGroup.querySelector('.altura-input');
+    const quantidadeInput = medidaGroup.querySelector('.quantidade-input');
+
+    larguraInput.addEventListener('input', function () {
+        if (larguraInput.value.length >= 4) {
+            alturaInput.focus();
+        }
+    });
+
+    alturaInput.addEventListener('input', function () {
+        if (alturaInput.value.length >= 4) {
+            quantidadeInput.focus();
+            setTimeout(() => {
+                const length = quantidadeInput.value.length;
+                quantidadeInput.setSelectionRange(length, length);
+            }, 0);
+        }
+    });
+
+    if (isFirst) {
+        larguraInput.focus();
+    }
+
+    calculateTotal();
+    console.log("Grupo de medidas adicionado com sucesso");
+}
+
+        function atualizarTotal(input) {
+    const group = input.closest('.bg-white');
+    const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+    const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+    const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+    const totalM2 = largura * altura * quantidade;
+
+    group.querySelector('input[placeholder="M²"]').value = totalM2.toFixed(2);
+    calculateTotal();
+}
+
+      // Função para duplicar um grupo de medidas
+function duplicarGrupo(button) {
+    const group = button.closest('.bg-white');
+    const largura = group.querySelector('.largura-input').value || '';
+    const altura = group.querySelector('.altura-input').value || '';
+    const quantidade = group.querySelector('.quantidade-input').value || '';
+    const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]').value || '';
+    const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]').value || '';
+    const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
+
+    addMedidaGroup(true, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
+
+    const container = document.getElementById('medidasContainer');
+    const firstGroup = container.firstChild;
+    const larguraInput = firstGroup.querySelector('.largura-input');
+    larguraInput.focus();
+
+    calculateTotal();
+}
+
+   // Função para duplicar todas as medidas
+function duplicarMedidas() {
+    const medidaGroups = Array.from(document.querySelectorAll('#medidasContainer > div'));
+
+    medidaGroups.reverse().forEach(group => {
+        const largura = group.querySelector('.largura-input').value || '';
+        const altura = group.querySelector('.altura-input').value || '';
+        const quantidade = group.querySelector('.quantidade-input').value || '';
+        const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]').value || '';
+        const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]').value || '';
+        const peliculaSelecionada = group.querySelector('.pelicula-select').value || '';
+
+        addMedidaGroup(false, largura, altura, quantidade, true, ambiente, tipoAplicacao, peliculaSelecionada);
+    });
+
+    const container = document.getElementById('medidasContainer');
+    const firstGroup = container.firstChild;
+    const larguraInput = firstGroup.querySelector('.largura-input');
+    larguraInput.focus();
+
+    calculateTotal();
+}
 
         function deleteMedidaGroup(button) {
             if (confirm('Tem certeza que deseja excluir este grupo de medidas?')) {
@@ -791,52 +1705,41 @@ async function clearMedidas() {
             }
         }
 
-        function calculateTotal() {
-    const medidaGroups = document.querySelectorAll('#medidasContainer > div');
-    let totalM2 = 0;
-    let precoTotal = 0;
+        async function calculateTotal() {
+            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+            let totalM2 = 0;
+            let precoTotal = 0;
 
-    medidaGroups.forEach(group => {
-        const isChecked = group.querySelector('input[type="checkbox"]').checked;
-        const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
-        const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
-        const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+            for (const group of medidaGroups) {
+                const isChecked = group.querySelector('input[type="checkbox"]').checked;
+                const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+                const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+                const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
 
-        if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
-            const peliculaNome = group.querySelector('.pelicula-select').value;
-            const pelicula = peliculas.find(p => p.nome === peliculaNome);
-            const area = largura * altura * quantidade;
-            const preco = pelicula ? area * pelicula.preco : 0;
+                if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
+                    const peliculaNome = group.querySelector('.pelicula-select').value;
+                    let pelicula = peliculas.find(p => p.nome === peliculaNome);
+                    
+                    if (!pelicula) {
+                        const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
+                        pelicula = peliculasPersonalizadas.find(p => p.nome === peliculaNome);
+                    }
 
-            totalM2 += area;
-            precoTotal += preco;
+                    const area = largura * altura * quantidade; // Convertendo para m²
+                    const preco = pelicula ? area * pelicula.preco : 0;
 
-            // Atualizar o campo M² do grupo
-            group.querySelector('input[placeholder="M²"]').value = area.toFixed(2);
-        } else {
-            // Se o grupo não estiver marcado ou for inválido, zerar o campo M²
-            group.querySelector('input[placeholder="M²"]').value = '0.00';
+                    totalM2 += area;
+                    precoTotal += preco;
+
+                    group.querySelector('input[placeholder="M²"]').value = area.toFixed(2);
+                } else {
+                    group.querySelector('input[placeholder="M²"]').value = '0.00';
+                }
+            }
+
+            updateResultado(totalM2, precoTotal);
+            await saveMedidas();
         }
-    });
-
-    updateResultado(totalM2, precoTotal);
-    saveMedidas();
-}
-
-// Função auxiliar para atualizar os resultados
-function updateResultado(m2, preco) {
-    const resultadoDesktop = document.getElementById('resultadoDesktop');
-    const resultadoMobile = document.getElementById('resultadoMobile');
-    
-    if (resultadoDesktop) {
-        resultadoDesktop.textContent = `Total M²: ${m2.toFixed(2)} | Preço Total: R$ ${preco.toFixed(2)}`;
-    }
-    if (resultadoMobile) {
-        resultadoMobile.textContent = `Total M²: ${m2.toFixed(2)} | R$ ${preco.toFixed(2)}`;
-    }
-}
-
-       
 
         function toggleAdditionalFields(button) {
             const fields = button.closest('.bg-white').querySelector('.additional-fields');
@@ -877,7 +1780,99 @@ function updateResultado(m2, preco) {
             });
         }
 
-        const DURACAO_TESTE_GRATIS = 2 * 60 * 1000;
+        // Funções para películas personalizadas
+        function abrirPopupPeliculaPersonalizada() {
+            const popupHTML = `
+                <div id="popupPeliculaPersonalizada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                        <h2 class="text-xl font-semibold mb-4">Adicionar Película Personalizada</h2>
+                        <input type="text" id="nomePeliculaPersonalizada" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Nome da Película">
+                        <input type="number" id="precoPeliculaPersonalizada" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Preço por m²">
+                        <button id="salvarPeliculaPersonalizada" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar Película</button>
+                        <button onclick="fecharPopupPeliculaPersonalizada()" class="mt-2 w-full p-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+            document.getElementById('salvarPeliculaPersonalizada').addEventListener('click', salvarPeliculaPersonalizada);
+        }
+
+        function fecharPopupPeliculaPersonalizada() {
+            const popup = document.getElementById('popupPeliculaPersonalizada');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        async function salvarPeliculaPersonalizada() {
+            const nome = document.getElementById('nomePeliculaPersonalizada').value.trim();
+            const preco = parseFloat(document.getElementById('precoPeliculaPersonalizada').value);
+
+            if (nome && !isNaN(preco)) {
+                const novaPelicula = { nome, preco };
+                await salvarPeliculaPersonalizadaNoIndexedDB(novaPelicula);
+                fecharPopupPeliculaPersonalizada();
+                await atualizarSeletoresPeliculas();
+                calculateTotal();
+            } else {
+                alert('Por favor, preencha todos os campos corretamente.');
+            }
+        }
+
+        async function salvarPeliculaPersonalizadaNoIndexedDB(pelicula) {
+           
+
+ const db = await abrirIndexedDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
+                const store = transaction.objectStore('peliculas_personalizadas');
+                const request = store.put(pelicula);
+
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function carregarPeliculasPersonalizadasDoIndexedDB() {
+            const db = await abrirIndexedDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['peliculas_personalizadas'], 'readonly');
+                const store = transaction.objectStore('peliculas_personalizadas');
+                const request = store.getAll();
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function atualizarSeletoresPeliculas() {
+            const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
+            peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
+
+            const seletores = document.querySelectorAll('.pelicula-select');
+            seletores.forEach(seletor => {
+                const selectedValue = seletor.value;
+                seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('');
+                seletor.innerHTML += '<option value="Outra">Outra</option>';
+                seletor.value = selectedValue;
+            });
+        }
+
+        function onPeliculaChange(select) {
+            if (select.value === 'Outra') {
+                abrirPopupPeliculaPersonalizada();
+            }
+            calculateTotal();
+        }
+
+        async function carregarPeliculasPersonalizadas() {
+            const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
+            peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
+            await atualizarSeletoresPeliculas();
+        }
+
+        // Sistema de verificação do aplicativo
+        const DURACAO_TESTE_GRATIS = 30 * 24 * 60 * 60 * 1000; // 30 dias em milissegundos
 
         async function verificarStatusAplicativo() {
             const db = await abrirIndexedDB();
@@ -925,124 +1920,200 @@ function updateResultado(m2, preco) {
             await objectStore.put({ id: 'status', ativado: false, inicioTeste: new Date().toISOString() });
         }
 
-        async function ativarAplicativo() {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['verificacao'], 'readwrite');
-    const objectStore = transaction.objectStore('verificacao');
-    await objectStore.put({ id: 'status', ativado: true });
-    atualizarIconeVerificacao('ativado');
-}
+     // Função ativarAplicativo permanece a mesma
+async function ativarAplicativo() {
+    console.log('Iniciando ativarAplicativo()');
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClientesDB', 7);
         
-
-        async function salvarClienteNoIndexedDB(cliente) {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['clientes'], 'readwrite');
-    const objectStore = transaction.objectStore('clientes');
-    const request = objectStore.add(cliente);
-    return new Promise((resolve, reject) => {
-        request.onsuccess = event => {
-            resolve(event.target.result); // Retorna o ID gerado
-        };
-        request.onerror = event => {
-            reject(event);
-        };
-    });
-}
-
-        async function obterTodosClientesDoIndexedDB() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.getAll();
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function verificarClienteExistente(nome) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['clientes'], 'readonly');
-            const objectStore = transaction.objectStore('clientes');
-            const request = objectStore.get(nome);
-
-            return new Promise((resolve, reject) => {
-                request.onsuccess = event => {
-                    resolve(!!event.target.result);
-                };
-                request.onerror = event => {
-                    reject(event);
-                };
-            });
-        }
-
-        async function atualizarClienteNoIndexedDB(clienteId, novoCliente) {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['clientes'], 'readwrite');
-    const objectStore = transaction.objectStore('clientes');
-    
-    // Mantém o ID original
-    novoCliente.id = parseInt(clienteId);
-    
-    return objectStore.put(novoCliente);
-}
-
-async function obterClienteDoIndexedDB(id) {
-    const db = await abrirIndexedDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['clientes'], 'readonly');
-        const objectStore = transaction.objectStore('clientes');
-        const request = objectStore.get(parseInt(id));
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-        request.onerror = event => {
-            reject(event);
-        };
-    });
-}
-
-        // Função para remover cliente no IndexedDB
-async function removerClienteDoIndexedDB(id) {
-    const db = await abrirIndexedDB();
-    const transaction = db.transaction(['clientes'], 'readwrite');
-    const objectStore = transaction.objectStore('clientes');
-    
-    return new Promise((resolve, reject) => {
-        const request = objectStore.delete(parseInt(id));
-        request.onsuccess = () => {
-            console.log(`Cliente com ID ${id} removido do IndexedDB.`);
-            resolve();
-        };
         request.onerror = (event) => {
-            console.error(`Erro ao tentar remover o cliente com ID ${id}:`, event);
-            reject(event);
+            console.error('Erro ao abrir o IndexedDB:', event.target.error);
+            reject('Erro ao abrir o IndexedDB');
+        };
+        
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const store = transaction.objectStore('verificacao');
+            
+            const putRequest = store.put({ id: 'status', ativado: true });
+            
+            putRequest.onerror = (event) => {
+                console.error('Erro ao salvar status de ativação:', event.target.error);
+                reject('Erro ao salvar status de ativação');
+            };
+            
+            putRequest.onsuccess = () => {
+                console.log('Status de ativação salvo com sucesso');
+                resolve(true);
+            };
+        };
+        
+        request.onupgradeneeded = (event) => {
+            console.log('Atualizando estrutura do banco de dados');
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('verificacao')) {
+                db.createObjectStore('verificacao', { keyPath: 'id' });
+            }
         };
     });
 }
 
-        async function salvarMedidasNoIndexedDB(cliente, medidas) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.put({ cliente, medidas });
+        function gerarFrasesAleatorias() {
+            const frases = [];
+            for (let i = 0; i < 7; i++) {
+                const tamanho = Math.floor(Math.random() * 4) + 5;
+                let frase = '';
+                for (let j = 0; j < tamanho; j++) {
+                    frase += String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+                }
+                frases.push(frase);
+            }
+            return frases;
         }
 
-        async function obterMedidasDoIndexedDB(cliente) {
+        function extrairCodigoAtivacao(frases) {
+            let codigo = '';
+
+            let seq1 = frases[0][frases[0].length - 2];
+            if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
+            codigo += seq1;
+
+            let seq2 = frases[1][1];
+            if (seq2.match(/[^a-zA-Z0-9]/) || seq2.match(/[a-z]/)) seq2 = frases[1][2] || '';
+            codigo += seq2;
+
+            let seq3 = frases[2][0];
+            if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
+            codigo += seq3;
+
+            let seq4 = frases[3][frases[3].length - 1];
+            if (seq4.match(/[0-9]/)) seq4 = frases[3][frases[3].length - 2] || '';
+            codigo += seq4;
+
+            let seq5 = frases[4][1];
+            if (seq5.match(/[a-zA-Z]/)) seq5 += frases[4][2] || '';
+            codigo += seq5;
+
+            let seq6 = frases[5][4] || '';
+            if (seq6.match(/[^a-zA-Z0-9]/)) seq6 = frases[5][0] || '';
+            codigo += seq6;
+
+            let seq7 = frases[6][3] || '';
+            if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
+            codigo += seq7;
+
+            return codigo;
+        }
+
+        function verificarCodigo(codigoUsuario, frasesOriginais) {
+            const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
+
+            if (codigoUsuario === '987410') {
+                return true;
+            }
+
+            return codigoUsuario === codigoCorreto;
+        }
+
+        async function mostrarPopupVerificacao() {
+            // Remover qualquer popup existente antes de criar um novo
+            const existingPopup = document.getElementById('popupVerificacao');
+            if (existingPopup) {
+                existingPopup.parentNode.removeChild(existingPopup);
+            }
+            const frasesGeradas = gerarFrasesAleatorias();
+            const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
+
+            const popupHTML = `
+                <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
+                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Acesso Bloqueado</h2>
+                        <p>Para usar o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
+                        <ol class="list-decimal list-inside mb-4">
+                            ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
+                        </ol>
+                        <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
+                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+            document.getElementById('verificarCodigo').addEventListener('click', async () => {
+    console.log('Botão de verificação clicado');
+    const codigoUsuario = document.getElementById('codigoAtivacao').value;
+    console.log('Código inserido:', codigoUsuario);
+
+    // Verifica se é a senha alternativa ou o código gerado
+    if (codigoUsuario === '987410' || verificarCodigo(codigoUsuario, frasesGeradas)) {
+        console.log('Código correto ou senha alternativa válida, tentando ativar o aplicativo');
+        try {
+            const resultado = await ativarAplicativo();
+            console.log('Resultado da ativação:', resultado);
+            
+            if (resultado) {
+                console.log('Aplicativo ativado com sucesso, tentando fechar o popup');
+                const popup = document.getElementById('popupVerificacao');
+                if (popup) {
+                    popup.style.display = 'none';
+                    console.log('Popup ocultado');
+                } else {
+                    console.log('Elemento do popup não encontrado');
+                }
+                
+                alert('Aplicativo ativado com sucesso! A página será recarregada.');
+                location.reload();
+            } else {
+                console.log('Falha na ativação do aplicativo');
+                alert('Ocorreu um erro ao ativar o aplicativo. Por favor, tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro durante a ativação:', error);
+            alert('Ocorreu um erro ao ativar o aplicativo. Por favor, tente novamente.');
+        }
+    } else {
+        console.log('Código incorreto');
+        alert('Código incorreto. Tente novamente.');
+    }
+});
+        }
+
+        async function verificarAtivacaoAntes(acao) {
+    const status = await verificarStatusAplicativo();
+    if (status.status === 'ativado' || status.status === 'em_teste') {
+        acao();
+    } else {
+        mostrarPopupVerificacao();
+    }
+}
+        async function verificarStatusInicial() {
+            const status = await verificarStatusAplicativo();
+            if (status.status !== 'ativado') {
+                mostrarPopupVerificacao();
+                // Desabilitar todas as interações com a página
+                document.body.style.pointerEvents = 'none';
+                // Exceto o popup de verificação
+                document.getElementById('popupVerificacao').style.pointerEvents = 'auto';
+            }
+        }
+
+        async function salvarVerificacaoNoIndexedDB(verificado) {
             const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readonly');
-            const objectStore = transaction.objectStore('medidas');
-            const request = objectStore.get(cliente);
+            const transaction = db.transaction(['verificacao'], 'readwrite');
+            const objectStore = transaction.objectStore('verificacao');
+            return objectStore.put({ id: 'status', verificado });
+        }
+
+        async function obterStatusVerificacao() {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['verificacao'], 'readonly');
+            const objectStore = transaction.objectStore('verificacao');
+            const request = objectStore.get('status');
 
             return new Promise((resolve, reject) => {
                 request.onsuccess = event => {
-                    resolve(event.target.result ? event.target.result.medidas : null);
+                    resolve(event.target.result ? event.target.result.verificado : false);
                 };
                 request.onerror = event => {
                     reject(event);
@@ -1050,40 +2121,16 @@ async function removerClienteDoIndexedDB(id) {
             });
         }
 
-        async function removerMedidasDoIndexedDB(cliente) {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['medidas'], 'readwrite');
-            const objectStore = transaction.objectStore('medidas');
-            return objectStore.delete(cliente);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                           //Função generatePDF_v3_0 Completa e Atualizada
-
-                           async function generatePDF_v3_0() {
+        // Função para gerar PDF
+        async function generatePDF_v3_0() {
     try {
-        const clienteNome = clienteSelect.value;
-        if (!clienteNome) {
+        const clienteId = clienteSelect.value;
+        if (!clienteId) {
             alert('Selecione um cliente.');
             return;
         }
 
-        const cliente = clientes.find(c => c.id == clienteNome);
+        const cliente = clientes.find(c => c.id == clienteId);
         if (!cliente) {
             alert('Informações do cliente não encontradas.');
             return;
@@ -1101,6 +2148,8 @@ async function removerClienteDoIndexedDB(id) {
         const margin = 15;
 
         const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+        const formasPagamento = infoUsuario.payment_methods || []; // Recupera as formas de pagamento
+
         const colors = {
             primary: hexToRgb(infoUsuario.cores?.primaria || '#0056b3'),
             secondary: hexToRgb(infoUsuario.cores?.secundaria || '#17a2b8'),
@@ -1115,7 +2164,7 @@ async function removerClienteDoIndexedDB(id) {
         }
 
         function safeText(text, x, y, options = {}) {
-            if (typeof text !== 'string') text = String(text);
+            if (typeof text !== 'string') text = String(text || '');
             if (typeof x !== 'number' || typeof y !== 'number') {
                 console.error('Coordenadas inválidas:', x, y);
                 return;
@@ -1149,7 +2198,7 @@ async function removerClienteDoIndexedDB(id) {
                     }
                     const offsetX = x + (maxWidth - imgWidth) / 2;
                     const offsetY = y + (maxHeight - imgHeight) / 2;
-                    await doc.addImage(infoUsuario.logo, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
+                    doc.addImage(infoUsuario.logo, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
                 } catch (error) {
                     console.error("Erro ao adicionar a logo:", error);
                     doc.setFontSize(12);
@@ -1166,8 +2215,8 @@ async function removerClienteDoIndexedDB(id) {
             doc.rect(0, pageHeight - 10, pageWidth, 10, 'F');
             doc.setTextColor(...colors.white);
             doc.setFontSize(8);
-            safeText(infoUsuario.empresa, margin, pageHeight - 3);
-            safeText(infoUsuario.telefone, pageWidth / 2, pageHeight - 3, { align: 'center' });
+            safeText(infoUsuario.empresa || '', margin, pageHeight - 3);
+            safeText(infoUsuario.telefone || '', pageWidth / 2, pageHeight - 3, { align: 'center' });
             safeText(`Página ${pageNumber}`, pageWidth - margin, pageHeight - 3, { align: 'right' });
         }
 
@@ -1210,6 +2259,8 @@ async function removerClienteDoIndexedDB(id) {
             safeText(`Orçamento Nº: ${Math.floor(Math.random() * 10000)}`, pageWidth - margin, 48, { align: 'right' });
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 90, pageWidth - 85, 60, 3, 3, 'F');
+
+            // Seção Contratada
             doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(12);
@@ -1217,10 +2268,13 @@ async function removerClienteDoIndexedDB(id) {
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
-            safeText(`Empresa: ${infoUsuario.empresa}`, 75, 115);
-            safeText(`Telefone: ${infoUsuario.telefone}`, 75, 125);
-            safeText(`Email: ${infoUsuario.email}`, 75, 135);
-            safeText(`CNPJ/CPF: ${infoUsuario.cpfCnpj}`, 75, 145);
+            safeText(`Empresa: ${infoUsuario.empresa || ''}`, 75, 115);
+            safeText(`Telefone: ${infoUsuario.telefone || ''}`, 75, 125);
+            safeText(`Email: ${infoUsuario.email || ''}`, 75, 135);
+            safeText(`CNPJ/CPF: ${infoUsuario.cpfCnpj || ''}`, 75, 145);
+            safeText(`Endereço: ${infoUsuario.endereco || ''}`, 75, 155); // Adicionado
+
+            // Seção Cliente
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 160, pageWidth - 85, 60, 3, 3, 'F');
             doc.setTextColor(...colors.primary);
@@ -1230,10 +2284,12 @@ async function removerClienteDoIndexedDB(id) {
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
-            safeText(`Nome: ${cliente.nome}`, 75, 185);
-            safeText(`Telefone: ${cliente.telefone}`, 75, 195);
+            safeText(`Nome: ${cliente.nome || ''}`, 75, 185);
+            safeText(`Telefone: ${cliente.telefone || ''}`, 75, 195);
             safeText(`Email: ${cliente.email || 'N/A'}`, 75, 205);
             safeText(`CNPJ/CPF: ${cliente.cpfCnpj || cliente.cpf || cliente.cnpj || 'N/A'}`, 75, 215);
+            safeText(`Endereço: ${cliente.endereco || ''}`, 75, 225); // Adicionado
+
             addFooter(1);
         }
 
@@ -1245,28 +2301,31 @@ async function removerClienteDoIndexedDB(id) {
             y += 10;
 
             const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+
             const medidasPorPelicula = {};
             const totaisGerais = { totalM2: 0, precoTotal: 0 };
 
             medidaGroups.forEach(group => {
-                const isChecked = group.querySelector('input[type="checkbox"]').checked;
-                const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
-                const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
-                const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
+                const isChecked = group.querySelector('input[type="checkbox"]')?.checked;
+                const largura = parseFloat(group.querySelector('.largura-input')?.value) || 0;
+                const altura = parseFloat(group.querySelector('.altura-input')?.value) || 0;
+                const quantidade = parseInt(group.querySelector('.quantidade-input')?.value) || 0;
 
                 if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
-                    const peliculaNome = group.querySelector('.pelicula-select').value;
-                    if (!medidasPorPelicula[peliculaNome]) {
-                        medidasPorPelicula[peliculaNome] = [];
+                    const peliculaNome = group.querySelector('.pelicula-select')?.value;
+                    if (peliculaNome) {
+                        if (!medidasPorPelicula[peliculaNome]) {
+                            medidasPorPelicula[peliculaNome] = [];
+                        }
+                        medidasPorPelicula[peliculaNome].push(group);
+
+                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                        const area = largura * altura * quantidade / 10000; // Convertendo para m²
+                        const preco = pelicula ? area * pelicula.preco : 0;
+
+                        totaisGerais.totalM2 += area;
+                        totaisGerais.precoTotal += preco;
                     }
-                    medidasPorPelicula[peliculaNome].push(group);
-
-                    const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                    const area = largura * altura * quantidade;
-                    const preco = pelicula ? area * pelicula.preco : 0;
-
-                    totaisGerais.totalM2 += area;
-                    totaisGerais.precoTotal += preco;
                 }
             });
 
@@ -1274,14 +2333,12 @@ async function removerClienteDoIndexedDB(id) {
                 const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
                 const colWidths = [15, 30, 40, 40, 20, 30];
                 
-                // Título da tabela
                 doc.setTextColor(...colors.primary);
                 doc.setFont("helvetica", 'bold');
                 doc.setFontSize(12);
                 safeText(peliculaNome, margin, y);
                 y += 10;
 
-                // Cabeçalho da tabela
                 doc.setFillColor(...colors.primary);
                 doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                 doc.setTextColor(...colors.white);
@@ -1298,14 +2355,12 @@ async function removerClienteDoIndexedDB(id) {
                 doc.setFont("helvetica", 'normal');
                 doc.setFontSize(8);
 
-                // Cores para o efeito zebrado
-                const zebraColor1 = [255, 255, 255]; // Branco
-                const zebraColor2 = [245, 245, 245]; // Cinza muito claro
+                const zebraColor1 = [255, 255, 255];
+                const zebraColor2 = [245, 245, 245];
 
                 medidas.forEach((group, index) => {
                     if (y > pageHeight - 60) {
                         y = addPage(++pageNumber);
-                        // Repetir cabeçalho da tabela na nova página
                         doc.setFillColor(...colors.primary);
                         doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                         doc.setTextColor(...colors.white);
@@ -1321,18 +2376,17 @@ async function removerClienteDoIndexedDB(id) {
                         doc.setFontSize(8);
                     }
 
-                    // Efeito zebrado
                     doc.setFillColor(...(index % 2 === 0 ? zebraColor1 : zebraColor2));
                     doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
 
                     doc.setTextColor(...colors.text);
 
-                    const largura = group.querySelector('.largura-input').value || '0';
-                    const altura = group.querySelector('.altura-input').value || '0';
-                    const quantidade = group.querySelector('.quantidade-input').value || '0';
-                    const totalM2 = group.querySelector('input[placeholder="M²"]').value || '0';
-                    const ambiente = group.querySelector('.additional-fields select:first-child').value || '';
-                    const tipoAplicacao = group.querySelector('.additional-fields select:last-child').value || '';
+                    const largura = group.querySelector('.largura-input')?.value || '0';
+                    const altura = group.querySelector('.altura-input')?.value || '0';
+                    const quantidade = group.querySelector('.quantidade-input')?.value || '0';
+                    const totalM2 = group.querySelector('input[placeholder="M²"]')?.value || '0';
+                    const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]')?.value || '';
+                    const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]')?.value || '';
                     const pelicula = peliculas.find(p => p.nome === peliculaNome);
 
                     xOffset = margin;
@@ -1352,7 +2406,7 @@ async function removerClienteDoIndexedDB(id) {
                         safeText(`R$ ${preco}`, xOffset + 2, y + 4);
                     }
 
-                    y += 10; // Espaçamento entre linhas
+                    y += 10;
                 });
 
                 return y;
@@ -1363,13 +2417,20 @@ async function removerClienteDoIndexedDB(id) {
                 y = addMedidasTable(medidas, peliculaNome);
                 
                 const totalPelicula = {
-                    totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0), 0),
+                    totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0), 0),
                     precoTotal: medidas.reduce((sum, group) => {
-                        const area = parseFloat(group.querySelector('input[placeholder="M²"]').value) || 0;
+                        const area = parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0;
                         const pelicula = peliculas.find(p => p.nome === peliculaNome);
                         return sum + (pelicula ? area * pelicula.preco : 0);
                     }, 0)
                 };
+
+                // Acumular nos totais gerais
+                totaisGerais.totalM2 += totalPelicula.totalM2;
+                totaisGerais.precoTotal += totalPelicula.precoTotal;
+
+                console.log("Subtotal:", peliculaNome, "Área:", totalPelicula.totalM2, "Preço:", totalPelicula.precoTotal);
+                console.log("Total Geral Atualizado:", totaisGerais.totalM2, totaisGerais.precoTotal);
 
                 y += 5;
                 doc.setDrawColor(...colors.secondary);
@@ -1384,10 +2445,13 @@ async function removerClienteDoIndexedDB(id) {
                 y += 15;
             });
 
+            console.log("Final Total Geral:", totaisGerais.totalM2, totaisGerais.precoTotal);
+
             if (y > pageHeight - 60) {
                 y = addPage(++pageNumber);
             }
 
+            // Seção de Total Geral
             y = addSectionTitle("Total Geral do Orçamento", y);
             y += 10;
             doc.setDrawColor(...colors.primary);
@@ -1400,8 +2464,53 @@ async function removerClienteDoIndexedDB(id) {
             safeText("Total Geral:", margin, y + 10);
             safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
             safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
+
             y += 30;
 
+            // Seção de Formas de Pagamento
+            y = addPage(++pageNumber);
+            y = addSectionTitle("Formas de Pagamento", y);
+            y += 10;
+
+            formasPagamento.forEach(method => {
+                let metodoTexto = '';
+                switch (method.tipo) {
+                    case 'pix':
+                        metodoTexto = 'Pix';
+                        break;
+                    case 'boleto':
+                        metodoTexto = 'Boleto';
+                        break;
+                    case 'parcelado_sem_juros':
+                        metodoTexto = `Até 12x sem Juros`;
+                        break;
+                    case 'parcelado_com_juros':
+                        metodoTexto = `12x com Juros (Taxa de ${method.juros}%)`;
+                        break;
+                    default:
+                        metodoTexto = method.tipo;
+                }
+                if (method.ativo) {
+                    safeText(`• ${metodoTexto}`, margin, y);
+                    y += 10;
+
+                    // Detalhes adicionais
+                    if (method.tipo === 'parcelado_sem_juros') {
+                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
+                        y += 10;
+                    }
+                    if (method.tipo === 'parcelado_com_juros') {
+                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
+                        y += 10;
+                        safeText(`  Taxa de Juros: ${method.juros}%`, margin + 5, y);
+                        y += 10;
+                    }
+                }
+            });
+
+            y += 10;
+
+            // Seção de Condições de Pagamento e Informações Relevantes
             y = addPage(++pageNumber);
             y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
             y += 10;
@@ -1453,12 +2562,12 @@ async function removerClienteDoIndexedDB(id) {
             doc.line(margin, y, pageWidth / 2 - 20, y);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(11);
-            safeText(infoUsuario.nome, margin, y + 6);
+            safeText(infoUsuario.nome || '', margin, y + 6);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
-            safeText(infoUsuario.empresa, margin, y + 12);
-            safeText(infoUsuario.telefone, margin, y + 18);
-            safeText(infoUsuario.email, margin, y + 24);
+            safeText(infoUsuario.empresa || '', margin, y + 12);
+            safeText(infoUsuario.telefone || '', margin, y + 18);
+            safeText(infoUsuario.email || '', margin, y + 24);
         }
 
         await addCover();
@@ -1468,193 +2577,41 @@ async function removerClienteDoIndexedDB(id) {
         console.log('PDF gerado com sucesso!');
     } catch (error) {
         console.error("Erro ao gerar PDF:", error);
-        alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique o console para mais detalhes.");
-    }
-}
 
-
-
-                           //PDF FINAL
-
-
-
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        function gerarFrasesAleatorias() {
-            const frases = [];
-            for (let i = 0; i < 7; i++) {
-                const tamanho = Math.floor(Math.random() * 4) + 5;
-                let frase = '';
-                for (let j = 0; j < tamanho; j++) {
-                    frase += String.fromCharCode(Math.floor(Math.random() * 94) + 33);
-                }
-                frases.push(frase);
-            }
-            return frases;
+        if (error.message && error.message.includes("Cannot read properties of undefined")) {
+            alert("Erro ao gerar o PDF: Dados da empresa incompletos. Por favor, preencha todas as informações da empresa no menu de configurações do usuário antes de gerar o PDF.");
+        } else {
+            alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique se todas as informações necessárias foram preenchidas e tente novamente.");
         }
-
-        function extrairCodigoAtivacao(frases) {
-            let codigo = '';
-
-            let seq1 = frases[0][frases[0].length - 2];
-            if (seq1.match(/[a-zA-Z]/)) seq1 = frases[0][0] + seq1;
-            codigo += seq1;
-
-            let seq2 = frases[1][1];
-            if (seq2.match(/[^a-zA-Z0-9]/) || seq2.match(/[a-z]/)) seq2 = frases[1][2] || '';
-            codigo += seq2;
-
-            let seq3 = frases[2][0];
-            if (seq3.match(/[0-9]/)) seq3 += frases[2][1] || '';
-            codigo += seq3;
-
-            let seq4 = frases[3][frases[3].length - 1];
-            if (seq4.match(/[0-9]/)) seq4 = frases[3][frases[3].length - 2] || '';
-            codigo += seq4;
-
-            let seq5 = frases[4][1];
-            if (seq5.match(/[a-zA-Z]/)) seq5 += frases[4][2] || '';
-            codigo += seq5;
-
-            let seq6 = frases[5][4] || '';
-            if (seq6.match(/[^a-zA-Z0-9]/)) seq6 = frases[5][0] || '';
-            codigo += seq6;
-
-            let seq7 = frases[6][3] || '';
-            if (seq7.match(/[A-Z]/)) seq7 += frases[6][frases[6].length - 1] || '';
-            codigo += seq7;
-
-            return codigo;
-        }
-
-        function verificarCodigo(codigoUsuario, frasesOriginais) {
-    const codigoCorreto = extrairCodigoAtivacao(frasesOriginais);
-
-    if (codigoUsuario === '987410') {
-        return true;
-    }
-
-    return codigoUsuario === codigoCorreto;
-    
-}
-
-async function mostrarPopupVerificacao() {
-
-     // Remover qualquer popup existente antes de criar um novo
-     const existingPopup = document.getElementById('popupVerificacao');
-    if (existingPopup) {
-        existingPopup.parentNode.removeChild(existingPopup);
-    }
-    const frasesGeradas = gerarFrasesAleatorias();
-    const codigoCorreto = extrairCodigoAtivacao(frasesGeradas);
-
-    const popupHTML = `
-        <div id="popupVerificacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
-            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Acesso Bloqueado</h2>
-                <p>Para usar o aplicativo, por favor, ative-o enviando as seguintes frases para o WhatsApp +5583993015765:</p>
-                <ol class="list-decimal list-inside mb-4">
-                    ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
-                </ol>
-                <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
-                <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', popupHTML);
-
-    document.getElementById('verificarCodigo').addEventListener('click', async () => {
-    const codigoUsuario = document.getElementById('codigoAtivacao').value;
-
-    if (verificarCodigo(codigoUsuario, frasesGeradas)) {
-        console.log('Código correto! Aplicativo ativado com sucesso');
-        
-        await ativarAplicativo();
-
-        // Fechar o popup de maneira confiável
-        const popup = document.getElementById('popupVerificacao');
-        if (popup) {
-            popup.style.display = 'none'; // Esconde o popup imediatamente
-            popup.parentNode.removeChild(popup); // Remove o popup do DOM
-        }
-
-        // Liberar o acesso à página
-        document.body.style.pointerEvents = 'auto';
-
-        alert('Código correto! Aplicativo ativado com sucesso.');
-
-        // Adicionar um pequeno atraso antes de recarregar a página
-        setTimeout(() => {
-            location.reload();
-        }, 500); // 500ms de atraso
-    } else {
-        alert('Código incorreto. Tente novamente.');
-    }
-});
-}
-
-async function verificarAtivacaoAntes(acao) {
-    const status = await verificarStatusAplicativo();
-    if (status.status === 'ativado') {
-        acao();
-    } else {
-        mostrarPopupVerificacao();
     }
 }
 
-async function verificarStatusInicial() {
-    const status = await verificarStatusAplicativo();
-    if (status.status !== 'ativado') {
-        mostrarPopupVerificacao();
-        // Desabilitar todas as interações com a página
-        document.body.style.pointerEvents = 'none';
-        // Exceto o popup de verificação
-        document.getElementById('popupVerificacao').style.pointerEvents = 'auto';
-    }
+        // Funções auxiliares para manipulação do IndexedDB
+        async function salvarClienteNoIndexedDB(cliente) {
+    const db = await abrirIndexedDB();
+    const transaction = db.transaction(['clientes'], 'readwrite');
+    const objectStore = transaction.objectStore('clientes');
+    const request = objectStore.add(cliente);
+    return new Promise((resolve, reject) => {
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+        request.onerror = event => {
+            reject(event);
+        };
+    });
 }
-        async function salvarVerificacaoNoIndexedDB(verificado) {
+
+
+        async function obterTodosClientesDoIndexedDB() {
             const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readwrite');
-            const objectStore = transaction.objectStore('verificacao');
-            return objectStore.put({ id: 'status', verificado });
-        }
-
-        async function obterStatusVerificacao() {
-            const db = await abrirIndexedDB();
-            const transaction = db.transaction(['verificacao'], 'readonly');
-            const objectStore = transaction.objectStore('verificacao');
-            const request = objectStore.get('status');
+            const transaction = db.transaction(['clientes'], 'readonly');
+            const objectStore = transaction.objectStore('clientes');
+            const request = objectStore.getAll();
 
             return new Promise((resolve, reject) => {
                 request.onsuccess = event => {
-                    resolve(event.target.result ? event.target.result.verificado : false);
+                    resolve(event.target.result);
                 };
                 request.onerror = event => {
                     reject(event);
@@ -1662,34 +2619,82 @@ async function verificarStatusInicial() {
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-    verificarStatusInicial(); // Adicione esta linha
+        async function removerClienteDoIndexedDB(id) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['clientes'], 'readwrite');
+            const objectStore = transaction.objectStore('clientes');
+            
+            return new Promise((resolve, reject) => {
+                const request = objectStore.delete(parseInt(id));
+                request.onsuccess = () => {
+                    console.log(`Cliente com ID ${id} removido do IndexedDB.`);
+                    resolve();
+                };
+                request.onerror = (event) => {
+                    console.error(`Erro ao tentar remover o cliente com ID ${id}:`, event);
+                    reject(event);
+                };
+            });
+        }
+
+        async function salvarMedidasNoIndexedDB(cliente, medidas) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readwrite');
+            const objectStore = transaction.objectStore('medidas');
+            return objectStore.put({ cliente, medidas });
+        }
+
+        async function obterMedidasDoIndexedDB(cliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readonly');
+            const objectStore = transaction.objectStore('medidas');
+            const request = objectStore.get(cliente);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = event => {
+                    resolve(event.target.result ? event.target.result.medidas : null);
+                };
+                request.onerror = event => {
+                    reject(event);
+                };
+            });
+        }
+
+        async function removerMedidasDoIndexedDB(cliente) {
+            const db = await abrirIndexedDB();
+            const transaction = db.transaction(['medidas'], 'readwrite');
+            const objectStore = transaction.objectStore('medidas');
+            return objectStore.delete(cliente);
+        }
+   
+        window.addEventListener('load', () => {
+    const trialDays = 30; // Definir o período de teste de 30 dias
+    const firstVisit = localStorage.getItem('firstVisit');
     
-    const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
-    if (popupClienteBtnSalvar) {
-        popupClienteBtnSalvar.addEventListener('click', salvarCliente);
-    }
+    if (!firstVisit) {
+        // Primeira visita
+        const firstVisitDate = new Date();
+        localStorage.setItem('firstVisit', firstVisitDate);
+        alert('Parabéns! Você ganhou 30 dias para explorar tudo o que nosso aplicativo oferece. Use à vontade e, se curtir, quem sabe você não fica por mais tempo? 😉');
+    } else {
+        // Calcular quantos dias restam
+        const currentDate = new Date();
+        const firstVisitDate = new Date(firstVisit);
+        const timeDiff = currentDate - firstVisitDate;
+        const daysPassed = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Converte a diferença em dias
+        const daysLeft = trialDays - daysPassed;
 
-    const userForm = document.getElementById('userForm');
-    if (userForm) {
-        userForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            salvarInformacoesUsuario();
-        });
+        if (daysLeft > 0) {
+            // Mostrar alerta de quantos dias restam
+            alert(`Você tem ${daysLeft} dias restantes no seu período de teste gratuito.`);
+        } else {
+            // O período de teste acabou
+            alert('Seu período de teste de 30 dias expirou. Esperamos que tenha aproveitado!');
+        }
     }
-
-    const fecharPopupBtn = document.querySelector('#popupCliente .fechar-popup');
-    if (fecharPopupBtn) {
-        fecharPopupBtn.addEventListener('click', fecharPopup);
-    }
-
- // Adicionar o evento para o botão de gerar PDF na versão mobile
- const generatePdfButtonMobile = document.getElementById('generatePdfButtonMobile');
-    if (generatePdfButtonMobile) {
-        generatePdfButtonMobile.addEventListener('click', () => verificarAtivacaoAntes(generatePDF_v3_0));
-    }
-
 });
+
     </script>
 </body>
 </html>
+
