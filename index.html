@@ -15,10 +15,13 @@
     <link rel="manifest" href="/peliqueiros-br/manifest.json">
     <meta name="theme-color" content="#000000">
     <style>
+
+        
         /* Certificando que o popup será sempre visível */
         #popupCliente, #popupUsuario {
             z-index: 10000; /* Elevando o nível do popup */
         }
+        
 
           /* Animação de carregamento */
     .loader {
@@ -77,31 +80,87 @@
     </div>
 </div>
 
-<!-- Contêiner principal -->
-<!-- Seção de Ícones com Botões Trocados -->
-<div class="flex items-center justify-between mt-2">
-    <!-- Novo: Ícone do Usuário à Esquerda -->
-    <div class="flex items-center">
-        <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
-            <i class="fas fa-user-cog"></i>
+
+
+
+
+
+
+
+<!-- Contêiner Principal dos Ícones -->
+<div class="flex justify-between items-center w-full mt-4 px-0">
+    
+    <!-- Botão Usuário à Esquerda -->
+    <div class="relative group">
+        <button 
+            onclick="abrirPopupUsuario()" 
+            class="p-2 bg-gray-200 text-purple-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-purple-400" 
+            aria-label="Configurações do Usuário"
+        >
+            <i class="fas fa-user-cog fa-lg"></i>
         </button>
+        <!-- Tooltip Usuário -->
+        <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            Configurações do Usuário
+        </div>
     </div>
 
-    <!-- Ícones à Direita (Incluindo o ícone de Mapa agora) -->
-    <div id="editIconContainer" class="flex items-center space-x-2">
-        <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
-            <i class="fas fa-edit"></i>
-        </button>
-        <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-sm">
-            <i class="fas fa-trash-alt"></i>
-        </button>
-        <button onclick="abrirMapa()" class="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-300 shadow-sm">
-            <i class="fas fa-map-marker-alt"></i>
-        </button>
+    <!-- Grupo de Ações à Direita (Mapa, Editar, Excluir) -->
+    <div class="flex space-x-2">
+        <!-- Botão Mapa -->
+        <div class="relative group">
+            <button 
+                onclick="abrirMapa()" 
+                class="p-2 bg-gray-200 text-blue-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                aria-label="Abrir Mapa"
+            >
+                <i class="fas fa-map-marker-alt fa-lg"></i>
+            </button>
+            <!-- Tooltip Mapa -->
+            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                Abrir Mapa
+            </div>
+        </div>
+
+        <!-- Botão Editar -->
+        <div class="relative group">
+            <button 
+                onclick="abrirPopup('editar')" 
+                class="p-2 bg-gray-200 text-yellow-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-yellow-400" 
+                aria-label="Editar Cliente"
+            >
+                <i class="fas fa-edit fa-lg"></i>
+            </button>
+            <!-- Tooltip Editar -->
+            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                Editar Cliente
+            </div>
+        </div>
+
+        <!-- Botão Excluir -->
+        <div class="relative group">
+            <button 
+                onclick="confirmClearMedidas()" 
+                class="p-2 bg-gray-200 text-red-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-red-400" 
+                aria-label="Excluir Cliente e Medidas"
+            >
+                <i class="fas fa-trash-alt fa-lg"></i>
+            </button>
+            <!-- Tooltip Excluir -->
+            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                Excluir Cliente e Medidas
+            </div>
+        </div>
     </div>
 </div>
-                
-                </div>
+
+
+
+
+
+
+
+</div>
 
                 <!-- Conteúdo scrollável (grupos de medidas) -->
                 <div id="medidasContainer" class="space-y-2 w-full pb-20 sm:pb-0">
