@@ -539,14 +539,14 @@ function fecharPopupPaymentMethods() {
         modalContent.classList.remove('scale-100');
         setTimeout(() => {
             popupPaymentMethods.classList.add('hidden');
-            // Reabrir o popup de usuário após fechar o de formas de pagamento
-            abrirPopupUsuario();
-            console.log('Popup de Formas de Pagamento fechado e popup de Usuário reaberto');
+            // Removido: abrirPopupUsuario();
+            console.log('Popup de Formas de Pagamento fechado');
         }, 300); // Tempo deve coincidir com a duração da transição
     } else {
         console.error('Elemento popupPaymentMethods não encontrado para fechar');
     }
 }
+
 
 
 // Função para carregar as formas de pagamento do IndexedDB
