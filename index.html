@@ -78,15 +78,16 @@
 </div>
 
 <!-- Contêiner principal -->
+<!-- Seção de Ícones com Botões Trocados -->
 <div class="flex items-center justify-between mt-2">
-    <!-- Ícone de Localização à Esquerda -->
+    <!-- Novo: Ícone do Usuário à Esquerda -->
     <div class="flex items-center">
-        <button onclick="abrirMapa()" class="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-300 shadow-sm">
-            <i class="fas fa-map-marker-alt"></i>
+        <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
+            <i class="fas fa-user-cog"></i>
         </button>
     </div>
 
-    <!-- Ícones à Direita -->
+    <!-- Ícones à Direita (Incluindo o ícone de Mapa agora) -->
     <div id="editIconContainer" class="flex items-center space-x-2">
         <button onclick="abrirPopup('editar')" class="p-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 shadow-sm">
             <i class="fas fa-edit"></i>
@@ -94,14 +95,12 @@
         <button onclick="confirmClearMedidas()" class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 shadow-sm">
             <i class="fas fa-trash-alt"></i>
         </button>
-        <button onclick="abrirPopupUsuario()" class="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition duration-300 shadow-sm">
-            <i class="fas fa-user-cog"></i>
+        <button onclick="abrirMapa()" class="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-300 shadow-sm">
+            <i class="fas fa-map-marker-alt"></i>
         </button>
     </div>
 </div>
-
-    
-                    
+                
                 </div>
 
                 <!-- Conteúdo scrollável (grupos de medidas) -->
