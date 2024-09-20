@@ -274,8 +274,8 @@
                 <input type="number" id="parcelas_com_juros" name="parcelas_com_juros" min="1" max="12" placeholder="Até 12" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
             </div>
             <div class="ml-6">
-                <label for="taxa_juros" class="block text-sm text-gray-700 dark:text-gray-300">Taxa de Juros (%):</label>
-                <input type="number" id="taxa_juros" name="taxa_juros" step="0.01" min="0" placeholder="Ex: 2.5" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                <label for="taxa_juros" class="block text-sm text-gray-700 dark:text-gray-300">Taxa de Juros: (%):</label>
+                <input type="number" id="taxa_juros" name="taxa_juros" step="0.01" min="0" placeholder="Ex: 2.99" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
             </div>
               <!-- Novos Campos: Adiantamento em Porcentagem -->
               <div class="flex items-center">
@@ -2304,6 +2304,7 @@ async function ativarAplicativo() {
         // Função para gerar PDF
         async function generatePDF_v3_0() {
     try {
+        // 1. Validação do Cliente
         const clienteId = clienteSelect.value;
         if (!clienteId) {
             alert('Selecione um cliente.');
@@ -2316,6 +2317,7 @@ async function ativarAplicativo() {
             return;
         }
 
+        // 2. Configuração do jsPDF
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
             orientation: 'portrait',
@@ -2327,6 +2329,7 @@ async function ativarAplicativo() {
         const pageHeight = doc.internal.pageSize.height;
         const margin = 15;
 
+        // 3. Obter Informações do Usuário e Formas de Pagamento
         const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
         const formasPagamento = infoUsuario.payment_methods || []; // Recupera as formas de pagamento
 
@@ -2338,11 +2341,13 @@ async function ativarAplicativo() {
             white: [255, 255, 255]
         };
 
+        // Função para converter hex para RGB
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
         }
 
+        // Função para adicionar texto de forma segura
         function safeText(text, x, y, options = {}) {
             if (typeof text !== 'string') text = String(text || '');
             if (typeof x !== 'number' || typeof y !== 'number') {
@@ -2356,6 +2361,7 @@ async function ativarAplicativo() {
             }
         }
 
+        // Função para adicionar a logo da empresa
         async function addLogo(x, y, maxWidth, maxHeight) {
             if (infoUsuario.logo) {
                 try {
@@ -2390,6 +2396,7 @@ async function ativarAplicativo() {
             }
         }
 
+        // Função para adicionar o rodapé
         function addFooter(pageNumber) {
             doc.setFillColor(...colors.primary);
             doc.rect(0, pageHeight - 10, pageWidth, 10, 'F');
@@ -2400,12 +2407,14 @@ async function ativarAplicativo() {
             safeText(`Página ${pageNumber}`, pageWidth - margin, pageHeight - 3, { align: 'right' });
         }
 
+        // Função para adicionar uma nova página com rodapé
         function addPage(pageNumber) {
             doc.addPage();
             addFooter(pageNumber);
             return margin + 10;
         }
 
+        // Função para adicionar títulos de seção
         function addSectionTitle(title, y) {
             doc.setDrawColor(...colors.primary);
             doc.setLineWidth(0.5);
@@ -2417,6 +2426,7 @@ async function ativarAplicativo() {
             return y + 20;
         }
 
+        // Função para adicionar a capa do PDF
         async function addCover() {
             doc.setFillColor(...colors.white);
             doc.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -2473,10 +2483,29 @@ async function ativarAplicativo() {
             addFooter(1);
         }
 
+        // Funções auxiliares para cálculos
+        function calculateParceladoSemJuros(total, parcelas_max) {
+            return (total / parcelas_max).toFixed(2);
+        }
+
+        function calculateParceladoComJuros(total, parcelas_max, juros) {
+            // Fórmula de juros compostos: FV = PV * (1 + i)^n
+            const fator = Math.pow(1 + juros / 100, parcelas_max);
+            const totalComJuros = total * fator;
+            const valorParcela = (totalComJuros / parcelas_max).toFixed(2);
+            return valorParcela;
+        }
+
+        function calculateAdiantamento(total, porcentagem) {
+            return ((total * porcentagem) / 100).toFixed(2);
+        }
+
+        // Função principal para adicionar o conteúdo ao PDF
         function addContent() {
             let y = addPage(2);
             let pageNumber = 2;
 
+            // Seção Orçamento Detalhado
             y = addSectionTitle("Orçamento Detalhado", y);
             y += 10;
 
@@ -2485,6 +2514,7 @@ async function ativarAplicativo() {
             const medidasPorPelicula = {};
             const totaisGerais = { totalM2: 0, precoTotal: 0 };
 
+            // Agrupar medidas por película
             medidaGroups.forEach(group => {
                 const isChecked = group.querySelector('input[type="checkbox"]')?.checked;
                 const largura = parseFloat(group.querySelector('.largura-input')?.value) || 0;
@@ -2509,6 +2539,7 @@ async function ativarAplicativo() {
                 }
             });
 
+            // Função para adicionar uma tabela de medidas por película
             function addMedidasTable(medidas, peliculaNome) {
                 const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
                 const colWidths = [15, 30, 40, 40, 20, 30];
@@ -2519,6 +2550,7 @@ async function ativarAplicativo() {
                 safeText(peliculaNome, margin, y);
                 y += 10;
 
+                // Cabeçalho da tabela
                 doc.setFillColor(...colors.primary);
                 doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                 doc.setTextColor(...colors.white);
@@ -2541,6 +2573,7 @@ async function ativarAplicativo() {
                 medidas.forEach((group, index) => {
                     if (y > pageHeight - 60) {
                         y = addPage(++pageNumber);
+                        // Repetir o cabeçalho da tabela na nova página
                         doc.setFillColor(...colors.primary);
                         doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
                         doc.setTextColor(...colors.white);
@@ -2592,6 +2625,7 @@ async function ativarAplicativo() {
                 return y;
             }
 
+            // Adicionar tabelas de medidas por película
             Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
                 if (index > 0) y = addPage(++pageNumber);
                 y = addMedidasTable(medidas, peliculaNome);
@@ -2647,49 +2681,6 @@ async function ativarAplicativo() {
 
             y += 30;
 
-            // Seção de Formas de Pagamento
-            y = addPage(++pageNumber);
-            y = addSectionTitle("Formas de Pagamento", y);
-            y += 10;
-
-            formasPagamento.forEach(method => {
-                let metodoTexto = '';
-                switch (method.tipo) {
-                    case 'pix':
-                        metodoTexto = 'Pix';
-                        break;
-                    case 'boleto':
-                        metodoTexto = 'Boleto';
-                        break;
-                    case 'parcelado_sem_juros':
-                        metodoTexto = `Até 12x sem Juros`;
-                        break;
-                    case 'parcelado_com_juros':
-                        metodoTexto = `12x com Juros (Taxa de ${method.juros}%)`;
-                        break;
-                    default:
-                        metodoTexto = method.tipo;
-                }
-                if (method.ativo) {
-                    safeText(`• ${metodoTexto}`, margin, y);
-                    y += 10;
-
-                    // Detalhes adicionais
-                    if (method.tipo === 'parcelado_sem_juros') {
-                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
-                        y += 10;
-                    }
-                    if (method.tipo === 'parcelado_com_juros') {
-                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
-                        y += 10;
-                        safeText(`  Taxa de Juros: ${method.juros}%`, margin + 5, y);
-                        y += 10;
-                    }
-                }
-            });
-
-            y += 10;
-
             // Seção de Condições de Pagamento e Informações Relevantes
             y = addPage(++pageNumber);
             y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
@@ -2699,15 +2690,59 @@ async function ativarAplicativo() {
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
 
+            // Construindo as Condições de Pagamento com Formas de Pagamento Dinâmicas
             const condicoesPagamento = [
-                "1. Formas de Pagamento Aceitas:",
-                "   • Transferência bancária e Pix",
-                "   • Cartão de crédito (em até 3x sem juros)",
-                "   • Boleto bancário",
+                "1. Formas de Pagamento Aceitas:"
+            ];
+
+            // Adicionando as formas de pagamento dinâmicas com valores
+            formasPagamento.forEach(method => {
+                let metodoTexto = '';
+                switch (method.tipo) {
+                    case 'pix':
+                        metodoTexto = `• Pix R$ ${totaisGerais.precoTotal.toFixed(2)}`;
+                        break;
+                    case 'boleto':
+                        metodoTexto = `• Boleto Bancário R$ ${totaisGerais.precoTotal.toFixed(2)}`;
+                        break;
+                    case 'parcelado_sem_juros':
+                        const parcelaSemJuros = calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max);
+                        metodoTexto = `• Parcelado sem Juros (até ${method.parcelas_max}x)`;
+                        break;
+                    case 'parcelado_com_juros':
+                        const parcelaComJuros = calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros);
+                        metodoTexto = `• Parcelado com Juros (até ${method.parcelas_max}x, Taxa de ${method.juros}%)`;
+                        break;
+                    case 'adiantamento':
+                        const adiantamento = calculateAdiantamento(totaisGerais.precoTotal, method.porcentagem);
+                        metodoTexto = `• Adiantamento: ${method.porcentagem}% do valor total R$ ${adiantamento}`;
+                        break;
+                    case 'observacao':
+                        metodoTexto = `• Observações Pag: ${method.texto}`;
+                        break;
+                    default:
+                        metodoTexto = `• ${method.tipo}`;
+                }
+                if (method.ativo) {
+                    condicoesPagamento.push(metodoTexto);
+
+                    // Detalhes adicionais para alguns tipos
+                    if (method.tipo === 'parcelado_sem_juros') {
+                        condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max)}`);
+                    }
+                    if (method.tipo === 'parcelado_com_juros') {
+                        condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros)}`);
+                        condicoesPagamento.push(`   Taxa de Juros: ${method.juros}%`);
+                    }
+                    // Não há detalhes adicionais para Adiantamento e Observação
+                }
+            });
+
+            // Adicionando as condições estáticas
+            const condicoesEstaticas = [
                 "",
                 "2. Cronograma de Pagamento:",
-                "   • 50% do valor quando acima de R$ 2.500 na aprovação do orçamento",
-                "   • 50% restantes após a conclusão dos serviços",
+                "   • Aberto a negociação",
                 "",
                 "3. Prazo de Instalação:",
                 "   • A ser definido em comum acordo, conforme disponibilidade",
@@ -2725,11 +2760,14 @@ async function ativarAplicativo() {
                 "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
             ];
 
+            // Combinar as formas de pagamento dinâmicas com as condições estáticas
+            const todasCondicoes = condicoesPagamento.concat(condicoesEstaticas);
+
             const lineHeight = 6;
-            condicoesPagamento.forEach((condicao, index) => {
+            todasCondicoes.forEach((condicao, index) => {
                 if (y > pageHeight - 40) {
                     y = addPage(++pageNumber);
-                    y = addSectionTitle("Condições de Pagamento (continuação)", y);
+                    y = addSectionTitle("Condições de Pagamento (Continuação)", y);
                     y += 10;
                 }
                 safeText(condicao, margin, y);
@@ -2750,9 +2788,12 @@ async function ativarAplicativo() {
             safeText(infoUsuario.email || '', margin, y + 24);
         }
 
+        // Adicionar a capa
         await addCover();
+        // Adicionar o conteúdo
         addContent();
 
+        // Salvar o PDF com o nome baseado no nome do cliente
         doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
         console.log('PDF gerado com sucesso!');
     } catch (error) {
@@ -2765,6 +2806,7 @@ async function ativarAplicativo() {
         }
     }
 }
+
 
         // Funções auxiliares para manipulação do IndexedDB
         async function salvarClienteNoIndexedDB(cliente) {
@@ -2877,4 +2919,3 @@ async function ativarAplicativo() {
     </script>
 </body>
 </html>
-
