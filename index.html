@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-gradient-to-r from-blue-50 via-white to-blue-50">
 <head>
@@ -153,6 +154,7 @@
 
 
  <!-- Popup de Cadastro de Usuário -->
+  
 <div id="popupUsuario" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-lg w-full mx-4 sm:mx-0">
         <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
@@ -162,7 +164,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
+               <!-- Ícone de Cifrão -->
+               <button onclick="abrirPopupPaymentMethods()" class="absolute top-4 right-10 text-gray-500 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 focus:outline-none">
+                <i class="fas fa-dollar-sign fa-lg"></i>
+            </button>
         </div>
+        <!-- Dentro do Popup de Cadastro de Usuário -->
+<div class="p-6 space-y-6 max-h-70vh overflow-y-auto">
+    <form id="userForm" class="space-y-4">
+        <!-- Campos existentes... -->
+
+    </form>
+</div>
+
         <div class="p-6 space-y-6 max-h-70vh overflow-y-auto">
             <form id="userForm" class="space-y-4">
                 <div>
@@ -219,7 +233,73 @@
     </div>
 </div>
 
-    
+    <!-- Popup de Formas de Pagamento -->
+<div id="popupPaymentMethods" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Configurar Formas de Pagamento</h2>
+            <button onclick="fecharPopupPaymentMethods()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="paymentMethodsForm" class="p-6 space-y-4">
+            <!-- Pix -->
+            <div class="flex items-center">
+                <input type="checkbox" id="pix" name="payment_methods" value="pix" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="pix" class="ml-2 text-gray-700 dark:text-gray-300">Pix</label>
+            </div>
+            <!-- Boleto -->
+            <div class="flex items-center">
+                <input type="checkbox" id="boleto" name="payment_methods" value="boleto" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="boleto" class="ml-2 text-gray-700 dark:text-gray-300">Boleto</label>
+            </div>
+            <!-- Até 12x sem Juros -->
+            <div class="flex items-center">
+                <input type="checkbox" id="parcelado_sem_juros" name="payment_methods" value="parcelado_sem_juros" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="parcelado_sem_juros" class="ml-2 text-gray-700 dark:text-gray-300">Até 12x sem Juros</label>
+            </div>
+            <div class="ml-6">
+                <label for="parcelas_sem_juros" class="block text-sm text-gray-700 dark:text-gray-300">Número de Parcelas:</label>
+                <input type="number" id="parcelas_sem_juros" name="parcelas_sem_juros" min="1" max="12" placeholder="Até 12" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <!-- 12x com Juros -->
+            <div class="flex items-center">
+                <input type="checkbox" id="parcelado_com_juros" name="payment_methods" value="parcelado_com_juros" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="parcelado_com_juros" class="ml-2 text-gray-700 dark:text-gray-300">12x com Juros</label>
+            </div>
+            <div class="ml-6">
+                <label for="parcelas_com_juros" class="block text-sm text-gray-700 dark:text-gray-300">Número de Parcelas:</label>
+                <input type="number" id="parcelas_com_juros" name="parcelas_com_juros" min="1" max="12" placeholder="Até 12" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <div class="ml-6">
+                <label for="taxa_juros" class="block text-sm text-gray-700 dark:text-gray-300">Taxa de Juros (%):</label>
+                <input type="number" id="taxa_juros" name="taxa_juros" step="0.01" min="0" placeholder="Ex: 2.5" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+              <!-- Novos Campos: Adiantamento em Porcentagem -->
+              <div class="flex items-center">
+                <input type="checkbox" id="solicitar_adiantamento" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="solicitar_adiantamento" class="ml-2 text-gray-700 dark:text-gray-300">Solicitar Adiantamento</label>
+                <input type="number" id="porcentagem_adiantamento" placeholder="Porcentagem (%)" class="ml-4 p-1 border border-gray-300 rounded-md w-24 hidden">
+            </div>
+
+            <!-- Novos Campos: Observação -->
+            <div class="flex items-center">
+                <input type="checkbox" id="adicionar_observacao" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                <label for="adicionar_observacao" class="ml-2 text-gray-700 dark:text-gray-300">Adicionar Observação</label>
+            </div>
+            <div id="campo_observacao" class="hidden">
+                <textarea id="observacao" placeholder="Escreva sua observação aqui..." class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+            </div>
+            <!-- Botão de Salvar -->
+            <button type="submit" class="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
+                Salvar
+            </button>
+        </form>
+    </div>
+</div>
+
 
 <!-- Popup de Cadastro de Cliente -->
 <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
@@ -360,6 +440,264 @@ function abrirMapa() {
         console.error('Erro ao abrir o mapa:', error);
     });
 }
+
+
+// Função para abrir o popup de Formas de Pagamento
+function abrirPopupPaymentMethods() {
+    console.log('Abrindo popup de Formas de Pagamento');
+    // Fechar o popup de usuário
+    fecharPopupUsuario();
+    
+    // Abrir o popup de formas de pagamento
+    const popupPaymentMethods = document.getElementById('popupPaymentMethods');
+    if (popupPaymentMethods) {
+        popupPaymentMethods.classList.remove('hidden');
+        const modalContent = popupPaymentMethods.querySelector('div');
+        modalContent.classList.add('scale-95');
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }, 10);
+        carregarFormasPagamento(); // Carrega as formas de pagamento ao abrir
+    } else {
+        console.error('Elemento popupPaymentMethods não encontrado');
+    }
+}
+
+
+
+// Função para fechar o popup de Formas de Pagamento
+function fecharPopupPaymentMethods() {
+    console.log('Fechando popup de Formas de Pagamento');
+    const popupPaymentMethods = document.getElementById('popupPaymentMethods');
+    if (popupPaymentMethods) {
+        const modalContent = popupPaymentMethods.querySelector('div');
+        modalContent.classList.add('scale-95');
+        modalContent.classList.remove('scale-100');
+        setTimeout(() => {
+            popupPaymentMethods.classList.add('hidden');
+            // Reabrir o popup de usuário após fechar o de formas de pagamento
+            abrirPopupUsuario();
+            console.log('Popup de Formas de Pagamento fechado e popup de Usuário reaberto');
+        }, 300); // Tempo deve coincidir com a duração da transição
+    } else {
+        console.error('Elemento popupPaymentMethods não encontrado para fechar');
+    }
+}
+
+
+// Função para carregar as formas de pagamento do IndexedDB
+async function carregarFormasPagamento() {
+    try {
+        const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+        const formasPagamento = infoUsuario.payment_methods || [];
+
+        // Listagem de IDs dos checkboxes e inputs
+        const checkboxIds = ['pix', 'boleto', 'parcelado_sem_juros', 'parcelado_com_juros'];
+        const camposAdicionais = ['parcelas_sem_juros', 'parcelas_com_juros', 'taxa_juros'];
+        const adiantamentoCheckbox = document.getElementById('solicitar_adiantamento');
+        const porcentagemAdiantamentoInput = document.getElementById('porcentagem_adiantamento');
+        const observacaoCheckbox = document.getElementById('adicionar_observacao');
+        const observacaoDiv = document.getElementById('campo_observacao');
+        const observacaoInput = document.getElementById('observacao');
+
+        // Resetar todos os checkboxes e campos adicionais
+        checkboxIds.forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        });
+
+        camposAdicionais.forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) {
+                campo.value = '';
+            }
+        });
+
+        // Resetar os novos campos
+        adiantamentoCheckbox.checked = false;
+        porcentagemAdiantamentoInput.classList.add('hidden');
+        porcentagemAdiantamentoInput.value = '';
+
+        observacaoCheckbox.checked = false;
+        observacaoDiv.classList.add('hidden');
+        observacaoInput.value = '';
+
+        // Iterar sobre as formas de pagamento e marcar as selecionadas
+        formasPagamento.forEach(method => {
+            switch (method.tipo) {
+                case 'pix':
+                    const pixCheckbox = document.getElementById('pix');
+                    if (pixCheckbox) {
+                        pixCheckbox.checked = method.ativo;
+                    }
+                    break;
+                case 'boleto':
+                    const boletoCheckbox = document.getElementById('boleto');
+                    if (boletoCheckbox) {
+                        boletoCheckbox.checked = method.ativo;
+                    }
+                    break;
+                case 'parcelado_sem_juros':
+                    const parceladoSemJurosCheckbox = document.getElementById('parcelado_sem_juros');
+                    const parcelasSemJurosInput = document.getElementById('parcelas_sem_juros');
+                    if (parceladoSemJurosCheckbox) {
+                        parceladoSemJurosCheckbox.checked = method.ativo;
+                    }
+                    if (parcelasSemJurosInput) {
+                        parcelasSemJurosInput.value = method.parcelas_max || '';
+                    }
+                    break;
+                case 'parcelado_com_juros':
+                    const parceladoComJurosCheckbox = document.getElementById('parcelado_com_juros');
+                    const parcelasComJurosInput = document.getElementById('parcelas_com_juros');
+                    const taxaJurosInput = document.getElementById('taxa_juros');
+                    if (parceladoComJurosCheckbox) {
+                        parceladoComJurosCheckbox.checked = method.ativo;
+                    }
+                    if (parcelasComJurosInput) {
+                        parcelasComJurosInput.value = method.parcelas_max || '';
+                    }
+                    if (taxaJurosInput) {
+                        taxaJurosInput.value = method.juros || '';
+                    }
+                    break;
+                case 'adiantamento':
+                    if (method.ativo) {
+                        adiantamentoCheckbox.checked = true;
+                        porcentagemAdiantamentoInput.classList.remove('hidden');
+                        porcentagemAdiantamentoInput.value = method.porcentagem || '';
+                    }
+                    break;
+                case 'observacao':
+                    if (method.ativo) {
+                        observacaoCheckbox.checked = true;
+                        observacaoDiv.classList.remove('hidden');
+                        observacaoInput.value = method.texto || '';
+                    }
+                    break;
+                default:
+                    console.warn(`Tipo de forma de pagamento desconhecido: ${method.tipo}`);
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao carregar formas de pagamento:', error);
+    }
+}
+
+
+
+
+
+// Função para salvar as formas de pagamento no IndexedDB
+async function salvarFormasPagamento(event) {
+    event.preventDefault();
+    console.log('Evento submit capturado em salvarFormasPagamento');
+
+    try {
+        const formasPagamento = [];
+
+        // Pix
+        const pixAtivo = document.getElementById('pix').checked;
+        formasPagamento.push({
+            tipo: 'pix',
+            ativo: pixAtivo
+        });
+
+        // Boleto
+        const boletoAtivo = document.getElementById('boleto').checked;
+        formasPagamento.push({
+            tipo: 'boleto',
+            ativo: boletoAtivo
+        });
+
+        // Parcelado sem Juros
+        const parceladoSemJurosAtivo = document.getElementById('parcelado_sem_juros').checked;
+        const parcelasSemJuros = parseInt(document.getElementById('parcelas_sem_juros').value) || null;
+        if (parceladoSemJurosAtivo) {
+            formasPagamento.push({
+                tipo: 'parcelado_sem_juros',
+                ativo: true,
+                parcelas_max: parcelasSemJuros
+            });
+        }
+        
+
+        // Parcelado com Juros
+        const parceladoComJurosAtivo = document.getElementById('parcelado_com_juros').checked;
+        const parcelasComJuros = parseInt(document.getElementById('parcelas_com_juros').value) || null;
+        const taxaJuros = parseFloat(document.getElementById('taxa_juros').value) || null;
+        if (parceladoComJurosAtivo) {
+            formasPagamento.push({
+                tipo: 'parcelado_com_juros',
+                ativo: true,
+                parcelas_max: parcelasComJuros,
+                juros: taxaJuros
+            });
+        }
+
+            // Adiantamento em Porcentagem
+            const solicitarAdiantamento = document.getElementById('solicitar_adiantamento').checked;
+        const porcentagemAdiantamento = parseFloat(document.getElementById('porcentagem_adiantamento').value) || null;
+        if (solicitarAdiantamento) {
+            formasPagamento.push({
+                tipo: 'adiantamento',
+                ativo: true,
+                porcentagem: porcentagemAdiantamento
+            });
+        }
+
+        // Observação
+        const adicionarObservacao = document.getElementById('adicionar_observacao').checked;
+        const observacao = document.getElementById('observacao').value.trim();
+        if (adicionarObservacao) {
+            formasPagamento.push({
+                tipo: 'observacao',
+                ativo: true,
+                texto: observacao
+            });
+        }
+
+        // Validações
+        for (let method of formasPagamento) {
+            if (method.tipo === 'parcelado_sem_juros' && (!method.parcelas_max || method.parcelas_max > 12)) {
+                alert('Número de parcelas sem juros deve ser entre 1 e 12.');
+                console.log('Validação falhou para parcelado_sem_juros');
+                return;
+            }
+            if (method.tipo === 'parcelado_com_juros') {
+                if (!method.parcelas_max || method.parcelas_max > 12) {
+                    alert('Número de parcelas com juros deve ser entre 1 e 12.');
+                    console.log('Validação falhou para parcelado_com_juros - parcelas_max');
+                    return;
+                }
+                if (method.juros === null || method.juros < 0) {
+                    alert('Taxa de juros deve ser um valor positivo.');
+                    console.log('Validação falhou para parcelado_com_juros - juros');
+                    return;
+                }
+            }
+        }
+
+        // Obter informações do usuário
+        const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+        infoUsuario.payment_methods = formasPagamento;
+
+        await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
+        fecharPopupPaymentMethods();
+        alert('Formas de pagamento salvas com sucesso!');
+        console.log('Formas de pagamento salvas com sucesso');
+    } catch (error) {
+        console.error('Erro ao salvar formas de pagamento:', error);
+        alert('Ocorreu um erro ao salvar as formas de pagamento. Por favor, tente novamente.');
+    }
+}
+
+
+
+
 
 
 // Funções para adicionar opções personalizadas
@@ -841,7 +1179,7 @@ function fecharPopupCliente() {
             }
         }
         // Função para fechar o popupUsuario com animação
-function fecharPopupUsuario() {
+        function fecharPopupUsuario() {
     const popupUsuario = document.getElementById('popupUsuario');
     if (popupUsuario) {
         const modalContent = popupUsuario.querySelector('div');
@@ -852,6 +1190,7 @@ function fecharPopupUsuario() {
         }, 300); // Tempo deve coincidir com a duração da transição
     }
 }
+
 
         function converterImagemParaBase64(file) {
             return new Promise((resolve, reject) => {
@@ -1002,7 +1341,12 @@ async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
             salvarInformacoesUsuario();
         });
     }
-
+    const salvarFormasPagamentoBtn = document.getElementById('paymentMethodsForm');
+    if (salvarFormasPagamentoBtn) {
+        document.getElementById('paymentMethodsForm').addEventListener('submit', salvarFormasPagamento);
+        console.log('Listener de submit adicionado para paymentMethodsForm');
+    }
+    
     const popupClienteBtnSalvar = document.getElementById('popupClienteBtnSalvar');
     if (popupClienteBtnSalvar) {
         popupClienteBtnSalvar.addEventListener('click', salvarCliente);
@@ -1070,7 +1414,50 @@ async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
         });
     }
 });
-    
+    // Event Listener para Adiantamento em Porcentagem
+    const solicitarAdiantamentoCheckbox = document.getElementById('solicitar_adiantamento');
+    const porcentagemAdiantamentoInput = document.getElementById('porcentagem_adiantamento');
+
+    if (solicitarAdiantamentoCheckbox && porcentagemAdiantamentoInput) {
+        solicitarAdiantamentoCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                porcentagemAdiantamentoInput.classList.remove('hidden');
+            } else {
+                porcentagemAdiantamentoInput.classList.add('hidden');
+                porcentagemAdiantamentoInput.value = ''; // Limpar valor quando ocultar
+            }
+        });
+    } else {
+        console.error('Elementos de Adiantamento não encontrados.');
+    }
+
+    // Event Listener para Observação
+    const adicionarObservacaoCheckbox = document.getElementById('adicionar_observacao');
+    const observacaoDiv = document.getElementById('campo_observacao');
+    const observacaoInput = document.getElementById('observacao');
+
+    if (adicionarObservacaoCheckbox && observacaoDiv && observacaoInput) {
+        adicionarObservacaoCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                observacaoDiv.classList.remove('hidden');
+            } else {
+                observacaoDiv.classList.add('hidden');
+                observacaoInput.value = ''; // Limpar observação quando ocultar
+            }
+        });
+    } else {
+        console.error('Elementos de Observação não encontrados.');
+    }
+
+    // Listener para o Formulário de Formas de Pagamento
+    const paymentMethodsForm = document.getElementById('paymentMethodsForm');
+    if (paymentMethodsForm) {
+        paymentMethodsForm.addEventListener('submit', salvarFormasPagamento);
+        console.log('Listener de submit adicionado para paymentMethodsForm');
+    } else {
+        console.error('Elemento paymentMethodsForm não encontrado');
+    }
+
 
         // ... [O código continua com as funções restantes]
         async function carregarDadosCliente(clienteId) {
@@ -1824,7 +2211,10 @@ async function ativarAplicativo() {
                             ${frasesGeradas.map(frase => `<li>${frase}</li>`).join('')}
                         </ol>
                         <input type="text" id="codigoAtivacao" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Insira o código de ativação">
-                        <button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md">Ativar Aplicativo</button>
+<button id="verificarCodigo" class="w-full p-3 bg-blue-500 text-white rounded-md flex items-center justify-center">
+    <i class="fas fa-dollar-sign fa-lg"></i>
+    <span class="ml-2">Ativar Aplicativo</span>
+</button>
                     </div>
                 </div>
             `;
@@ -1914,13 +2304,13 @@ async function ativarAplicativo() {
         // Função para gerar PDF
         async function generatePDF_v3_0() {
     try {
-        const clienteNome = clienteSelect.value;
-        if (!clienteNome) {
+        const clienteId = clienteSelect.value;
+        if (!clienteId) {
             alert('Selecione um cliente.');
             return;
         }
 
-        const cliente = clientes.find(c => c.id == clienteNome);
+        const cliente = clientes.find(c => c.id == clienteId);
         if (!cliente) {
             alert('Informações do cliente não encontradas.');
             return;
@@ -1938,6 +2328,8 @@ async function ativarAplicativo() {
         const margin = 15;
 
         const infoUsuario = await obterInformacoesUsuarioDoIndexedDB();
+        const formasPagamento = infoUsuario.payment_methods || []; // Recupera as formas de pagamento
+
         const colors = {
             primary: hexToRgb(infoUsuario.cores?.primaria || '#0056b3'),
             secondary: hexToRgb(infoUsuario.cores?.secundaria || '#17a2b8'),
@@ -2048,8 +2440,8 @@ async function ativarAplicativo() {
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 90, pageWidth - 85, 60, 3, 3, 'F');
 
-        // Seção Contratada
-             doc.setTextColor(...colors.primary);
+            // Seção Contratada
+            doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(12);
             safeText("CONTRATADA", 75, 102);
@@ -2062,8 +2454,7 @@ async function ativarAplicativo() {
             safeText(`CNPJ/CPF: ${infoUsuario.cpfCnpj || ''}`, 75, 145);
             safeText(`Endereço: ${infoUsuario.endereco || ''}`, 75, 155); // Adicionado
 
-
-       // Seção Cliente
+            // Seção Cliente
             doc.setFillColor(...colors.lightGray);
             doc.roundedRect(70, 160, pageWidth - 85, 60, 3, 3, 'F');
             doc.setTextColor(...colors.primary);
@@ -2109,7 +2500,7 @@ async function ativarAplicativo() {
                         medidasPorPelicula[peliculaNome].push(group);
 
                         const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                        const area = largura * altura * quantidade / 10000;
+                        const area = largura * altura * quantidade / 10000; // Convertendo para m²
                         const preco = pelicula ? area * pelicula.preco : 0;
 
                         totaisGerais.totalM2 += area;
@@ -2210,124 +2601,170 @@ async function ativarAplicativo() {
                     precoTotal: medidas.reduce((sum, group) => {
                         const area = parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0;
                         const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                return sum + (pelicula ? area * pelicula.preco : 0);
-            }, 0)
-        };
+                        return sum + (pelicula ? area * pelicula.preco : 0);
+                    }, 0)
+                };
 
-        // Acumular nos totais gerais
-        totaisGerais.totalM2 += totalPelicula.totalM2;
-        totaisGerais.precoTotal += totalPelicula.precoTotal;
+                // Acumular nos totais gerais
+                totaisGerais.totalM2 += totalPelicula.totalM2;
+                totaisGerais.precoTotal += totalPelicula.precoTotal;
 
-        console.log("Subtotal:", peliculaNome, "Área:", totalPelicula.totalM2, "Preço:", totalPelicula.precoTotal);
-        console.log("Total Geral Atualizado:", totaisGerais.totalM2, totaisGerais.precoTotal);
+                console.log("Subtotal:", peliculaNome, "Área:", totalPelicula.totalM2, "Preço:", totalPelicula.precoTotal);
+                console.log("Total Geral Atualizado:", totaisGerais.totalM2, totaisGerais.precoTotal);
 
-        y += 5;
-        doc.setDrawColor(...colors.secondary);
-        doc.setLineWidth(0.5);
-        doc.line(margin, y, pageWidth - margin, y);
-        doc.setTextColor(...colors.secondary);
-        doc.setFont("helvetica", 'bold');
-        doc.setFontSize(10);
-        safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
-        safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
-        safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
-        y += 15;
-    });
+                y += 5;
+                doc.setDrawColor(...colors.secondary);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth - margin, y);
+                doc.setTextColor(...colors.secondary);
+                doc.setFont("helvetica", 'bold');
+                doc.setFontSize(10);
+                safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
+                safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
+                safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
+                y += 15;
+            });
 
-    console.log("Final Total Geral:", totaisGerais.totalM2, totaisGerais.precoTotal);
+            console.log("Final Total Geral:", totaisGerais.totalM2, totaisGerais.precoTotal);
 
-    if (y > pageHeight - 60) {
-        y = addPage(++pageNumber);
-    }
+            if (y > pageHeight - 60) {
+                y = addPage(++pageNumber);
+            }
 
-    y = addSectionTitle("Total Geral do Orçamento", y);
-    y += 10;
-    doc.setDrawColor(...colors.primary);
-    doc.setLineWidth(1);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 5;
-    doc.setTextColor(...colors.primary);
-    doc.setFont("helvetica", 'bold');
-    doc.setFontSize(12);
-    safeText("Total Geral:", margin, y + 10);
-    safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
-    safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
-
-    y += 30;
-
-    y = addPage(++pageNumber);
-    y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
-    y += 10;
-
-    doc.setTextColor(...colors.text);
-    doc.setFont("helvetica", 'normal');
-    doc.setFontSize(10);
-
-    const condicoesPagamento = [
-        "1. Formas de Pagamento Aceitas:",
-        "   • Transferência bancária e Pix",
-        "   • Cartão de crédito (em até 3x sem juros)",
-        "   • Boleto bancário",
-        "",
-        "2. Cronograma de Pagamento:",
-        "   • 50% do valor quando acima de R$ 2.500 na aprovação do orçamento",
-        "   • 50% restantes após a conclusão dos serviços",
-        "",
-        "3. Prazo de Instalação:",
-        "   • A ser definido em comum acordo, conforme disponibilidade",
-        "",
-        "4. Validade da Proposta:",
-        "   • Esta proposta é válida por 60 dias a partir da data de emissão",
-        "",
-        "5. Garantia:",
-        "   • 2 a 10 anos contra defeitos de fabricação",
-        "   • 10 semanas contra defeitos de aplicação",
-        "",
-        "6. Observações Importantes:",
-        "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
-        "   • A instalação está sujeita às condições climáticas favoráveis",
-        "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
-    ];
-
-    const lineHeight = 6;
-    condicoesPagamento.forEach((condicao, index) => {
-        if (y > pageHeight - 40) {
-            y = addPage(++pageNumber);
-            y = addSectionTitle("Condições de Pagamento (continuação)", y);
+            // Seção de Total Geral
+            y = addSectionTitle("Total Geral do Orçamento", y);
             y += 10;
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(1);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 5;
+            doc.setTextColor(...colors.primary);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(12);
+            safeText("Total Geral:", margin, y + 10);
+            safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
+            safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
+
+            y += 30;
+
+            // Seção de Formas de Pagamento
+            y = addPage(++pageNumber);
+            y = addSectionTitle("Formas de Pagamento", y);
+            y += 10;
+
+            formasPagamento.forEach(method => {
+                let metodoTexto = '';
+                switch (method.tipo) {
+                    case 'pix':
+                        metodoTexto = 'Pix';
+                        break;
+                    case 'boleto':
+                        metodoTexto = 'Boleto';
+                        break;
+                    case 'parcelado_sem_juros':
+                        metodoTexto = `Até 12x sem Juros`;
+                        break;
+                    case 'parcelado_com_juros':
+                        metodoTexto = `12x com Juros (Taxa de ${method.juros}%)`;
+                        break;
+                    default:
+                        metodoTexto = method.tipo;
+                }
+                if (method.ativo) {
+                    safeText(`• ${metodoTexto}`, margin, y);
+                    y += 10;
+
+                    // Detalhes adicionais
+                    if (method.tipo === 'parcelado_sem_juros') {
+                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
+                        y += 10;
+                    }
+                    if (method.tipo === 'parcelado_com_juros') {
+                        safeText(`  Número de Parcelas: ${method.parcelas_max}`, margin + 5, y);
+                        y += 10;
+                        safeText(`  Taxa de Juros: ${method.juros}%`, margin + 5, y);
+                        y += 10;
+                    }
+                }
+            });
+
+            y += 10;
+
+            // Seção de Condições de Pagamento e Informações Relevantes
+            y = addPage(++pageNumber);
+            y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
+            y += 10;
+
+            doc.setTextColor(...colors.text);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+
+            const condicoesPagamento = [
+                "1. Formas de Pagamento Aceitas:",
+                "   • Transferência bancária e Pix",
+                "   • Cartão de crédito (em até 3x sem juros)",
+                "   • Boleto bancário",
+                "",
+                "2. Cronograma de Pagamento:",
+                "   • 50% do valor quando acima de R$ 2.500 na aprovação do orçamento",
+                "   • 50% restantes após a conclusão dos serviços",
+                "",
+                "3. Prazo de Instalação:",
+                "   • A ser definido em comum acordo, conforme disponibilidade",
+                "",
+                "4. Validade da Proposta:",
+                "   • Esta proposta é válida por 60 dias a partir da data de emissão",
+                "",
+                "5. Garantia:",
+                "   • 2 a 10 anos contra defeitos de fabricação",
+                "   • 10 semanas contra defeitos de aplicação",
+                "",
+                "6. Observações Importantes:",
+                "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
+                "   • A instalação está sujeita às condições climáticas favoráveis",
+                "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
+            ];
+
+            const lineHeight = 6;
+            condicoesPagamento.forEach((condicao, index) => {
+                if (y > pageHeight - 40) {
+                    y = addPage(++pageNumber);
+                    y = addSectionTitle("Condições de Pagamento (continuação)", y);
+                    y += 10;
+                }
+                safeText(condicao, margin, y);
+                y += lineHeight;
+            });
+
+            y += 20;
+            doc.setDrawColor(...colors.primary);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth / 2 - 20, y);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(11);
+            safeText(infoUsuario.nome || '', margin, y + 6);
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(10);
+            safeText(infoUsuario.empresa || '', margin, y + 12);
+            safeText(infoUsuario.telefone || '', margin, y + 18);
+            safeText(infoUsuario.email || '', margin, y + 24);
         }
-        safeText(condicao, margin, y);
-        y += lineHeight;
-    });
 
-    y += 20;
-    doc.setDrawColor(...colors.primary);
-    doc.setLineWidth(0.5);
-    doc.line(margin, y, pageWidth / 2 - 20, y);
-    doc.setFont("helvetica", 'bold');
-    doc.setFontSize(11);
-    safeText(infoUsuario.nome || '', margin, y + 6);
-    doc.setFont("helvetica", 'normal');
-    doc.setFontSize(10);
-    safeText(infoUsuario.empresa || '', margin, y + 12);
-    safeText(infoUsuario.telefone || '', margin, y + 18);
-    safeText(infoUsuario.email || '', margin, y + 24);
-}
+        await addCover();
+        addContent();
 
-    await addCover();
-    addContent();
+        doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+        console.log('PDF gerado com sucesso!');
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
 
-    doc.save(`orcamento_${cliente.nome.replace(/\s+/g, '_').toLowerCase()}.pdf`);
-    console.log('PDF gerado com sucesso!');
-} catch (error) {
-    console.error("Erro ao gerar PDF:", error);
-    
-    if (error.message && error.message.includes("Cannot read properties of undefined")) {
-        alert("Erro ao gerar o PDF: Dados da empresa incompletos. Por favor, preencha todas as informações da empresa no menu de configurações do usuário antes de gerar o PDF.");
-    } else {
-        alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique se todas as informações necessárias foram preenchidas e tente novamente.");
+        if (error.message && error.message.includes("Cannot read properties of undefined")) {
+            alert("Erro ao gerar o PDF: Dados da empresa incompletos. Por favor, preencha todas as informações da empresa no menu de configurações do usuário antes de gerar o PDF.");
+        } else {
+            alert("Ocorreu um erro ao gerar o PDF. Por favor, verifique se todas as informações necessárias foram preenchidas e tente novamente.");
+        }
     }
-}}
+}
 
         // Funções auxiliares para manipulação do IndexedDB
         async function salvarClienteNoIndexedDB(cliente) {
@@ -2440,5 +2877,4 @@ async function ativarAplicativo() {
     </script>
 </body>
 </html>
-
 
