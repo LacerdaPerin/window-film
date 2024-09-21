@@ -407,11 +407,9 @@
     </div>
 </div>
 
-
-
-
-
     <script>
+
+
         // Registro do Service Worker
         if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/peliqueiros-br/service-worker.js')
@@ -447,6 +445,8 @@
         splashScreen.style.display = 'none'; // ou use uma animação para fade-out
     });
     
+    let currentSelectForPelicula = null;
+
 
         // Array de películas predefinidas
         const peliculasPredefinidas = [
@@ -1219,7 +1219,7 @@ function fecharPopupCliente() {
     }
 }
 
-
+//salvarInformacoesUsuari
 async function salvarInformacoesUsuario() {
     const nome = document.getElementById('name').value;
     const empresa = document.getElementById('companyName').value;
@@ -1247,6 +1247,7 @@ async function salvarInformacoesUsuario() {
 
         // Mescla os novos dados com os dados existentes, preservando payment_methods
         const infoUsuario = {
+            id: 'info', // Garantir que o id seja sempre 'info'
             ...existingInfo, // Preserva todos os campos existentes, incluindo payment_methods
             nome,
             empresa,
@@ -1286,7 +1287,7 @@ async function salvarInformacoesUsuario() {
     }
 }
 
-
+        //abrirIndexedDB
         function converterImagemParaBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1297,53 +1298,61 @@ async function salvarInformacoesUsuario() {
         }
 
         async function abrirIndexedDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('ClientesDB', 7);
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClientesDB', 7);
 
-                request.onerror = event => {
-                    console.error('Erro ao abrir o IndexedDB:', event);
-                    reject(event);
-                };
+        request.onerror = event => {
+            console.error('Erro ao abrir o IndexedDB:', event);
+            reject(event);
+        };
 
-                request.onsuccess = event => {
-                    resolve(event.target.result);
-                };
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
 
-                request.onupgradeneeded = event => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('ambientes_personalizados')) {
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('ambientes_personalizados')) {
                 db.createObjectStore('ambientes_personalizados', { keyPath: 'nome' });
             }
             if (!db.objectStoreNames.contains('tipos_aplicacao_personalizados')) {
                 db.createObjectStore('tipos_aplicacao_personalizados', { keyPath: 'nome' });
             }
 
-                    if (!db.objectStoreNames.contains('usuario')) {
-                        db.createObjectStore('usuario', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('clientes')) {
-                        db.createObjectStore('clientes', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('medidas')) {
-                        db.createObjectStore('medidas', { keyPath: 'cliente' });
-                    }
-                    if (!db.objectStoreNames.contains('verificacao')) {
-                        db.createObjectStore('verificacao', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('peliculas_personalizadas')) {
-                        db.createObjectStore('peliculas_personalizadas', { keyPath: 'nome' });
-                    }
-                    // Certifique-se de que o object store para ambientes personalizados seja criado
-                    if (!db.objectStoreNames.contains('ambientes_personalizados')) {
-                        db.createObjectStore('ambientes_personalizados', { keyPath: 'nome' });
-                    }
-                    // Certifique-se de que o object store para tipos de aplicação personalizados seja criado
-                    if (!db.objectStoreNames.contains('tipos_aplicacao_personalizados')) {
-                        db.createObjectStore('tipos_aplicacao_personalizados', { keyPath: 'nome' });
-                    }
-                };
-            });
-        }
+            if (!db.objectStoreNames.contains('usuario')) {
+                const usuarioStore = db.createObjectStore('usuario', { keyPath: 'id' });
+                // Inicializar com um registro padrão se não existir
+                usuarioStore.put({
+                    id: 'info',
+                    nome: '',
+                    empresa: '',
+                    telefone: '',
+                    email: '',
+                    endereco: '',
+                    cpfCnpj: '',
+                    logo: '',
+                    cores: {
+                        primaria: '#0056b3',
+                        secundaria: '#17a2b8'
+                    },
+                    payment_methods: []
+                });
+            }
+            if (!db.objectStoreNames.contains('clientes')) {
+                db.createObjectStore('clientes', { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains('medidas')) {
+                db.createObjectStore('medidas', { keyPath: 'cliente' });
+            }
+            if (!db.objectStoreNames.contains('verificacao')) {
+                db.createObjectStore('verificacao', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('peliculas_personalizadas')) {
+                db.createObjectStore('peliculas_personalizadas', { keyPath: 'nome' });
+            }
+        };
+    });
+}
 
 
         // Funções auxiliares que você já deve ter, mas incluídas aqui para completude
@@ -1832,10 +1841,10 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
     const container = document.getElementById('medidasContainer');
     const medidaGroup = document.createElement('div');
     medidaGroup.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2');
-    
+
     const isZebra = container.children.length % 2 === 0;
     const zebraClass = isZebra ? 'bg-gray-300' : 'bg-white';
-    
+
     medidaGroup.classList.add(zebraClass, 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2', 'mb-2');
 
     medidaGroup.innerHTML = `
@@ -1862,6 +1871,16 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
             </button>
         </div>
         <div class="additional-fields hidden mt-2">
+            <!-- Seletor Dinâmico de Ambiente -->
+            <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ambiente</label>
+                <input type="text" placeholder="Selecione ou digite o ambiente" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
+            <!-- Seletor Dinâmico de Tipo de Aplicação -->
+            <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Aplicação</label>
+                <input type="text" placeholder="Selecione ou digite o tipo de aplicação" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100">
+            </div>
         </div>
     `;
 
@@ -1916,6 +1935,13 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
     console.log("Grupo de medidas adicionado com sucesso");
 }
 
+
+
+
+
+
+
+       //function atualizarTotal
         function atualizarTotal(input) {
     const group = input.closest('.bg-white');
     const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
@@ -2053,22 +2079,97 @@ function duplicarMedidas() {
             });
         }
 
+
+
+
         // Funções para películas personalizadas
         function abrirPopupPeliculaPersonalizada() {
-            const popupHTML = `
-                <div id="popupPeliculaPersonalizada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
-                        <h2 class="text-xl font-semibold mb-4">Adicionar Película Personalizada</h2>
-                        <input type="text" id="nomePeliculaPersonalizada" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Nome da Película">
-                        <input type="number" id="precoPeliculaPersonalizada" class="w-full p-2 mb-4 border border-gray-300 rounded-md" placeholder="Preço por m²">
-                        <button id="salvarPeliculaPersonalizada" class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">Salvar Película</button>
-                        <button onclick="fecharPopupPeliculaPersonalizada()" class="mt-2 w-full p-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
-                    </div>
+    const popupHTML = `
+        <div id="popupPeliculaPersonalizada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
+                <!-- Cabeçalho do Popup -->
+                <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Adicionar Película Personalizada</h2>
+                    <button onclick="fecharPopupPeliculaPersonalizada()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', popupHTML);
-            document.getElementById('salvarPeliculaPersonalizada').addEventListener('click', salvarPeliculaPersonalizada);
-        }
+                <!-- Corpo do Popup -->
+                <form id="peliculaForm" class="p-6 space-y-4">
+                    <!-- Campo de Nome da Película -->
+                    <div>
+                        <label for="nomePeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome da Película</label>
+                        <input type="text" id="nomePeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Nome da Película" required>
+                    </div>
+                    <!-- Campo de Preço por m² -->
+                    <div>
+                        <label for="precoPeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço por m² (R$)</label>
+                        <input type="number" id="precoPeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Preço por m²" min="0" step="0.01" required>
+                    </div>
+                    <!-- Novo Campo de Garantia Fabricante -->
+                    <div>
+                        <label for="garantiaFabricante" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Fabricante (Anos)</label>
+                        <select id="garantiaFabricante" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
+                            <option value="" disabled selected>Selecione a garantia fabricante</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="7">7</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </div>
+                    <!-- Novo Campo de Garantia Mão de Obra -->
+                    <div>
+                        <label for="garantiaMaoDeObra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Mão de Obra (Inicia em Dias)</label>
+                        <select id="garantiaMaoDeObra" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
+                            <option value="" disabled selected>Selecione a garantia mão de obra</option>
+                            <option value="30">Inicia em 30 dias</option>
+                            <option value="60">Inicia em 60 dias</option>
+                            <option value="90">Inicia em 90 dias</option>
+                            <option value="120">Inicia em 120 dias</option>
+                            <option value="180">Inicia em 180 dias</option>
+                            <option value="360">Inicia em 360 dias</option>
+                        </select>
+                    </div>
+                </form>
+                <!-- Rodapé do Popup com Botões -->
+                <div class="flex justify-end items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-x-4">
+                    <button 
+                        id="salvarPeliculaPersonalizada" 
+                        type="submit" 
+                        form="peliculaForm" 
+                        class="flex-grow px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    >
+                        <span>Salvar Película</span>
+                    </button>
+                    <button 
+                        onclick="fecharPopupPeliculaPersonalizada()" 
+                        class="p-2 bg-gray-200 text-gray-500 rounded-md hover:bg-gray-300 transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        aria-label="Cancelar"
+                    >
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+    // Adiciona o event listener ao formulário para capturar o evento de submissão
+    document.getElementById('peliculaForm').addEventListener('submit', salvarPeliculaPersonalizada);
+}
+
+
+
+
+
+
+
 
         function fecharPopupPeliculaPersonalizada() {
             const popup = document.getElementById('popupPeliculaPersonalizada');
@@ -2077,66 +2178,123 @@ function duplicarMedidas() {
             }
         }
 
-        async function salvarPeliculaPersonalizada() {
-            const nome = document.getElementById('nomePeliculaPersonalizada').value.trim();
-            const preco = parseFloat(document.getElementById('precoPeliculaPersonalizada').value);
 
-            if (nome && !isNaN(preco)) {
-                const novaPelicula = { nome, preco };
-                await salvarPeliculaPersonalizadaNoIndexedDB(novaPelicula);
-                fecharPopupPeliculaPersonalizada();
-                await atualizarSeletoresPeliculas();
-                calculateTotal();
-            } else {
-                alert('Por favor, preencha todos os campos corretamente.');
-            }
+
+
+
+       //SALVAR PELICULAS
+       async function salvarPeliculaPersonalizada(event) {
+    event.preventDefault(); // Previne o envio padrão do formulário
+
+    const nome = document.getElementById('nomePeliculaPersonalizada').value.trim();
+    const preco = parseFloat(document.getElementById('precoPeliculaPersonalizada').value);
+    const garantiaFabricante = parseInt(document.getElementById('garantiaFabricante').value);
+    const garantiaMaoDeObra = parseInt(document.getElementById('garantiaMaoDeObra').value);
+
+    // Validações
+    if (!nome) {
+        alert('Por favor, insira o nome da película.');
+        return;
+    }
+
+    if (isNaN(preco) || preco < 0) {
+        alert('Por favor, insira um preço válido.');
+        return;
+    }
+
+    if (isNaN(garantiaFabricante)) {
+        alert('Por favor, selecione uma garantia fabricante.');
+        return;
+    }
+
+    if (isNaN(garantiaMaoDeObra)) {
+        alert('Por favor, selecione uma garantia mão de obra.');
+        return;
+    }
+
+    const novaPelicula = { 
+        nome, 
+        preco, 
+        garantiaFabricante, 
+        garantiaMaoDeObra 
+    };
+
+    try {
+        await salvarPeliculaPersonalizadaNoIndexedDB(novaPelicula);
+        fecharPopupPeliculaPersonalizada();
+        await atualizarSeletoresPeliculas();
+
+        if (currentSelectForPelicula) {
+            currentSelectForPelicula.value = novaPelicula.nome; // Seleciona a nova película
+            currentSelectForPelicula = null; // Reseta a referência
         }
 
-        async function salvarPeliculaPersonalizadaNoIndexedDB(pelicula) {
-           
+        calculateTotal();
+        alert('Película personalizada salva com sucesso!');
+    } catch (error) {
+        console.error('Erro ao salvar película personalizada:', error);
+        alert('Ocorreu um erro ao salvar a película personalizada. Por favor, tente novamente.');
+    }
+}
 
- const db = await abrirIndexedDB();
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
-                const store = transaction.objectStore('peliculas_personalizadas');
-                const request = store.put(pelicula);
 
-                request.onsuccess = () => resolve();
-                request.onerror = () => reject(request.error);
-            });
+
+//salvarPeliculaPersonalizadaNoIndexedDB:
+async function salvarPeliculaPersonalizadaNoIndexedDB(pelicula) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
+        const store = transaction.objectStore('peliculas_personalizadas');
+        const request = store.put(pelicula);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+//carregarPeliculasPersonalizadasDoIndexedDB
+async function carregarPeliculasPersonalizadasDoIndexedDB() {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['peliculas_personalizadas'], 'readonly');
+        const store = transaction.objectStore('peliculas_personalizadas');
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+
+// atualizarSeletoresPeliculas
+async function atualizarSeletoresPeliculas() {
+    const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
+    peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
+
+    const seletores = document.querySelectorAll('.pelicula-select');
+    seletores.forEach(seletor => {
+        const selectedValue = seletor.value;
+        // Adiciona todas as opções existentes e concatena a opção "Outra" no final
+        seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('') + '<option value="Outra">Outra</option>';
+        // Mantém a seleção atual, a menos que tenha sido substituída pela nova película
+        if (peliculas.some(p => p.nome === selectedValue)) {
+            seletor.value = selectedValue;
+        } else {
+            seletor.value = '';
         }
+    });
+}
 
-        async function carregarPeliculasPersonalizadasDoIndexedDB() {
-            const db = await abrirIndexedDB();
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['peliculas_personalizadas'], 'readonly');
-                const store = transaction.objectStore('peliculas_personalizadas');
-                const request = store.getAll();
 
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
 
-        async function atualizarSeletoresPeliculas() {
-            const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
-            peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
 
-            const seletores = document.querySelectorAll('.pelicula-select');
-            seletores.forEach(seletor => {
-                const selectedValue = seletor.value;
-                seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('');
-                seletor.innerHTML += '<option value="Outra">Outra</option>';
-                seletor.value = selectedValue;
-            });
-        }
+      function onPeliculaChange(select) {
+    if (select.value === 'Outra') {
+        currentSelectForPelicula = select; // Armazena a referência do <select>
+        abrirPopupPeliculaPersonalizada();
+    }
+    calculateTotal();
+}
 
-        function onPeliculaChange(select) {
-            if (select.value === 'Outra') {
-                abrirPopupPeliculaPersonalizada();
-            }
-            calculateTotal();
-        }
 
         async function carregarPeliculasPersonalizadas() {
             const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
@@ -2596,293 +2754,355 @@ async function ativarAplicativo() {
             return ((total * porcentagem) / 100).toFixed(2);
         }
 
-        // Função principal para adicionar o conteúdo ao PDF
-        function addContent() {
-            let y = addPage(2);
-            let pageNumber = 2;
 
-            // Seção Orçamento Detalhado
-            y = addSectionTitle("Orçamento Detalhado", y);
-            y += 10;
 
-            const medidaGroups = document.querySelectorAll('#medidasContainer > div');
 
-            const medidasPorPelicula = {};
-            const totaisGerais = { totalM2: 0, precoTotal: 0 };
 
-            // Agrupar medidas por película
-            medidaGroups.forEach(group => {
-                const isChecked = group.querySelector('input[type="checkbox"]')?.checked;
-                const largura = parseFloat(group.querySelector('.largura-input')?.value) || 0;
-                const altura = parseFloat(group.querySelector('.altura-input')?.value) || 0;
-                const quantidade = parseInt(group.querySelector('.quantidade-input')?.value) || 0;
 
-                if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
-                    const peliculaNome = group.querySelector('.pelicula-select')?.value;
-                    if (peliculaNome) {
-                        if (!medidasPorPelicula[peliculaNome]) {
-                            medidasPorPelicula[peliculaNome] = [];
-                        }
-                        medidasPorPelicula[peliculaNome].push(group);
+ // Função principal para adicionar o conteúdo ao PDF
+function addContent() {
+    let y = addPage(2);
+    let pageNumber = 2;
 
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                        const area = largura * altura * quantidade / 10000; // Convertendo para m²
-                        const preco = pelicula ? area * pelicula.preco : 0;
+    // Seção Orçamento Detalhado
+    y = addSectionTitle("Orçamento Detalhado", y);
+    y += 10;
 
-                        totaisGerais.totalM2 += area;
-                        totaisGerais.precoTotal += preco;
-                    }
+    const medidaGroups = document.querySelectorAll('#medidasContainer > div');
+
+    const medidasPorPelicula = {};
+    const totaisGerais = { totalM2: 0, precoTotal: 0 };
+
+    // Agrupar medidas por película
+    medidaGroups.forEach(group => {
+        const isChecked = group.querySelector('input[type="checkbox"]')?.checked;
+        const largura = parseFloat(group.querySelector('.largura-input')?.value) || 0;
+        const altura = parseFloat(group.querySelector('.altura-input')?.value) || 0;
+        const quantidade = parseInt(group.querySelector('.quantidade-input')?.value) || 0;
+
+        if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
+            const peliculaNome = group.querySelector('.pelicula-select')?.value;
+            if (peliculaNome) {
+                if (!medidasPorPelicula[peliculaNome]) {
+                    medidasPorPelicula[peliculaNome] = [];
                 }
-            });
+                medidasPorPelicula[peliculaNome].push(group);
 
-            // Função para adicionar uma tabela de medidas por película
-            function addMedidasTable(medidas, peliculaNome) {
-                const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
-                const colWidths = [15, 30, 40, 40, 20, 30];
-                
-                doc.setTextColor(...colors.primary);
-                doc.setFont("helvetica", 'bold');
-                doc.setFontSize(12);
-                safeText(peliculaNome, margin, y);
-                y += 10;
+                const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                const area = largura * altura * quantidade / 10000; // Convertendo para m²
+                const preco = pelicula ? area * pelicula.preco : 0;
 
-                // Cabeçalho da tabela
-                doc.setFillColor(...colors.primary);
-                doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
-                doc.setTextColor(...colors.white);
-                doc.setFont("helvetica", 'bold');
-                doc.setFontSize(9);
-
-                let xOffset = margin;
-                headers.forEach((header, index) => {
-                    safeText(header, xOffset + 2, y + 6);
-                    xOffset += colWidths[index];
-                });
-                y += 10;
-
-                doc.setFont("helvetica", 'normal');
-                doc.setFontSize(8);
-
-                const zebraColor1 = [255, 255, 255];
-                const zebraColor2 = [245, 245, 245];
-
-                medidas.forEach((group, index) => {
-                    if (y > pageHeight - 60) {
-                        y = addPage(++pageNumber);
-                        // Repetir o cabeçalho da tabela na nova página
-                        doc.setFillColor(...colors.primary);
-                        doc.rect(margin, y, pageWidth - 2*margin, 8, 'F');
-                        doc.setTextColor(...colors.white);
-                        doc.setFont("helvetica", 'bold');
-                        doc.setFontSize(9);
-                        xOffset = margin;
-                        headers.forEach((header, index) => {
-                            safeText(header, xOffset + 2, y + 6);
-                            xOffset += colWidths[index];
-                        });
-                        y += 10;
-                        doc.setFont("helvetica", 'normal');
-                        doc.setFontSize(8);
-                    }
-
-                    doc.setFillColor(...(index % 2 === 0 ? zebraColor1 : zebraColor2));
-                    doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
-
-                    doc.setTextColor(...colors.text);
-
-                    const largura = group.querySelector('.largura-input')?.value || '0';
-                    const altura = group.querySelector('.altura-input')?.value || '0';
-                    const quantidade = group.querySelector('.quantidade-input')?.value || '0';
-                    const totalM2 = group.querySelector('input[placeholder="M²"]')?.value || '0';
-                    const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]')?.value || '';
-                    const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]')?.value || '';
-                    const pelicula = peliculas.find(p => p.nome === peliculaNome);
-
-                    xOffset = margin;
-                    safeText(`${index + 1}`, xOffset + 2, y + 4);
-                    xOffset += colWidths[0];
-                    safeText(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 4);
-                    xOffset += colWidths[1];
-                    safeText(ambiente, xOffset + 2, y + 4);
-                    xOffset += colWidths[2];
-                    safeText(tipoAplicacao, xOffset + 2, y + 4);
-                    xOffset += colWidths[3];
-                    safeText(`${totalM2} m²`, xOffset + 2, y + 4);
-                    xOffset += colWidths[4];
-
-                    if (pelicula) {
-                        const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-                        safeText(`R$ ${preco}`, xOffset + 2, y + 4);
-                    }
-
-                    y += 10;
-                });
-
-                return y;
+                totaisGerais.totalM2 += area;
+                totaisGerais.precoTotal += preco;
             }
+        }
+    });
+        
+        
+    function addMedidasTable(medidas, peliculaNome) {
+        // [Código da função já modificado acima]
+    }
 
-            // Adicionar tabelas de medidas por película
-            Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
-                if (index > 0) y = addPage(++pageNumber);
-                y = addMedidasTable(medidas, peliculaNome);
-                
-                const totalPelicula = {
-                    totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0), 0),
-                    precoTotal: medidas.reduce((sum, group) => {
-                        const area = parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0;
-                        const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                        return sum + (pelicula ? area * pelicula.preco : 0);
-                    }, 0)
-                };
 
-                // Acumular nos totais gerais
-                totaisGerais.totalM2 += totalPelicula.totalM2;
-                totaisGerais.precoTotal += totalPelicula.precoTotal;
 
-                console.log("Subtotal:", peliculaNome, "Área:", totalPelicula.totalM2, "Preço:", totalPelicula.precoTotal);
-                console.log("Total Geral Atualizado:", totaisGerais.totalM2, totaisGerais.precoTotal);
 
-                y += 5;
-                doc.setDrawColor(...colors.secondary);
-                doc.setLineWidth(0.5);
-                doc.line(margin, y, pageWidth - margin, y);
-                doc.setTextColor(...colors.secondary);
-                doc.setFont("helvetica", 'bold');
-                doc.setFontSize(10);
-                safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
-                safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
-                safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
-                y += 15;
-            });
 
-            console.log("Final Total Geral:", totaisGerais.totalM2, totaisGerais.precoTotal);
 
+
+
+
+
+// Função para adicionar garantias por película
+function addGarantiasSection() {
+    y = addSectionTitle("Garantias", y);
+    y += 10;
+
+    Object.keys(medidasPorPelicula).forEach(peliculaNome => {
+        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+        if (pelicula) {
             if (y > pageHeight - 60) {
                 y = addPage(++pageNumber);
+                y = addSectionTitle("Garantias (Continuação)", y);
+                y += 10;
             }
 
-            // Seção de Total Geral
-            y = addSectionTitle("Total Geral do Orçamento", y);
-            y += 10;
-            doc.setDrawColor(...colors.primary);
-            doc.setLineWidth(1);
-            doc.line(margin, y, pageWidth - margin, y);
-            y += 5;
             doc.setTextColor(...colors.primary);
             doc.setFont("helvetica", 'bold');
             doc.setFontSize(12);
-            safeText("Total Geral:", margin, y + 10);
-            safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
-            safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
-
-            y += 30;
-
-            // Seção de Condições de Pagamento e Informações Relevantes
-            y = addPage(++pageNumber);
-            y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
-            y += 10;
+            safeText(peliculaNome, margin, y);
+            y += 7;
 
             doc.setTextColor(...colors.text);
             doc.setFont("helvetica", 'normal');
             doc.setFontSize(10);
+            safeText(`Garantia Fabricante: ${pelicula.garantiaFabricante} anos`, margin + 5, y);
+            y += 7;
+            safeText(`Garantia Mão de Obra: ${pelicula.garantiaMaoDeObra} dias`, margin + 5, y);
+            y += 10;
+        }
+    });
+}
 
-            // Construindo as Condições de Pagamento com Formas de Pagamento Dinâmicas
-            const condicoesPagamento = [
-                "1. Formas de Pagamento Aceitas:"
-            ];
 
-            // Adicionando as formas de pagamento dinâmicas com valores
-            formasPagamento.forEach(method => {
-                let metodoTexto = '';
-                switch (method.tipo) {
-                    case 'pix':
-                        metodoTexto = `• Pix R$ ${totaisGerais.precoTotal.toFixed(2)}`;
-                        break;
-                    case 'boleto':
-                        metodoTexto = `• Boleto Bancário R$ ${totaisGerais.precoTotal.toFixed(2)}`;
-                        break;
-                    case 'parcelado_sem_juros':
-                        const parcelaSemJuros = calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max);
-                        metodoTexto = `• Parcelado sem Juros (até ${method.parcelas_max}x)`;
-                        break;
-                    case 'parcelado_com_juros':
-                        const parcelaComJuros = calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros);
-                        metodoTexto = `• Parcelado com Juros (até ${method.parcelas_max}x, Taxa de ${method.juros}%)`;
-                        break;
-                    case 'adiantamento':
-                        const adiantamento = calculateAdiantamento(totaisGerais.precoTotal, method.porcentagem);
-                        metodoTexto = `• Adiantamento: ${method.porcentagem}% do valor total R$ ${adiantamento}`;
-                        break;
-                    case 'observacao':
-                        metodoTexto = `• Observações Pag: ${method.texto}`;
-                        break;
-                    default:
-                        metodoTexto = `• ${method.tipo}`;
-                }
-                if (method.ativo) {
-                    condicoesPagamento.push(metodoTexto);
 
-                    // Detalhes adicionais para alguns tipos
-                    if (method.tipo === 'parcelado_sem_juros') {
-                        condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max)}`);
-                    }
-                    if (method.tipo === 'parcelado_com_juros') {
-                        condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros)}`);
-                        condicoesPagamento.push(`   Taxa de Juros: ${method.juros}%`);
-                    }
-                    // Não há detalhes adicionais para Adiantamento e Observação
-                }
+
+
+
+
+
+
+
+// Função para adicionar uma tabela de medidas por película
+function addMedidasTable(medidas, peliculaNome) {
+    const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
+    const colWidths = [15, 30, 40, 40, 20, 30];
+    
+    doc.setTextColor(...colors.primary);
+    doc.setFont("helvetica", 'bold');
+    doc.setFontSize(12);
+    safeText(peliculaNome, margin, y);
+    y += 10;
+
+    // Cabeçalho da tabela
+    doc.setFillColor(...colors.primary);
+    doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+    doc.setTextColor(...colors.white);
+    doc.setFont("helvetica", 'bold');
+    doc.setFontSize(10);
+
+    let xOffset = margin;
+    headers.forEach((header, index) => {
+        safeText(header, xOffset + 2, y + 7);
+        xOffset += colWidths[index];
+    });
+    y += 12;
+
+    doc.setFont("helvetica", 'normal');
+    doc.setFontSize(9);
+
+    const zebraColor1 = [255, 255, 255];
+    const zebraColor2 = [245, 245, 245];
+
+    medidas.forEach((group, index) => {
+        if (y > pageHeight - 60) {
+            y = addPage(++pageNumber);
+            // Repetir o cabeçalho da tabela na nova página
+            doc.setFillColor(...colors.primary);
+            doc.rect(margin, y, pageWidth - 2*margin, 10, 'F');
+            doc.setTextColor(...colors.white);
+            doc.setFont("helvetica", 'bold');
+            doc.setFontSize(10);
+            headers.forEach((header, index) => {
+                safeText(header, margin + 2 + colWidths.slice(0, index).reduce((a, b) => a + b, 0), y + 7);
             });
+            y += 12;
+            doc.setFont("helvetica", 'normal');
+            doc.setFontSize(9);
+        }
+
+        doc.setFillColor(...(index % 2 === 0 ? zebraColor1 : zebraColor2));
+        doc.rect(margin, y - 2, pageWidth - 2*margin, 10, 'F');
+
+        doc.setTextColor(...colors.text);
+
+        const largura = group.querySelector('.largura-input')?.value || '0';
+        const altura = group.querySelector('.altura-input')?.value || '0';
+        const quantidade = group.querySelector('.quantidade-input')?.value || '0';
+        const totalM2 = group.querySelector('input[placeholder="M²"]')?.value || '0';
+        const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]')?.value || '';
+        const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]')?.value || '';
+        const pelicula = peliculas.find(p => p.nome === peliculaNome);
+
+        xOffset = margin;
+        safeText(`${index + 1}`, xOffset + 2, y + 3);
+        xOffset += colWidths[0];
+        safeText(`${largura}x${altura} (${quantidade})`, xOffset + 2, y + 3);
+        xOffset += colWidths[1];
+        safeText(ambiente, xOffset + 2, y + 3);
+        xOffset += colWidths[2];
+        safeText(tipoAplicacao, xOffset + 2, y + 3);
+        xOffset += colWidths[3];
+        safeText(`${totalM2} m²`, xOffset + 2, y + 3);
+        xOffset += colWidths[4];
+        
+        if (pelicula) {
+            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
+            safeText(`R$ ${preco}`, xOffset + 2, y + 3);
+        }
+        xOffset += colWidths[5];
+
+        y += 10;
+    });
+
+    return y;
+}
+
+
+        // Adicionar tabelas de medidas por película
+    Object.entries(medidasPorPelicula).forEach(([peliculaNome, medidas], index) => {
+        if (index > 0) y = addPage(++pageNumber);
+        y = addMedidasTable(medidas, peliculaNome);
+        
+        const totalPelicula = {
+            totalM2: medidas.reduce((sum, group) => sum + (parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0), 0),
+            precoTotal: medidas.reduce((sum, group) => {
+                const area = parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0;
+                const pelicula = peliculas.find(p => p.nome === peliculaNome);
+                return sum + (pelicula ? area * pelicula.preco : 0);
+            }, 0)
+        };
+
+            // Acumular nos totais gerais
+        totaisGerais.totalM2 += totalPelicula.totalM2;
+        totaisGerais.precoTotal += totalPelicula.precoTotal;
+
+        console.log("Subtotal:", peliculaNome, "Área:", totalPelicula.totalM2, "Preço:", totalPelicula.precoTotal);
+        console.log("Total Geral Atualizado:", totaisGerais.totalM2, totaisGerais.precoTotal);
+
+        y += 5;
+        doc.setDrawColor(...colors.secondary);
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, pageWidth - margin, y);
+        doc.setTextColor(...colors.secondary);
+        doc.setFont("helvetica", 'bold');
+        doc.setFontSize(10);
+        safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
+        safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
+        safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
+        y += 15;
+    });
+
+    console.log("Final Total Geral:", totaisGerais.totalM2, totaisGerais.precoTotal);
+
+    if (y > pageHeight - 60) {
+        y = addPage(++pageNumber);
+    }
+
+            // Seção de Total Geral
+    y = addSectionTitle("Total Geral do Orçamento", y);
+    y += 10;
+    doc.setDrawColor(...colors.primary);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 5;
+    doc.setTextColor(...colors.primary);
+    doc.setFont("helvetica", 'bold');
+    doc.setFontSize(12);
+    safeText("Total Geral:", margin, y + 10);
+    safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
+    safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
+
+    y += 30;
+
+    // Adicionar a seção de garantias
+    addGarantiasSection();
+
+          // Seção de Condições de Pagamento e Informações Relevantes
+    y = addPage(++pageNumber);
+    y = addSectionTitle("Condições de Pagamento e Informações Relevantes", y);
+    y += 10;
+
+    doc.setTextColor(...colors.text);
+    doc.setFont("helvetica", 'normal');
+    doc.setFontSize(10);
+
+    // Construindo as Condições de Pagamento com Formas de Pagamento Dinâmicas
+    const condicoesPagamento = [
+        "1. Formas de Pagamento Aceitas:"
+    ];
+
+         // Adicionando as formas de pagamento dinâmicas com valores
+    formasPagamento.forEach(method => {
+        let metodoTexto = '';
+        switch (method.tipo) {
+            case 'pix':
+                metodoTexto = `• Pix R$ ${totaisGerais.precoTotal.toFixed(2)}`;
+                break;
+            case 'boleto':
+                metodoTexto = `• Boleto Bancário R$ ${totaisGerais.precoTotal.toFixed(2)}`;
+                break;
+            case 'parcelado_sem_juros':
+                const parcelaSemJuros = calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max);
+                metodoTexto = `• Parcelado sem Juros (até ${method.parcelas_max}x)`;
+                break;
+            case 'parcelado_com_juros':
+                const parcelaComJuros = calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros);
+                metodoTexto = `• Parcelado com Juros (até ${method.parcelas_max}x, Taxa de ${method.juros}%)`;
+                break;
+            case 'adiantamento':
+                const adiantamento = calculateAdiantamento(totaisGerais.precoTotal, method.porcentagem);
+                metodoTexto = `• Adiantamento: ${method.porcentagem}% do valor total R$ ${adiantamento}`;
+                break;
+            case 'observacao':
+                metodoTexto = `• Observações Pag: ${method.texto}`;
+                break;
+            default:
+                metodoTexto = `• ${method.tipo}`;
+        }
+        if (method.ativo) {
+            condicoesPagamento.push(metodoTexto);
+
+            // Detalhes adicionais para alguns tipos
+            if (method.tipo === 'parcelado_sem_juros') {
+                condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max)}`);
+            }
+            if (method.tipo === 'parcelado_com_juros') {
+                condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros)}`);
+                condicoesPagamento.push(`   Taxa de Juros: ${method.juros}%`);
+            }
+            // Não há detalhes adicionais para Adiantamento e Observação
+        }
+    });
 
             // Adicionando as condições estáticas
-            const condicoesEstaticas = [
-                "",
-                "2. Cronograma de Pagamento:",
-                "   • Aberto a negociação",
-                "",
-                "3. Prazo de Instalação:",
-                "   • A ser definido em comum acordo, conforme disponibilidade",
-                "",
-                "4. Validade da Proposta:",
-                "   • Esta proposta é válida por 60 dias a partir da data de emissão",
-                "",
-                "5. Garantia:",
-                "   • 2 a 10 anos contra defeitos de fabricação",
-                "   • 10 semanas contra defeitos de aplicação",
-                "",
-                "6. Observações Importantes:",
-                "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
-                "   • A instalação está sujeita às condições climáticas favoráveis",
-                "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
-            ];
+    const condicoesEstaticas = [
+        "",
+        "2. Cronograma de Pagamento:",
+        "   • Aberto a negociação",
+        "",
+        "3. Prazo de Instalação:",
+        "   • A ser definido em comum acordo, conforme disponibilidade",
+        "",
+        "4. Validade da Proposta:",
+        "   • Esta proposta é válida por 60 dias a partir da data de emissão",
+        "",
+        "5. Garantia:",
+        "   • 2 a 10 anos contra defeitos de fabricação",
+        "   • 10 semanas contra defeitos de aplicação",
+        "",
+        "6. Observações Importantes:",
+        "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
+        "   • A instalação está sujeita às condições climáticas favoráveis",
+        "   • O cliente é responsável por fornecer acesso adequado ao local de instalação"
+    ];
 
             // Combinar as formas de pagamento dinâmicas com as condições estáticas
-            const todasCondicoes = condicoesPagamento.concat(condicoesEstaticas);
+    const todasCondicoes = condicoesPagamento.concat(condicoesEstaticas);
 
-            const lineHeight = 6;
-            todasCondicoes.forEach((condicao, index) => {
-                if (y > pageHeight - 40) {
-                    y = addPage(++pageNumber);
-                    y = addSectionTitle("Condições de Pagamento (Continuação)", y);
-                    y += 10;
-                }
-                safeText(condicao, margin, y);
-                y += lineHeight;
-            });
+const lineHeight = 6;
+todasCondicoes.forEach((condicao, index) => {
+    if (y > pageHeight - 40) {
+        y = addPage(++pageNumber);
+        y = addSectionTitle("Condições de Pagamento (Continuação)", y);
+        y += 10;
+    }
+    safeText(condicao, margin, y);
+    y += lineHeight;
+});
 
-            y += 20;
-            doc.setDrawColor(...colors.primary);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth / 2 - 20, y);
-            doc.setFont("helvetica", 'bold');
-            doc.setFontSize(11);
-            safeText(infoUsuario.nome || '', margin, y + 6);
-            doc.setFont("helvetica", 'normal');
-            doc.setFontSize(10);
-            safeText(infoUsuario.empresa || '', margin, y + 12);
-            safeText(infoUsuario.telefone || '', margin, y + 18);
-            safeText(infoUsuario.email || '', margin, y + 24);
-        }
+y += 20;
+    doc.setDrawColor(...colors.primary);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth / 2 - 20, y);
+    doc.setFont("helvetica", 'bold');
+    doc.setFontSize(11);
+    safeText(infoUsuario.nome || '', margin, y + 6);
+    doc.setFont("helvetica", 'normal');
+    doc.setFontSize(10);
+    safeText(infoUsuario.empresa || '', margin, y + 12);
+    safeText(infoUsuario.telefone || '', margin, y + 18);
+    safeText(infoUsuario.email || '', margin, y + 24);
+}
 
         // Adicionar a capa
         await addCover();
