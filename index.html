@@ -1219,51 +1219,60 @@ function fecharPopupCliente() {
     }
 }
 
-        async function salvarInformacoesUsuario() {
-            const nome = document.getElementById('name').value;
-            const empresa = document.getElementById('companyName').value;
-            const telefone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const endereco = document.getElementById('address').value;
-            const cpfCnpj = document.getElementById('cpfCnpj').value;
-            const logoFile = document.getElementById('logo').files[0];
-            const corPrimaria = document.getElementById('primaryColor').value;
-            const corSecundaria = document.getElementById('secondaryColor').value;
 
-            let logoUrl = '';
-            if (logoFile) {
-                logoUrl = await converterImagemParaBase64(logoFile);
-            } else {
-                const infoExistente = await obterInformacoesUsuarioDoIndexedDB();
-                if (infoExistente && infoExistente.logo) {
-                    logoUrl = infoExistente.logo;
-                }
-            }
+async function salvarInformacoesUsuario() {
+    const nome = document.getElementById('name').value;
+    const empresa = document.getElementById('companyName').value;
+    const telefone = document.getElementById('phone').value;
+    const email = document.getElementById('email').value;
+    const endereco = document.getElementById('address').value;
+    const cpfCnpj = document.getElementById('cpfCnpj').value;
+    const logoFile = document.getElementById('logo').files[0];
+    const corPrimaria = document.getElementById('primaryColor').value;
+    const corSecundaria = document.getElementById('secondaryColor').value;
 
-            const infoUsuario = {
-                id: 'info',
-                nome,
-                empresa,
-                telefone,
-                email,
-                endereco,
-                cpfCnpj,
-                logo: logoUrl,
-                cores: {
-                    primaria: corPrimaria,
-                    secundaria: corSecundaria
-                }
-            };
-
-            try {
-                await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
-                fecharPopupUsuario();
-                alert('Informações do usuário atualizadas com sucesso!');
-            } catch (error) {
-                console.error('Erro ao salvar informações:', error);
-                alert('Erro ao atualizar informações. Por favor, tente novamente.');
-            }
+    let logoUrl = '';
+    if (logoFile) {
+        logoUrl = await converterImagemParaBase64(logoFile);
+    } else {
+        const infoExistente = await obterInformacoesUsuarioDoIndexedDB();
+        if (infoExistente && infoExistente.logo) {
+            logoUrl = infoExistente.logo;
         }
+    }
+
+    try {
+        // Recupera os dados existentes do usuário
+        const existingInfo = await obterInformacoesUsuarioDoIndexedDB();
+
+        // Mescla os novos dados com os dados existentes, preservando payment_methods
+        const infoUsuario = {
+            ...existingInfo, // Preserva todos os campos existentes, incluindo payment_methods
+            nome,
+            empresa,
+            telefone,
+            email,
+            endereco,
+            cpfCnpj,
+            logo: logoUrl,
+            cores: {
+                primaria: corPrimaria,
+                secundaria: corSecundaria
+            }
+        };
+
+        // Salva o objeto atualizado no IndexedDB
+        await salvarInformacoesUsuarioNoIndexedDB(infoUsuario);
+        fecharPopupUsuario();
+        alert('Informações do usuário atualizadas com sucesso!');
+    } catch (error) {
+        console.error('Erro ao salvar informações:', error);
+        alert('Erro ao atualizar informações. Por favor, tente novamente.');
+    }
+}
+
+
+
         // Função para fechar o popupUsuario com animação
         function fecharPopupUsuario() {
     const popupUsuario = document.getElementById('popupUsuario');
