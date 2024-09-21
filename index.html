@@ -64,12 +64,12 @@
                             <option value="">Selecione um cliente</option>
                         </select>
                       <!-- Botão para adicionar novo cliente -->
-<button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden" onclick="abrirPopup('adicionar')">
-    <i class="fas fa-user-plus"></i>
-</button>
-                        <button id="addNewClienteBtnDesktop" class="hidden sm:block w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
-                            <i class="fas fa-user-plus mr-2"></i> Adicionar Cliente
-                        </button>
+                      <button id="addNewClienteBtn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md sm:hidden" onclick="abrirPopup('adicionar')">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button id="addNewClienteBtnDesktop" class="hidden sm:block w-auto p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 shadow-md">
+                        <i class="fas fa-user-plus mr-2"></i> Adicionar Cliente
+                    </button>
                     </div>
 
      <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
@@ -364,6 +364,7 @@
 </div>
 
 
+
 <!-- Popup de Cadastro de Cliente -->
 <div id="popupCliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out z-50">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
@@ -374,7 +375,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            
         </div>
         <form id="clienteForm" class="p-6 space-y-4">
             <div>
@@ -389,16 +389,12 @@
                 <label for="popupClienteEndereco" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Endereço</label>
                 <input type="text" id="popupClienteEndereco" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Endereço" required>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="popupClienteCPF" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CPF</label>
-                    <input type="text" id="popupClienteCPF" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="CPF" inputmode="numeric">
-                </div>
-                <div>
-                    <label for="popupClienteCNPJ" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CNPJ</label>
-                    <input type="text" id="popupClienteCNPJ" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="CNPJ" inputmode="numeric">
-                </div>
+            <!-- Campo Unificado CPF/CNPJ -->
+            <div>
+                <label for="popupClienteCpfCnpj" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CPF/CNPJ</label>
+                <input type="text" id="popupClienteCpfCnpj" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="CPF ou CNPJ" inputmode="numeric">
             </div>
+            
             <!-- Novo Campo de Email -->
             <div>
                 <label for="popupClienteEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
@@ -410,6 +406,8 @@
         </form>
     </div>
 </div>
+
+
 
 
 
@@ -1043,9 +1041,23 @@ async function atualizarSeletoresTiposAplicacao() {
     aplicarMascaraTelefone('#telefoneClienteInput');
     aplicarMascaraTelefone('#phone'); // Campo de telefone no popup de usuário
 
-    // Máscaras para CPF e CNPJ
-    $('#popupClienteCPF, #cpfClienteInput').mask('000.000.000-00');
-    $('#popupClienteCNPJ, #cnpjClienteInput').mask('00.000.000/0000-00');
+
+
+
+
+
+
+
+// Máscara para o campo CPF/CNPJ no popup de Cliente
+$('#popupClienteCpfCnpj').mask('000.000.000-00', {
+    onKeyPress: function(cpfCnpj, e, field, options) {
+        var masks = ['000.000.000-000', '00.000.000/0000-00'];
+        var mask = (cpfCnpj.length > 14) ? masks[1] : masks[0];
+        $('#popupClienteCpfCnpj').mask(mask, options);
+    }
+});
+
+
 
     // Máscara para o campo CPF/CNPJ no popup de usuário
     $('#cpfCnpj').mask('000.000.000-00', {
@@ -1074,11 +1086,19 @@ function abrirPopup(acao) {
         popupTitulo.innerText = 'Adicionar Novo Cliente';
         limparCamposPopup();
         clienteSelecionado = '';
+        console.log("Configurado para adicionar um novo cliente.");
     } else if (acao === 'editar') {
-        popupTitulo.innerText = 'Editar Cliente';
         clienteSelecionado = clienteSelect.value;
+        if (!clienteSelecionado) {
+            console.error("Nenhum cliente selecionado para editar.");
+            return;
+        }
+        popupTitulo.innerText = 'Editar Cliente';
         console.log("Editando cliente:", clienteSelecionado);
         carregarDadosCliente(clienteSelecionado);
+    } else {
+        console.error("Ação desconhecida passada para abrirPopup:", acao);
+        return;
     }
 
     // Remover a classe 'hidden' para exibir o popup
@@ -1101,21 +1121,24 @@ function abrirPopup(acao) {
             document.getElementById('popupClienteNome').value = '';
             document.getElementById('popupClienteTelefone').value = '';
             document.getElementById('popupClienteEndereco').value = '';
-            document.getElementById('popupClienteCPF').value = '';
-            document.getElementById('popupClienteCNPJ').value = '';
+            document.getElementById('popupClienteCpfCnpj').value = '';
+
         }
 
         // Função para carregar os dados do cliente no popupCliente (modo editar)
-async function carregarDadosCliente(clienteId) {
+        async function carregarDadosCliente(clienteId) {
     const cliente = await obterClienteDoIndexedDB(clienteId);
     if (cliente) {
         document.getElementById('popupClienteNome').value = cliente.nome;
         document.getElementById('popupClienteTelefone').value = cliente.telefone;
         document.getElementById('popupClienteEndereco').value = cliente.endereco;
-        document.getElementById('popupClienteCPF').value = cliente.cpf;
-        document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
+        document.getElementById('popupClienteCpfCnpj').value = cliente.cpfCnpj || ''; // Preencher o campo unificado
+        document.getElementById('popupClienteEmail').value = cliente.email || ''; // Preencher o email
+        
+        
     }
 }
+
 
 // Função para abrir o popupUsuario com animação
 function abrirPopupUsuario() {
@@ -1524,15 +1547,15 @@ async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
 
         // ... [O código continua com as funções restantes]
         async function carregarDadosCliente(clienteId) {
-            const cliente = await obterClienteDoIndexedDB(clienteId);
-            if (cliente) {
-                document.getElementById('popupClienteNome').value = cliente.nome;
-                document.getElementById('popupClienteTelefone').value = cliente.telefone;
-                document.getElementById('popupClienteEndereco').value = cliente.endereco;
-                document.getElementById('popupClienteCPF').value = cliente.cpf;
-                document.getElementById('popupClienteCNPJ').value = cliente.cnpj;
-            }
-        }
+    const cliente = await obterClienteDoIndexedDB(clienteId);
+    if (cliente) {
+        document.getElementById('popupClienteNome').value = cliente.nome;
+        document.getElementById('popupClienteTelefone').value = cliente.telefone;
+        document.getElementById('popupClienteEndereco').value = cliente.endereco;
+        document.getElementById('popupClienteCpfCnpj').value = cliente.cpfCnpj; // Campo unificado
+    }
+}
+
 
         async function salvarCliente(event) {
     event.preventDefault();
@@ -1540,11 +1563,10 @@ async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
     const nome = document.getElementById('popupClienteNome').value.trim();
     const telefone = document.getElementById('popupClienteTelefone').value.trim();
     const endereco = document.getElementById('popupClienteEndereco').value.trim();
-    const cpf = document.getElementById('popupClienteCPF').value.trim();
-    const cnpj = document.getElementById('popupClienteCNPJ').value.trim();
-    const email = document.getElementById('popupClienteEmail').value.trim(); // Novo campo
+    const cpfCnpj = document.getElementById('popupClienteCpfCnpj').value.trim(); // Novo campo unificado
+    const email = document.getElementById('popupClienteEmail').value.trim(); // Campo de email
 
-    const novoCliente = { nome, telefone, endereco, cpf, cnpj, email }; // Inclui o email
+    const novoCliente = { nome, telefone, endereco, cpfCnpj, email }; // Inclui o email e o campo unificado
 
     try {
         let clienteId;
@@ -1563,6 +1585,7 @@ async function carregarTiposAplicacaoPersonalizadosDoIndexedDB() {
         alert("Ocorreu um erro ao salvar o cliente. Por favor, tente novamente.");
     }
 }
+
 
 
 async function atualizarClienteNoIndexedDB(id, cliente) {
@@ -1603,6 +1626,7 @@ async function obterClienteDoIndexedDB(id) {
         };
     });
 }
+
 
   
 
@@ -2871,8 +2895,7 @@ async function ativarAplicativo() {
 }
 
 
-        // Funções auxiliares para manipulação do IndexedDB
-        async function salvarClienteNoIndexedDB(cliente) {
+async function salvarClienteNoIndexedDB(cliente) {
     const db = await abrirIndexedDB();
     const transaction = db.transaction(['clientes'], 'readwrite');
     const objectStore = transaction.objectStore('clientes');
@@ -2886,6 +2909,7 @@ async function ativarAplicativo() {
         };
     });
 }
+
 
 
         async function obterTodosClientesDoIndexedDB() {
