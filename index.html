@@ -1983,6 +1983,7 @@ function editarPelicula(button) {
 }
 
 
+
        //function atualizarTotal
         function atualizarTotal(input) {
     const group = input.closest('.bg-white');
@@ -2277,9 +2278,11 @@ function toggleInputs(checkbox) {
     };
 
     try {
+        let nomeOriginal = null;
         if (peliculaEditada) {
+            nomeOriginal = peliculaEditada.nome;
             // Atualizar a película existente
-            await atualizarPeliculaPersonalizadaNoIndexedDB(peliculaEditada.nome, novaPelicula);
+            await atualizarPeliculaPersonalizadaNoIndexedDB(nomeOriginal, novaPelicula);
             alert('Película atualizada com sucesso!');
         } else {
             // Salvar uma nova película
@@ -2291,6 +2294,16 @@ function toggleInputs(checkbox) {
 
         // Atualizar os seletores de películas
         await atualizarSeletoresPeliculas();
+
+        // Atualizar todos os seletores que tinham o nome original para o novo nome
+        if (nomeOriginal && nomeOriginal !== nome) {
+            const seletores = document.querySelectorAll('.pelicula-select');
+            seletores.forEach(seletor => {
+                if (seletor.value === nomeOriginal) {
+                    seletor.value = nome;
+                }
+            });
+        }
 
         // Atualizar o seletor que iniciou a ação para a nova película
         if (currentSelectForPelicula) {
@@ -2428,6 +2441,7 @@ async function atualizarSeletoresPeliculas() {
         }
     });
 }
+
 
 
     
