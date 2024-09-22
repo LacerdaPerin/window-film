@@ -1865,17 +1865,17 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
                 <option value="Outra">Outra</option>
             </select>
             <!-- Botão para editar a película -->
-            <button onclick="editarPelicula(this)" class="p-2 bg-gray-200 text-purple-500 rounded-md hover:bg-gray-300 transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-400" aria-label="Editar Película">
-                <i class="fas fa-edit fa-lg"></i>
+            <button onclick="editarPelicula(this)" class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-400" aria-label="Editar Película">
+                <i class="fas fa-edit fa-lg text-purple-500"></i>
             </button>
-            <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)">
-                <i class="fas fa-copy"></i>
+            <button class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-300 shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)" aria-label="Duplicar Grupo de Medidas">
+                <i class="fas fa-copy text-green-500"></i>
             </button>
-            <button class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="toggleAdditionalFields(this)">
-                <i class="fas fa-eye"></i>
+            <button class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-300 shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="toggleAdditionalFields(this)" aria-label="Toggle Campos Adicionais">
+                <i class="fas fa-eye text-blue-500"></i>
             </button>
-            <button class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="deleteMedidaGroup(this)">
-                <i class="fas fa-trash-alt"></i>
+            <button class="p-2 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-300 shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center delete-button" onclick="deleteMedidaGroup(this)" style="display: ${isChecked ? 'none' : 'flex'};" aria-label="Excluir Grupo de Medidas">
+                <i class="fas fa-trash-alt text-red-500"></i>
             </button>
         </div>
         <div class="additional-fields hidden mt-2">
@@ -1941,6 +1941,7 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
     calculateTotal();
     console.log("Grupo de medidas adicionado com sucesso");
 }
+
 
 //editarPelicula
 function editarPelicula(button) {
@@ -2081,16 +2082,27 @@ function duplicarMedidas() {
                 button.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
-
-        function toggleInputs(checkbox) {
-            const inputs = checkbox.closest('.bg-white').querySelectorAll('input, select');
-            inputs.forEach(input => {
-                if (input !== checkbox) {
-                    input.disabled = !checkbox.checked;
-                }
-            });
-            calculateTotal();
+//toggleInputs 
+function toggleInputs(checkbox) {
+    const medidaGroup = checkbox.closest('.bg-white');
+    const inputs = medidaGroup.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input !== checkbox) {
+            input.disabled = !checkbox.checked;
         }
+    });
+    
+    // Seleciona o botão de excluir dentro do grupo de medidas usando a classe específica
+    const deleteButton = medidaGroup.querySelector('.delete-button');
+    if (deleteButton) {
+        // Mostrar o botão de excluir apenas se o checkbox não estiver marcado
+        deleteButton.style.display = checkbox.checked ? 'none' : 'flex';
+    }
+
+    calculateTotal();
+}
+
+
 
         function copyShareURL() {
             const cliente = clienteSelect.value;
