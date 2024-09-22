@@ -461,6 +461,8 @@
         let peliculas = [...peliculasPredefinidas];
         let clientes = [];
         let clienteSelecionado = '';
+        let currentEditPelicula = null;
+        let ultimaPeliculaSalva = null; // Variável global para rastrear a última película salva
 
   
 // Arrays para ambientes e tipos de aplicação
@@ -1847,8 +1849,10 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
 
     medidaGroup.classList.add(zebraClass, 'shadow-md', 'rounded-lg', 'p-2', 'space-y-2', 'mb-2');
 
-    medidaGroup.innerHTML = `
-        <div class="flex items-center space-x-1">
+    console.log("Películas disponíveis para o seletor:", peliculas);
+
+    medidaGroup.innerHTML = 
+        `<div class="flex items-center space-x-1">
             <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleInputs(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-0">
             <input type="number" placeholder="L" value="${largura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 largura-input" oninput="atualizarTotal(this)" maxlength="3">
             <input type="number" placeholder="A" value="${altura}" class="w-1/4 p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 altura-input" oninput="atualizarTotal(this)" maxlength="3">
@@ -1860,6 +1864,10 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
                 ${peliculas.map(p => `<option value="${p.nome}" ${p.nome === peliculaSelecionada ? 'selected' : ''}>${p.nome}</option>`).join('')}
                 <option value="Outra">Outra</option>
             </select>
+            <!-- Botão para editar a película -->
+            <button onclick="editarPelicula(this)" class="p-2 bg-gray-200 text-purple-500 rounded-md hover:bg-gray-300 transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-400" aria-label="Editar Película">
+                <i class="fas fa-edit fa-lg"></i>
+            </button>
             <button class="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md flex-shrink-0 w-8 h-8 flex items-center justify-center" onclick="duplicarGrupo(this)">
                 <i class="fas fa-copy"></i>
             </button>
@@ -1881,8 +1889,7 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Aplicação</label>
                 <input type="text" placeholder="Selecione ou digite o tipo de aplicação" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100">
             </div>
-        </div>
-    `;
+        </div>`;
 
     container.insertBefore(medidaGroup, container.firstChild);
 
@@ -1935,10 +1942,34 @@ function addMedidaGroup(isFirst, largura = '', altura = '', quantidade = 1, isCh
     console.log("Grupo de medidas adicionado com sucesso");
 }
 
+//editarPelicula
+function editarPelicula(button) {
+    // Obter o grupo de medidas correspondente
+    const medidaGroup = button.closest('.bg-white');
+    if (!medidaGroup) {
+        console.error("Grupo de medidas não encontrado para editar a película.");
+        return;
+    }
 
+    // Obter o nome da película selecionada
+    const peliculaSelect = medidaGroup.querySelector('.pelicula-select');
+    const peliculaNome = peliculaSelect.value;
 
+    // Obter a película dos dados predefinidos ou personalizados
+    let pelicula = peliculas.find(p => p.nome === peliculaNome);
+    if (!pelicula) {
+        const peliculasPersonalizadas = peliculas.filter(p => !peliculasPredefinidas.some(pp => pp.nome === p.nome));
+        pelicula = peliculasPersonalizadas.find(p => p.nome === peliculaNome);
+    }
 
+    if (!pelicula) {
+        alert("Película selecionada não encontrada.");
+        return;
+    }
 
+    // Abrir o popup com os dados da película para edição
+    abrirPopupPeliculaPersonalizada(pelicula);
+}
 
 
        //function atualizarTotal
@@ -2083,13 +2114,13 @@ function duplicarMedidas() {
 
 
         // Funções para películas personalizadas
-        function abrirPopupPeliculaPersonalizada() {
-    const popupHTML = `
-        <div id="popupPeliculaPersonalizada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        function abrirPopupPeliculaPersonalizada(pelicula = null) {
+    const popupHTML = 
+        `<div id="popupPeliculaPersonalizada" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md w-full mx-4 sm:mx-0">
                 <!-- Cabeçalho do Popup -->
                 <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Adicionar Película Personalizada</h2>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">${pelicula ? 'Editar Película' : 'Adicionar Película Personalizada'}</h2>
                     <button onclick="fecharPopupPeliculaPersonalizada()" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -2101,51 +2132,62 @@ function duplicarMedidas() {
                     <!-- Campo de Nome da Película -->
                     <div>
                         <label for="nomePeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome da Película</label>
-                        <input type="text" id="nomePeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Nome da Película" required>
+                        <input type="text" id="nomePeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Nome da Película" required value="${pelicula ? pelicula.nome : ''}">
                     </div>
                     <!-- Campo de Preço por m² -->
                     <div>
                         <label for="precoPeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço por m² (R$)</label>
-                        <input type="number" id="precoPeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Preço por m²" min="0" step="0.01" required>
+                        <input type="number" id="precoPeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Preço por m²" min="0" step="0.01" required value="${pelicula ? pelicula.preco : ''}">
                     </div>
-                    <!-- Novo Campo de Garantia Fabricante -->
+                    <!-- Campo de Garantia Fabricante -->
                     <div>
                         <label for="garantiaFabricante" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Fabricante (Anos)</label>
                         <select id="garantiaFabricante" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
-                            <option value="" disabled selected>Selecione a garantia fabricante</option>
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="5">5</option>
-                            <option value="7">7</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
+                            <option value="" disabled ${pelicula ? '' : 'selected'}>Selecione a garantia fabricante</option>
+                            <option value="0" ${pelicula && pelicula.garantiaFabricante === 0 ? 'selected' : ''}>0</option>
+                            <option value="1" ${pelicula && pelicula.garantiaFabricante === 1 ? 'selected' : ''}>1</option>
+                            <option value="2" ${pelicula && pelicula.garantiaFabricante === 2 ? 'selected' : ''}>2</option>
+                            <option value="3" ${pelicula && pelicula.garantiaFabricante === 3 ? 'selected' : ''}>3</option>
+                            <option value="5" ${pelicula && pelicula.garantiaFabricante === 5 ? 'selected' : ''}>5</option>
+                            <option value="7" ${pelicula && pelicula.garantiaFabricante === 7 ? 'selected' : ''}>7</option>
+                            <option value="10" ${pelicula && pelicula.garantiaFabricante === 10 ? 'selected' : ''}>10</option>
+                            <option value="15" ${pelicula && pelicula.garantiaFabricante === 15 ? 'selected' : ''}>15</option>
                         </select>
                     </div>
-                    <!-- Novo Campo de Garantia Mão de Obra -->
+                    <!-- Campo de Garantia Mão de Obra -->
                     <div>
                         <label for="garantiaMaoDeObra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Mão de Obra (Inicia em Dias)</label>
                         <select id="garantiaMaoDeObra" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
-                            <option value="" disabled selected>Selecione a garantia mão de obra</option>
-                            <option value="30">Inicia em 30 dias</option>
-                            <option value="60">Inicia em 60 dias</option>
-                            <option value="90">Inicia em 90 dias</option>
-                            <option value="120">Inicia em 120 dias</option>
-                            <option value="180">Inicia em 180 dias</option>
-                            <option value="360">Inicia em 360 dias</option>
+                            <option value="" disabled ${pelicula ? '' : 'selected'}>Selecione a garantia mão de obra</option>
+                            <option value="30" ${pelicula && pelicula.garantiaMaoDeObra === 30 ? 'selected' : ''}>Inicia em 30 dias</option>
+                            <option value="60" ${pelicula && pelicula.garantiaMaoDeObra === 60 ? 'selected' : ''}>Inicia em 60 dias</option>
+                            <option value="90" ${pelicula && pelicula.garantiaMaoDeObra === 90 ? 'selected' : ''}>Inicia em 90 dias</option>
+                            <option value="120" ${pelicula && pelicula.garantiaMaoDeObra === 120 ? 'selected' : ''}>Inicia em 120 dias</option>
+                            <option value="180" ${pelicula && pelicula.garantiaMaoDeObra === 180 ? 'selected' : ''}>Inicia em 180 dias</option>
+                            <option value="360" ${pelicula && pelicula.garantiaMaoDeObra === 360 ? 'selected' : ''}>Inicia em 360 dias</option>
                         </select>
                     </div>
                 </form>
                 <!-- Rodapé do Popup com Botões -->
                 <div class="flex justify-end items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-x-4">
+                    ${pelicula ? `
+                        <button 
+                            id="deletePeliculaButton" 
+                            class="p-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300 shadow-md flex items-center justify-center" 
+                            onclick="deletarPeliculaPersonalizada('${pelicula.nome}')"
+                            aria-label="Excluir Película"
+                        >
+                            <i class="fas fa-trash-alt fa-lg"></i>
+                            <span class="ml-2">Excluir</span>
+                        </button>
+                    ` : ''}
                     <button 
                         id="salvarPeliculaPersonalizada" 
                         type="submit" 
                         form="peliculaForm" 
                         class="flex-grow px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 shadow-md flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     >
-                        <span>Salvar Película</span>
+                        <span>${pelicula ? 'Salvar Alterações' : 'Salvar Película'}</span>
                     </button>
                     <button 
                         onclick="fecharPopupPeliculaPersonalizada()" 
@@ -2156,18 +2198,19 @@ function duplicarMedidas() {
                     </button>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
     // Adiciona o event listener ao formulário para capturar o evento de submissão
-    document.getElementById('peliculaForm').addEventListener('submit', salvarPeliculaPersonalizada);
+    document.getElementById('peliculaForm').addEventListener('submit', function(event) {
+        salvarPeliculaPersonalizada(event, pelicula);
+    });
+
+    // Se estiver no modo de edição, ajustar a referência para a película atual
+    if (pelicula) {
+        currentEditPelicula = pelicula;
+    }
 }
-
-
-
-
-
 
 
 
@@ -2178,12 +2221,9 @@ function duplicarMedidas() {
             }
         }
 
-
-
-
-
        //SALVAR PELICULAS
-       async function salvarPeliculaPersonalizada(event) {
+   // Função para salvar películas personalizadas
+async function salvarPeliculaPersonalizada(event, peliculaEditada = null) {
     event.preventDefault(); // Previne o envio padrão do formulário
 
     const nome = document.getElementById('nomePeliculaPersonalizada').value.trim();
@@ -2220,23 +2260,56 @@ function duplicarMedidas() {
     };
 
     try {
-        await salvarPeliculaPersonalizadaNoIndexedDB(novaPelicula);
-        fecharPopupPeliculaPersonalizada();
-        await atualizarSeletoresPeliculas();
-
-        if (currentSelectForPelicula) {
-            currentSelectForPelicula.value = novaPelicula.nome; // Seleciona a nova película
-            currentSelectForPelicula = null; // Reseta a referência
+        if (peliculaEditada) {
+            // Atualizar a película existente
+            await atualizarPeliculaPersonalizadaNoIndexedDB(peliculaEditada.nome, novaPelicula);
+            alert('Película atualizada com sucesso!');
+        } else {
+            // Salvar uma nova película
+            await salvarPeliculaPersonalizadaNoIndexedDB(novaPelicula);
+            alert('Película personalizada salva com sucesso!');
         }
 
+        fecharPopupPeliculaPersonalizada();
+        await atualizarSeletoresPeliculas(nome); // Passa o nome da película salva para selecionar
+
+        // Atualiza a variável global
+        ultimaPeliculaSalva = nome;
+
+        // Resetar a referência de edição
+        currentEditPelicula = null;
+
         calculateTotal();
-        alert('Película personalizada salva com sucesso!');
     } catch (error) {
         console.error('Erro ao salvar película personalizada:', error);
         alert('Ocorreu um erro ao salvar a película personalizada. Por favor, tente novamente.');
     }
 }
 
+
+
+//atualizarPeliculaPersonalizadaNoIndexedDB
+async function atualizarPeliculaPersonalizadaNoIndexedDB(nomeOriginal, peliculaAtualizada) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
+        const store = transaction.objectStore('peliculas_personalizadas');
+        
+        // Primeiro, remover a película antiga se o nome foi alterado
+        if (nomeOriginal !== peliculaAtualizada.nome) {
+            store.delete(nomeOriginal).onsuccess = () => {
+                // Adicionar a película atualizada
+                store.put(peliculaAtualizada).onsuccess = () => resolve();
+                store.put(peliculaAtualizada).onerror = (event) => reject(event);
+            };
+            store.delete(nomeOriginal).onerror = (event) => reject(event);
+        } else {
+            // Se o nome não mudou, apenas atualizar os outros campos
+            store.put(peliculaAtualizada).onsuccess = () => resolve();
+            store.put(peliculaAtualizada).onerror = (event) => reject(event);
+        }
+    });
+}
 
 
 //salvarPeliculaPersonalizadaNoIndexedDB:
@@ -2251,6 +2324,8 @@ async function salvarPeliculaPersonalizadaNoIndexedDB(pelicula) {
         request.onerror = () => reject(request.error);
     });
 }
+
+
 //carregarPeliculasPersonalizadasDoIndexedDB
 async function carregarPeliculasPersonalizadasDoIndexedDB() {
     const db = await abrirIndexedDB();
@@ -2259,31 +2334,74 @@ async function carregarPeliculasPersonalizadasDoIndexedDB() {
         const store = transaction.objectStore('peliculas_personalizadas');
         const request = store.getAll();
 
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+            console.log('Películas carregadas:', request.result);
+            resolve(request.result);
+        };
+        request.onerror = () => {
+            console.error('Erro ao carregar películas personalizadas:', request.error);
+            reject(request.error);
+        };
+    });
+}
+
+
+
+//deletarPeliculaPersonalizada
+async function deletarPeliculaPersonalizada(nomePelicula) {
+    if (!confirm("Tem certeza que deseja excluir esta película? Esta ação não pode ser desfeita.")) {
+        return;
+    }
+
+    try {
+        await removerPeliculaPersonalizadaDoIndexedDB(nomePelicula);
+        alert('Película excluída com sucesso!');
+        fecharPopupPeliculaPersonalizada();
+        await atualizarSeletoresPeliculas(); // Atualização após exclusão
+        calculateTotal();
+    } catch (error) {
+        console.error('Erro ao excluir película:', error);
+        alert('Ocorreu um erro ao excluir a película. Por favor, tente novamente.');
+    }
+}
+
+
+
+//removerPeliculaPersonalizadaDoIndexedDB
+async function removerPeliculaPersonalizadaDoIndexedDB(nomePelicula) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
+        const store = transaction.objectStore('peliculas_personalizadas');
+        const request = store.delete(nomePelicula);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject(event);
     });
 }
 
 
 // atualizarSeletoresPeliculas
-async function atualizarSeletoresPeliculas() {
+// Atualizar a função atualizarSeletoresPeliculas para aceitar um parâmetro opcional
+async function atualizarSeletoresPeliculas(peliculaSelecionada = null) {
     const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
-    peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
+    peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas]; // Inclui predefinidas e personalizadas
+
+    console.log('Array de películas atualizado:', peliculas);
 
     const seletores = document.querySelectorAll('.pelicula-select');
     seletores.forEach(seletor => {
-        const selectedValue = seletor.value;
-        // Adiciona todas as opções existentes e concatena a opção "Outra" no final
+        const valorSelecionado = peliculaSelecionada || seletor.value; // Prioriza a película selecionada recentemente
         seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('') + '<option value="Outra">Outra</option>';
-        // Mantém a seleção atual, a menos que tenha sido substituída pela nova película
-        if (peliculas.some(p => p.nome === selectedValue)) {
-            seletor.value = selectedValue;
+        
+        // Verifica se a película selecionada existe
+        if (peliculas.some(p => p.nome === valorSelecionado)) {
+            seletor.value = valorSelecionado;
         } else {
             seletor.value = '';
         }
     });
 }
-
 
 
 
@@ -2295,12 +2413,12 @@ async function atualizarSeletoresPeliculas() {
     calculateTotal();
 }
 
-
-        async function carregarPeliculasPersonalizadas() {
-            const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
-            peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
-            await atualizarSeletoresPeliculas();
-        }
+//carregarPeliculasPersonalizadas
+async function carregarPeliculasPersonalizadas() {
+    const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
+    peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas];
+    await atualizarSeletoresPeliculas();
+}
 
         // Sistema de verificação do aplicativo
         const DURACAO_TESTE_GRATIS = 30 * 24 * 60 * 60 * 1000; // 30 dias em milissegundos
