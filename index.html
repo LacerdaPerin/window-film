@@ -408,7 +408,8 @@
 </div>
 
     <script>
-
+  let currentEditPelicula = null;
+  let ultimaPeliculaSalva = null; // Variável global para rastrear a última película salva
 
         // Registro do Service Worker
         if ('serviceWorker' in navigator) {
@@ -461,8 +462,7 @@
         let peliculas = [...peliculasPredefinidas];
         let clientes = [];
         let clienteSelecionado = '';
-        let currentEditPelicula = null;
-        let ultimaPeliculaSalva = null; // Variável global para rastrear a última película salva
+      
 
   
 // Arrays para ambientes e tipos de aplicação
@@ -1953,8 +1953,17 @@ function editarPelicula(button) {
         return;
     }
 
-    // Obter o nome da película selecionada
+    // Obter o seletor de película dentro do grupo de medidas
     const peliculaSelect = medidaGroup.querySelector('.pelicula-select');
+    if (!peliculaSelect) {
+        console.error("Seletor de película não encontrado no grupo de medidas.");
+        return;
+    }
+
+    // Armazena a referência do seletor atual para atualização posterior
+    currentSelectForPelicula = peliculaSelect;
+
+    // Obter o nome da película selecionada
     const peliculaNome = peliculaSelect.value;
 
     // Obter a película dos dados predefinidos ou personalizados
@@ -2142,17 +2151,15 @@ function toggleInputs(checkbox) {
                 </div>
                 <!-- Corpo do Popup -->
                 <form id="peliculaForm" class="p-6 space-y-4">
-                    <!-- Campo de Nome da Película -->
+                    <!-- Campos do formulário -->
                     <div>
                         <label for="nomePeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome da Película</label>
                         <input type="text" id="nomePeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Nome da Película" required value="${pelicula ? pelicula.nome : ''}">
                     </div>
-                    <!-- Campo de Preço por m² -->
                     <div>
                         <label for="precoPeliculaPersonalizada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço por m² (R$)</label>
                         <input type="number" id="precoPeliculaPersonalizada" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" placeholder="Preço por m²" min="0" step="0.01" required value="${pelicula ? pelicula.preco : ''}">
                     </div>
-                    <!-- Campo de Garantia Fabricante -->
                     <div>
                         <label for="garantiaFabricante" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Fabricante (Anos)</label>
                         <select id="garantiaFabricante" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
@@ -2167,7 +2174,6 @@ function toggleInputs(checkbox) {
                             <option value="15" ${pelicula && pelicula.garantiaFabricante === 15 ? 'selected' : ''}>15</option>
                         </select>
                     </div>
-                    <!-- Campo de Garantia Mão de Obra -->
                     <div>
                         <label for="garantiaMaoDeObra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Garantia Mão de Obra (Inicia em Dias)</label>
                         <select id="garantiaMaoDeObra" class="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
@@ -2182,7 +2188,7 @@ function toggleInputs(checkbox) {
                     </div>
                 </form>
                 <!-- Rodapé do Popup com Botões -->
-   <div class="flex justify-end items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-x-4">
+                <div class="flex justify-end items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-x-4">
                     ${pelicula ? 
                         `<button 
                             id="deletePeliculaButton" 
@@ -2283,16 +2289,13 @@ function toggleInputs(checkbox) {
 
         fecharPopupPeliculaPersonalizada();
 
-        // Atualizar apenas o seletor atual com a nova película
+        // Atualizar os seletores de películas
+        await atualizarSeletoresPeliculas();
+
+        // Atualizar o seletor que iniciou a ação para a nova película
         if (currentSelectForPelicula) {
-            await atualizarSeletoresPeliculas(nome, currentSelectForPelicula);
-            // Seleciona a nova película no seletor atual
             currentSelectForPelicula.value = nome;
-            // Limpa a referência após atualização
-            currentSelectForPelicula = null;
-        } else {
-            // Caso não haja referência, atualiza todos os seletores como antes
-            await atualizarSeletoresPeliculas(nome);
+            currentSelectForPelicula = null; // Limpar a referência após atualização
         }
 
         calculateTotal();
@@ -2305,6 +2308,8 @@ function toggleInputs(checkbox) {
 
 
 
+
+
 //atualizarPeliculaPersonalizadaNoIndexedDB
 async function atualizarPeliculaPersonalizadaNoIndexedDB(nomeOriginal, peliculaAtualizada) {
     const db = await abrirIndexedDB();
@@ -2312,21 +2317,25 @@ async function atualizarPeliculaPersonalizadaNoIndexedDB(nomeOriginal, peliculaA
         const transaction = db.transaction(['peliculas_personalizadas'], 'readwrite');
         const store = transaction.objectStore('peliculas_personalizadas');
         
-        // Primeiro, remover a película antiga se o nome foi alterado
         if (nomeOriginal !== peliculaAtualizada.nome) {
-            store.delete(nomeOriginal).onsuccess = () => {
-                // Adicionar a película atualizada
-                store.put(peliculaAtualizada).onsuccess = () => resolve();
-                store.put(peliculaAtualizada).onerror = (event) => reject(event);
+            // Remove a película antiga se o nome foi alterado
+            const deleteRequest = store.delete(nomeOriginal);
+            deleteRequest.onsuccess = () => {
+                // Adiciona a película atualizada
+                const putRequest = store.put(peliculaAtualizada);
+                putRequest.onsuccess = () => resolve();
+                putRequest.onerror = (event) => reject(event);
             };
-            store.delete(nomeOriginal).onerror = (event) => reject(event);
+            deleteRequest.onerror = (event) => reject(event);
         } else {
-            // Se o nome não mudou, apenas atualizar os outros campos
-            store.put(peliculaAtualizada).onsuccess = () => resolve();
-            store.put(peliculaAtualizada).onerror = (event) => reject(event);
+            // Se o nome não mudou, apenas atualiza os outros campos
+            const putRequest = store.put(peliculaAtualizada);
+            putRequest.onsuccess = () => resolve();
+            putRequest.onerror = (event) => reject(event);
         }
     });
 }
+
 
 
 //salvarPeliculaPersonalizadaNoIndexedDB:
@@ -2399,51 +2408,37 @@ async function removerPeliculaPersonalizadaDoIndexedDB(nomePelicula) {
 
 
 // atualizarSeletoresPeliculas
-// Atualizar a função atualizarSeletoresPeliculas para aceitar um seletor específico
-async function atualizarSeletoresPeliculas(peliculaSelecionada = null, seletorAtual = null) {
+async function atualizarSeletoresPeliculas() {
     const peliculasPersonalizadas = await carregarPeliculasPersonalizadasDoIndexedDB();
     peliculas = [...peliculasPredefinidas, ...peliculasPersonalizadas]; // Inclui predefinidas e personalizadas
 
     console.log('Array de películas atualizado:', peliculas);
 
-    if (seletorAtual) {
-        // Atualizar apenas o seletor especificado
-        seletorAtual.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('') + '<option value="Outra">Outra</option>';
-        
-        // Selecionar a película recém-adicionada
-        if (peliculas.some(p => p.nome === peliculaSelecionada)) {
-            seletorAtual.value = peliculaSelecionada;
+    // Atualizar todos os seletores
+    const seletores = document.querySelectorAll('.pelicula-select');
+    seletores.forEach(seletor => {
+        const valorSelecionado = seletor.value;
+        seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('') + '<option value="Outra">Outra</option>';
+
+        // Retentar selecionar o valor anterior se ainda existir
+        if (peliculas.some(p => p.nome === valorSelecionado)) {
+            seletor.value = valorSelecionado;
         } else {
-            seletorAtual.value = '';
+            seletor.value = 'Outra';
         }
-    } else {
-        // Se nenhum seletor específico for fornecido, atualizar todos
-        const seletores = document.querySelectorAll('.pelicula-select');
-        seletores.forEach(seletor => {
-            const valorSelecionado = peliculaSelecionada || seletor.value; // Prioriza a película selecionada recentemente
-            seletor.innerHTML = peliculas.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('') + '<option value="Outra">Outra</option>';
-            
-            // Verifica se a película selecionada existe
-            if (peliculas.some(p => p.nome === valorSelecionado)) {
-                seletor.value = valorSelecionado;
-            } else {
-                seletor.value = '';
-            }
-        });
-    }
+    });
 }
 
 
-
-
     
-        function onPeliculaChange(select) {
+function onPeliculaChange(select) {
     if (select.value === 'Outra') {
         currentSelectForPelicula = select; // Armazena a referência do <select>
         abrirPopupPeliculaPersonalizada();
     }
     calculateTotal();
 }
+
 
 
 //carregarPeliculasPersonalizadas
