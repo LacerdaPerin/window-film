@@ -669,7 +669,6 @@ async function carregarFormasPagamento() {
     }
 }
 
-
 // Função para abrir o WhatsApp do cliente
 function abrirWhatsAppCliente() {
     const clienteId = document.getElementById('clienteSelect').value;
@@ -682,6 +681,7 @@ function abrirWhatsAppCliente() {
         if (cliente && cliente.telefone) {
             // Formatar o número para o padrão do WhatsApp
             const telefoneFormatado = formatarTelefoneParaWhatsApp(cliente.telefone);
+            console.log('Telefone Formatado:', telefoneFormatado);
             if (!telefoneFormatado) {
                 alert('Número de telefone inválido. Verifique o cadastro do cliente.');
                 return;
@@ -690,9 +690,10 @@ function abrirWhatsAppCliente() {
             // Construir a URL do WhatsApp
             const mensagem = encodeURIComponent('Olá, gostaria de falar sobre o orçamento que você solicitou.');
             const url = `https://wa.me/${telefoneFormatado}?text=${mensagem}`;
+            console.log('URL do WhatsApp:', url);
 
-            // Abrir o WhatsApp em uma nova aba
-            window.open(url, '_blank');
+            // Abrir o WhatsApp na mesma aba
+            window.location.href = url;
         } else {
             alert('Informações do cliente incompletas. Certifique-se de que o cliente possui um número de telefone cadastrado.');
         }
@@ -704,23 +705,50 @@ function abrirWhatsAppCliente() {
 
 // Função para formatar o telefone para o padrão do WhatsApp
 function formatarTelefoneParaWhatsApp(telefone) {
-    // Remover todos os caracteres não numéricos
-    let numeros = telefone.replace(/\D/g, '');A
+    try {
+        console.log('Telefone Original:', telefone);
+        
+        // Remover todos os caracteres não numéricos
+        let numeros = telefone.replace(/\D/g, '');
+        console.log('Telefone Após Remoção de Não Numéricos:', numeros);
 
-    // Verificar se o número já inclui o código do país (ex: 55 para Brasil)
-    if (!numeros.startsWith('55')) {
-        // Adicionar o código do país (55 para Brasil)
-        numeros = '55' + numeros;
-    }
+        // Verificar se o número já inclui o código do país (ex: 55 para Brasil)
+        if (!numeros.startsWith('55')) {
+            numeros = '55' + numeros;
+            console.log('Telefone Após Adição do Código do País:', numeros);
+        }
 
-    // Verificar o comprimento do número
-    if (numeros.length === 13 || numeros.length === 14) {
-        return numeros;
-    } else {
-        console.error('Número de telefone inválido para o WhatsApp:', telefone);
+        // Verificar o comprimento do número
+        if (numeros.length === 13 || numeros.length === 14) {
+            console.log('Número Formatado para WhatsApp:', numeros);
+            return numeros;
+        } else {
+            console.error('Número de telefone inválido para o WhatsApp:', telefone);
+            return null;
+        }
+    } catch (error) {
+        console.error('Erro na função formatarTelefoneParaWhatsApp:', error);
         return null;
     }
 }
+
+// Função para obter o cliente do IndexedDB
+async function obterClienteDoIndexedDB(id) {
+    const db = await abrirIndexedDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['clientes'], 'readonly');
+        const store = transaction.objectStore('clientes');
+        const request = store.get(parseInt(id));
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+        request.onerror = event => {
+            reject(event);
+        };
+    });
+}
+
 
 
 // Função para salvar as formas de pagamento no IndexedDB
