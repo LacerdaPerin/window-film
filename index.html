@@ -13,6 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
     <link rel="manifest" href="/peliqueiros-br/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papvE2KxtNX3TccU8r1FSOQXhr3K8lLzCvXaMlka0kq2l4GmMbfhLQIgmyxvTfmQSwPtyJ6Rk3k4H4kDVYB/Zw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <meta name="theme-color" content="#000000">
     <style>
 
@@ -72,7 +74,7 @@
                     </button>
                     </div>
 
-     <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
+ <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
 <div id="splash-screen" class="fixed inset-0 bg-black flex items-center justify-center z-50">
     <div class="flex flex-col items-center">
         <!-- Animação de carregamento -->
@@ -98,7 +100,7 @@
         </div>
     </div>
 
-    <!-- Grupo de Ações à Direita (Mapa, Editar, Excluir) -->
+    <!-- Grupo de Ações à Direita (Mapa, WhatsApp, Editar, Excluir) -->
     <div class="flex space-x-2">
         <!-- Botão Mapa -->
         <div class="relative group">
@@ -114,6 +116,22 @@
                 Abrir Mapa
             </div>
         </div>
+
+        <!-- Novo Botão WhatsApp -->
+        <div class="relative group">
+            <button 
+                onclick="abrirWhatsAppCliente()" 
+                class="p-2 bg-gray-200 text-green-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-green-400" 
+                aria-label="Abrir WhatsApp do Cliente"
+            >
+                <i class="fab fa-whatsapp fa-lg"></i>
+            </button>
+            <!-- Tooltip WhatsApp -->
+            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                Abrir WhatsApp do Cliente
+            </div>
+        </div>
+        <!-- Fim do Novo Botão WhatsApp -->
 
         <!-- Botão Editar -->
         <div class="relative group">
@@ -147,6 +165,7 @@
     </div>
 </div>
 </div>
+
 
                 <!-- Conteúdo scrollável (grupos de medidas) -->
                 <div id="medidasContainer" class="space-y-2 w-full pb-20 sm:pb-0">
@@ -651,7 +670,57 @@ async function carregarFormasPagamento() {
 }
 
 
+// Função para abrir o WhatsApp do cliente
+function abrirWhatsAppCliente() {
+    const clienteId = document.getElementById('clienteSelect').value;
+    if (!clienteId) {
+        alert('Selecione um cliente para iniciar a conversa.');
+        return;
+    }
 
+    obterClienteDoIndexedDB(clienteId).then(cliente => {
+        if (cliente && cliente.telefone) {
+            // Formatar o número para o padrão do WhatsApp
+            const telefoneFormatado = formatarTelefoneParaWhatsApp(cliente.telefone);
+            if (!telefoneFormatado) {
+                alert('Número de telefone inválido. Verifique o cadastro do cliente.');
+                return;
+            }
+
+            // Construir a URL do WhatsApp
+            const mensagem = encodeURIComponent('Olá, gostaria de falar sobre o orçamento que você solicitou.');
+            const url = `https://wa.me/${telefoneFormatado}?text=${mensagem}`;
+
+            // Abrir o WhatsApp em uma nova aba
+            window.open(url, '_blank');
+        } else {
+            alert('Informações do cliente incompletas. Certifique-se de que o cliente possui um número de telefone cadastrado.');
+        }
+    }).catch(error => {
+        console.error('Erro ao obter informações do cliente:', error);
+        alert('Ocorreu um erro ao tentar iniciar a conversa. Por favor, tente novamente.');
+    });
+}
+
+// Função para formatar o telefone para o padrão do WhatsApp
+function formatarTelefoneParaWhatsApp(telefone) {
+    // Remover todos os caracteres não numéricos
+    let numeros = telefone.replace(/\D/g, '');A
+
+    // Verificar se o número já inclui o código do país (ex: 55 para Brasil)
+    if (!numeros.startsWith('55')) {
+        // Adicionar o código do país (55 para Brasil)
+        numeros = '55' + numeros;
+    }
+
+    // Verificar o comprimento do número
+    if (numeros.length === 13 || numeros.length === 14) {
+        return numeros;
+    } else {
+        console.error('Número de telefone inválido para o WhatsApp:', telefone);
+        return null;
+    }
+}
 
 
 // Função para salvar as formas de pagamento no IndexedDB
@@ -3226,9 +3295,8 @@ function addMedidasTable(medidas, peliculaNome) {
         "4. Validade da Proposta:",
         "   • Esta proposta é válida por 60 dias a partir da data de emissão",
         "",
-        "5. Garantia:",
-        "   • 2 a 10 anos contra defeitos de fabricação",
-        "   • 10 semanas contra defeitos de aplicação",
+        "5. Data da Aplicação:",
+        "   • A combinar",
         "",
         "6. Observações Importantes:",
         "   • Quaisquer alterações no projeto podem resultar em ajustes no orçamento",
