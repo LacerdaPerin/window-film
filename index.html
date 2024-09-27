@@ -3469,7 +3469,7 @@ async function salvarClienteNoIndexedDB(cliente) {
         // Primeira visita
         const firstVisitDate = new Date();
         localStorage.setItem('firstVisit', firstVisitDate);
-        alert('Parabéns! Você ganhou 30 dias para explorar tudo o que nosso aplicativo oferece. Use à vontade e, se curtir, quem sabe você não fica por mais tempo? 😉');
+        alert('PParabéns! Você agora faz parte do plano vitalício e pode explorar todas as funcionalidades do nosso aplicativo, sem a necessidade de pagar mensalidades! 😉');
     } else {
         // Calcular quantos dias restam
         const currentDate = new Date();
@@ -3480,10 +3480,10 @@ async function salvarClienteNoIndexedDB(cliente) {
 
         if (daysLeft > 0) {
             // Mostrar alerta de quantos dias restam
-            alert(`Você tem ${daysLeft} dias restantes no seu período de teste gratuito.`);
+            alert(`Sua verificação será concedida em  ${daysLeft} dias, como parte do nosso processo de segurança para prevenir fraudes.`);
         } else {
             // O período de teste acabou
-            alert('Seu período de teste de 30 dias expirou. Esperamos que tenha aproveitado!');
+            alert('Por favor, informe seu e-mail ou o nome completo utilizado na compra para receber sua verificação e desbloquear o acesso ao aplicativo.');
         }
     }
 });
