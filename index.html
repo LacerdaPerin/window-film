@@ -1663,7 +1663,92 @@ async function obterClienteDoIndexedDB(id) {
     });
 }
 
+// Adicione esta função para exibir mensagens via popup
+function showPopupMessage(title, message) {
+    // Remove o popup existente, se houver
+    const existingPopup = document.getElementById('popupMessage');
+    if (existingPopup) {
+        existingPopup.parentNode.removeChild(existingPopup);
+    }
 
+    const popupHTML = `
+        <div id="popupMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full mx-4 sm:mx-0">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">${title}</h2>
+                <p class="text-gray-700">${message}</p>
+                <button id="closePopupMessage" class="mt-4 w-full p-3 bg-blue-500 text-white rounded-md flex items-center justify-center">
+                    <span>Fechar</span>
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+    document.getElementById('closePopupMessage').addEventListener('click', () => {
+        const popup = document.getElementById('popupMessage');
+        if (popup) {
+            popup.parentNode.removeChild(popup);
+        }
+    });
+}
+
+// Modifique o evento de carregamento da janela para usar as novas mensagens e exibir via popup
+window.addEventListener('load', () => {
+    const trialDays = 30; // Definir o período de teste de 30 dias
+    const firstVisit = localStorage.getItem('firstVisit');
+    
+    if (!firstVisit) {
+        // Primeira visita
+        const firstVisitDate = new Date();
+        localStorage.setItem('firstVisit', firstVisitDate);
+        
+        // Mensagem personalizada para a primeira visita
+        const message = `
+            Bem-vindo! Você está em um <strong>plano de teste</strong> e receberá novas atualizações somente após adquirir o aplicativo.
+            <br><br>
+            Se você ativar rapidamente, economizará, pois com o cupom <strong>SEM-MENSALIDADE</strong> você faz um único pagamento de <strong>R$49</strong> e economiza <strong>R$248</strong> enquanto os cupons durarem.
+            <br><br>
+            Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
+            <br><br>
+            <strong>Os cupons estão se esgotando!</strong>
+        `;
+        showPopupMessage('Plano de Teste', message);
+        
+    } else {
+        // Calcular quantos dias restam
+        const currentDate = new Date();
+        const firstVisitDate = new Date(firstVisit);
+        const timeDiff = currentDate - firstVisitDate;
+        const daysPassed = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Converte a diferença em dias
+        const daysLeft = trialDays - daysPassed;
+
+        if (daysLeft > 0) {
+            // Mostrar mensagem de quantos dias restam
+            const message = `
+                Seu teste é válido por mais <strong>${daysLeft} dias</strong>.
+                <br><br>
+                Você pode comprar o aplicativo hoje e garantir todas as futuras atualizações.
+                <br><br>
+                Aproveite a oferta com o cupom <strong>SEM-MENSALIDADE</strong> e faça um único pagamento de <strong>R$49</strong>, economizando <strong>R$248</strong> enquanto os cupons durarem.
+                <br><br>
+                Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
+            `;
+            showPopupMessage('Teste em Andamento', message);
+        } else {
+            // O período de teste acabou
+            const message = `
+                Seu período de teste expirou.
+                <br><br>
+                Compre o aplicativo agora para continuar usando e garantir todas as futuras atualizações.
+                <br><br>
+                Aproveite a oferta com o cupom <strong>SEM-MENSALIDADE</strong> e faça um único pagamento de <strong>R$49</strong>, economizando <strong>R$248</strong> enquanto os cupons durarem.
+                <br><br>
+                Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
+            `;
+            showPopupMessage('Teste Expirado', message);
+        }
+    }
+});
 
 // Função para fechar o popupCliente com animação
 function fecharPopup() {
@@ -2052,6 +2137,9 @@ function duplicarMedidas() {
 
     calculateTotal();
 }
+
+
+
 
         function deleteMedidaGroup(button) {
             if (confirm('Tem certeza que deseja excluir este grupo de medidas?')) {
