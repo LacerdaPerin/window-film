@@ -13,8 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link rel="icon" href="icons/peliqueiros.png" type="image/png">
     <link rel="manifest" href="/peliqueiros-br/manifest.json">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papvE2KxtNX3TccU8r1FSOQXhr3K8lLzCvXaMlka0kq2l4GmMbfhLQIgmyxvTfmQSwPtyJ6Rk3k4H4kDVYB/Zw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <meta name="theme-color" content="#000000">
     <style>
 
@@ -74,7 +72,7 @@
                     </button>
                     </div>
 
- <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
+     <!-- ANIMAÇÃO ENTRADA CARREGANDO -->
 <div id="splash-screen" class="fixed inset-0 bg-black flex items-center justify-center z-50">
     <div class="flex flex-col items-center">
         <!-- Animação de carregamento -->
@@ -100,7 +98,7 @@
         </div>
     </div>
 
-    <!-- Grupo de Ações à Direita (Mapa, WhatsApp, Editar, Excluir) -->
+    <!-- Grupo de Ações à Direita (Mapa, Editar, Excluir) -->
     <div class="flex space-x-2">
         <!-- Botão Mapa -->
         <div class="relative group">
@@ -116,22 +114,6 @@
                 Abrir Mapa
             </div>
         </div>
-
-        <!-- Novo Botão WhatsApp -->
-        <div class="relative group">
-            <button 
-                onclick="abrirWhatsAppCliente()" 
-                class="p-2 bg-gray-200 text-green-500 rounded-md hover:bg-gray-300 transition duration-300 shadow focus:outline-none focus:ring-2 focus:ring-green-400" 
-                aria-label="Abrir WhatsApp do Cliente"
-            >
-                <i class="fab fa-whatsapp fa-lg"></i>
-            </button>
-            <!-- Tooltip WhatsApp -->
-            <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                Abrir WhatsApp do Cliente
-            </div>
-        </div>
-        <!-- Fim do Novo Botão WhatsApp -->
 
         <!-- Botão Editar -->
         <div class="relative group">
@@ -165,7 +147,6 @@
     </div>
 </div>
 </div>
-
 
                 <!-- Conteúdo scrollável (grupos de medidas) -->
                 <div id="medidasContainer" class="space-y-2 w-full pb-20 sm:pb-0">
@@ -669,85 +650,7 @@ async function carregarFormasPagamento() {
     }
 }
 
-// Função para abrir o WhatsApp do cliente
-function abrirWhatsAppCliente() {
-    const clienteId = document.getElementById('clienteSelect').value;
-    if (!clienteId) {
-        alert('Selecione um cliente para iniciar a conversa.');
-        return;
-    }
 
-    obterClienteDoIndexedDB(clienteId).then(cliente => {
-        if (cliente && cliente.telefone) {
-            // Formatar o número para o padrão do WhatsApp
-            const telefoneFormatado = formatarTelefoneParaWhatsApp(cliente.telefone);
-            console.log('Telefone Formatado:', telefoneFormatado);
-            if (!telefoneFormatado) {
-                alert('Número de telefone inválido. Verifique o cadastro do cliente.');
-                return;
-            }
-
-            // Construir a URL do WhatsApp
-            const mensagem = encodeURIComponent('Olá, gostaria de falar sobre o orçamento que você solicitou.');
-            const url = `https://wa.me/${telefoneFormatado}?text=${mensagem}`;
-            console.log('URL do WhatsApp:', url);
-
-            // Abrir o WhatsApp na mesma aba
-            window.location.href = url;
-        } else {
-            alert('Informações do cliente incompletas. Certifique-se de que o cliente possui um número de telefone cadastrado.');
-        }
-    }).catch(error => {
-        console.error('Erro ao obter informações do cliente:', error);
-        alert('Ocorreu um erro ao tentar iniciar a conversa. Por favor, tente novamente.');
-    });
-}
-
-// Função para formatar o telefone para o padrão do WhatsApp
-function formatarTelefoneParaWhatsApp(telefone) {
-    try {
-        console.log('Telefone Original:', telefone);
-        
-        // Remover todos os caracteres não numéricos
-        let numeros = telefone.replace(/\D/g, '');
-        console.log('Telefone Após Remoção de Não Numéricos:', numeros);
-
-        // Verificar se o número já inclui o código do país (ex: 55 para Brasil)
-        if (!numeros.startsWith('55')) {
-            numeros = '55' + numeros;
-            console.log('Telefone Após Adição do Código do País:', numeros);
-        }
-
-        // Verificar o comprimento do número
-        if (numeros.length === 13 || numeros.length === 14) {
-            console.log('Número Formatado para WhatsApp:', numeros);
-            return numeros;
-        } else {
-            console.error('Número de telefone inválido para o WhatsApp:', telefone);
-            return null;
-        }
-    } catch (error) {
-        console.error('Erro na função formatarTelefoneParaWhatsApp:', error);
-        return null;
-    }
-}
-
-// Função para obter o cliente do IndexedDB
-async function obterClienteDoIndexedDB(id) {
-    const db = await abrirIndexedDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['clientes'], 'readonly');
-        const store = transaction.objectStore('clientes');
-        const request = store.get(parseInt(id));
-
-        request.onsuccess = event => {
-            resolve(event.target.result);
-        };
-        request.onerror = event => {
-            reject(event);
-        };
-    });
-}
 
 
 
@@ -1086,16 +989,20 @@ async function atualizarSeletoresTiposAplicacao() {
 
 
         function updateResultado(m2, preco) {
-            const resultadoDesktop = document.getElementById('resultadoDesktop');
-            const resultadoMobile = document.getElementById('resultadoMobile');
-            
-            if (resultadoDesktop) {
-                resultadoDesktop.textContent = `Total M²: ${m2.toFixed(2)} | Preço Total: R$ ${preco.toFixed(2)}`;
-            }
-            if (resultadoMobile) {
-                resultadoMobile.textContent = `Total M²: ${m2.toFixed(2)} | R$ ${preco.toFixed(2)}`;
-            }
-        }
+    const resultadoDesktop = document.getElementById('resultadoDesktop');
+    const resultadoMobile = document.getElementById('resultadoMobile');
+    
+    const formattedM2 = formatNumberBR(m2);
+    const formattedPreco = formatNumberBR(preco);
+    
+    if (resultadoDesktop) {
+        resultadoDesktop.textContent = `Total M²: ${formattedM2} | Preço Total: R$ ${formattedPreco}`;
+    }
+    if (resultadoMobile) {
+        resultadoMobile.textContent = `Total M²: ${formattedM2} | R$ ${formattedPreco}`;
+    }
+}
+
 
         function atualizarIconeVerificacao(status) {
             const icone = document.getElementById('verificacaoIcon');
@@ -1239,6 +1146,7 @@ function abrirPopup(acao) {
 }
 
 
+
 // Função para abrir o popupUsuario com animação
 function abrirPopupUsuario() {
     const popupUsuario = document.getElementById('popupUsuario');
@@ -1252,9 +1160,6 @@ function abrirPopupUsuario() {
     carregarInformacoesUsuario(); // Carrega os dados do usuário ao abrir
 }
 // Função para fechar qualquer popup adicional, se necessário
-
-
-
         async function carregarInformacoesUsuario() {
             try {
                 const info = await obterInformacoesUsuarioDoIndexedDB();
@@ -1317,6 +1222,20 @@ function fecharPopupCliente() {
         }, 300); // Tempo deve coincidir com a duração da transição
     }
 }
+
+/**
+ * Formata um número para o padrão brasileiro (pt-BR).
+ * Utiliza ponto como separador de milhares e vírgula para decimais.
+ * @param {number} number - O número a ser formatado.
+ * @returns {string} - O número formatado.
+ */
+ function formatNumberBR(number) {
+    return new Intl.NumberFormat('pt-BR', { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+    }).format(number);
+}
+
 
 //salvarInformacoesUsuari
 async function salvarInformacoesUsuario() {
@@ -1745,9 +1664,7 @@ async function obterClienteDoIndexedDB(id) {
 }
 
 
-  
 
-    // Função para fechar o popupCliente com animação
 // Função para fechar o popupCliente com animação
 function fecharPopup() {
     const popupCliente = document.getElementById('popupCliente');
@@ -2859,18 +2776,20 @@ async function ativarAplicativo() {
         }
 
         // Função para adicionar texto de forma segura
-        function safeText(text, x, y, options = {}) {
-            if (typeof text !== 'string') text = String(text || '');
-            if (typeof x !== 'number' || typeof y !== 'number') {
-                console.error('Coordenadas inválidas:', x, y);
-                return;
-            }
-            try {
-                doc.text(text, x, y, options);
-            } catch (error) {
-                console.error('Erro ao adicionar texto:', error, 'Texto:', text, 'Coordenadas:', x, y);
-            }
-        }
+      // Função para adicionar texto de forma segura
+function safeText(text, x, y, options = {}) {
+    if (typeof text !== 'string') text = String(text || '');
+    if (typeof x !== 'number' || typeof y !== 'number') {
+        console.error('Coordenadas inválidas:', x, y);
+        return;
+    }
+    try {
+        doc.text(text, x, y, options);
+    } catch (error) {
+        console.error('Erro ao adicionar texto:', error, 'Texto:', text, 'Coordenadas:', x, y);
+    }
+}
+
 
         // Função para adicionar a logo da empresa
         async function addLogo(x, y, maxWidth, maxHeight) {
@@ -2996,24 +2915,19 @@ async function ativarAplicativo() {
 
         // Funções auxiliares para cálculos
         function calculateParceladoSemJuros(total, parcelas_max) {
-            return (total / parcelas_max).toFixed(2);
-        }
+    return total / parcelas_max; // Retorna um número
+}
 
-        function calculateParceladoComJuros(total, parcelas_max, juros) {
-            // Fórmula de juros compostos: FV = PV * (1 + i)^n
-            const fator = Math.pow(1 + juros / 100, parcelas_max);
-            const totalComJuros = total * fator;
-            const valorParcela = (totalComJuros / parcelas_max).toFixed(2);
-            return valorParcela;
-        }
+function calculateParceladoComJuros(total, parcelas_max, juros) {
+    const fator = Math.pow(1 + juros / 100, parcelas_max);
+    const totalComJuros = total * fator;
+    const valorParcela = totalComJuros / parcelas_max; // Retorna um número
+    return valorParcela;
+}
 
-        function calculateAdiantamento(total, porcentagem) {
-            return ((total * porcentagem) / 100).toFixed(2);
-        }
-
-
-
-
+function calculateAdiantamento(total, porcentagem) {
+    return (total * porcentagem) / 100; // Retorna um número
+}
 
 
  // Função principal para adicionar o conteúdo ao PDF
@@ -3032,41 +2946,26 @@ function addContent() {
 
     // Agrupar medidas por película
     medidaGroups.forEach(group => {
-        const isChecked = group.querySelector('input[type="checkbox"]')?.checked;
-        const largura = parseFloat(group.querySelector('.largura-input')?.value) || 0;
-        const altura = parseFloat(group.querySelector('.altura-input')?.value) || 0;
-        const quantidade = parseInt(group.querySelector('.quantidade-input')?.value) || 0;
+    const isChecked = group.querySelector('input[type="checkbox"]').checked;
+    const largura = parseFloat(group.querySelector('.largura-input').value) || 0;
+    const altura = parseFloat(group.querySelector('.altura-input').value) || 0;
+    const quantidade = parseInt(group.querySelector('.quantidade-input').value) || 0;
 
-        if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
-            const peliculaNome = group.querySelector('.pelicula-select')?.value;
-            if (peliculaNome) {
-                if (!medidasPorPelicula[peliculaNome]) {
-                    medidasPorPelicula[peliculaNome] = [];
-                }
-                medidasPorPelicula[peliculaNome].push(group);
-
-                const pelicula = peliculas.find(p => p.nome === peliculaNome);
-                const area = largura * altura * quantidade / 10000; // Convertendo para m²
-                const preco = pelicula ? area * pelicula.preco : 0;
-
-                totaisGerais.totalM2 += area;
-                totaisGerais.precoTotal += preco;
+    if (isChecked && largura > 0 && altura > 0 && quantidade > 0) {
+        const peliculaNome = group.querySelector('.pelicula-select').value;
+        if (peliculaNome) {
+            if (!medidasPorPelicula[peliculaNome]) {
+                medidasPorPelicula[peliculaNome] = [];
             }
+            medidasPorPelicula[peliculaNome].push(group);
         }
-    });
-        
+    }
+});
+
         
     function addMedidasTable(medidas, peliculaNome) {
         // [Código da função já modificado acima]
     }
-
-
-
-
-
-
-
-
 
 
 // Função para adicionar garantias por película
@@ -3102,13 +3001,7 @@ function addGarantiasSection() {
 
 
 
-
-
-
-
-
-
-
+// Função para adicionar uma tabela de medidas por película
 // Função para adicionar uma tabela de medidas por película
 function addMedidasTable(medidas, peliculaNome) {
     const headers = ["Item", "Dimensões", "Ambiente", "Tipo", "Área", "Preço"];
@@ -3165,7 +3058,7 @@ function addMedidasTable(medidas, peliculaNome) {
         const largura = group.querySelector('.largura-input')?.value || '0';
         const altura = group.querySelector('.altura-input')?.value || '0';
         const quantidade = group.querySelector('.quantidade-input')?.value || '0';
-        const totalM2 = group.querySelector('input[placeholder="M²"]')?.value || '0';
+        const totalM2 = parseFloat(group.querySelector('input[placeholder="M²"]')?.value) || 0;
         const ambiente = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o ambiente"]')?.value || '';
         const tipoAplicacao = group.querySelector('.additional-fields input[placeholder="Selecione ou digite o tipo de aplicação"]')?.value || '';
         const pelicula = peliculas.find(p => p.nome === peliculaNome);
@@ -3179,12 +3072,12 @@ function addMedidasTable(medidas, peliculaNome) {
         xOffset += colWidths[2];
         safeText(tipoAplicacao, xOffset + 2, y + 3);
         xOffset += colWidths[3];
-        safeText(`${totalM2} m²`, xOffset + 2, y + 3);
+        safeText(`${formatNumberBR(totalM2)} m²`, xOffset + 2, y + 3);
         xOffset += colWidths[4];
         
         if (pelicula) {
-            const preco = (pelicula.preco * parseFloat(totalM2)).toFixed(2);
-            safeText(`R$ ${preco}`, xOffset + 2, y + 3);
+            const preco = pelicula.preco * totalM2;
+            safeText(`R$ ${formatNumberBR(preco)}`, xOffset + 2, y + 3);
         }
         xOffset += colWidths[5];
 
@@ -3193,6 +3086,8 @@ function addMedidasTable(medidas, peliculaNome) {
 
     return y;
 }
+
+
 
 
         // Adicionar tabelas de medidas por película
@@ -3223,9 +3118,13 @@ function addMedidasTable(medidas, peliculaNome) {
         doc.setTextColor(...colors.secondary);
         doc.setFont("helvetica", 'bold');
         doc.setFontSize(10);
-        safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
-        safeText(`Área: ${totalPelicula.totalM2.toFixed(2)} m²`, pageWidth / 2, y + 10);
-        safeText(`R$ ${totalPelicula.precoTotal.toFixed(2)}`, pageWidth - margin, y + 10, { align: 'right' });
+        const formattedSubtotalM2 = formatNumberBR(totalPelicula.totalM2);
+        const formattedSubtotalPreco = formatNumberBR(totalPelicula.precoTotal);
+
+safeText(`Subtotal ${peliculaNome}:`, margin, y + 10);
+safeText(`Área: ${formattedSubtotalM2} m²`, pageWidth / 2, y + 10);
+safeText(`R$ ${formattedSubtotalPreco}`, pageWidth - margin, y + 10, { align: 'right' });
+
         y += 15;
     });
 
@@ -3246,8 +3145,11 @@ function addMedidasTable(medidas, peliculaNome) {
     doc.setFont("helvetica", 'bold');
     doc.setFontSize(12);
     safeText("Total Geral:", margin, y + 10);
-    safeText(`Área Total: ${totaisGerais.totalM2.toFixed(2)} m²`, margin, y + 20);
-    safeText(`Preço Total: R$ ${totaisGerais.precoTotal.toFixed(2)}`, pageWidth - margin, y + 20, { align: 'right' });
+    const formattedTotalM2 = formatNumberBR(totaisGerais.totalM2);
+const formattedPrecoTotal = formatNumberBR(totaisGerais.precoTotal);
+
+safeText(`Área Total: ${formattedTotalM2} m²`, margin, y + 20);
+safeText(`Preço Total: R$ ${formattedPrecoTotal}`, pageWidth - margin, y + 20, { align: 'right' });
 
     y += 30;
 
@@ -3268,48 +3170,60 @@ function addMedidasTable(medidas, peliculaNome) {
         "1. Formas de Pagamento Aceitas:"
     ];
 
-         // Adicionando as formas de pagamento dinâmicas com valores
-    formasPagamento.forEach(method => {
-        let metodoTexto = '';
-        switch (method.tipo) {
-            case 'pix':
-                metodoTexto = `• Pix R$ ${totaisGerais.precoTotal.toFixed(2)}`;
-                break;
-            case 'boleto':
-                metodoTexto = `• Boleto Bancário R$ ${totaisGerais.precoTotal.toFixed(2)}`;
-                break;
-            case 'parcelado_sem_juros':
-                const parcelaSemJuros = calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max);
-                metodoTexto = `• Parcelado sem Juros (até ${method.parcelas_max}x)`;
-                break;
-            case 'parcelado_com_juros':
-                const parcelaComJuros = calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros);
-                metodoTexto = `• Parcelado com Juros (até ${method.parcelas_max}x, Taxa de ${method.juros}%)`;
-                break;
-            case 'adiantamento':
-                const adiantamento = calculateAdiantamento(totaisGerais.precoTotal, method.porcentagem);
-                metodoTexto = `• Adiantamento: ${method.porcentagem}% do valor total R$ ${adiantamento}`;
-                break;
-            case 'observacao':
-                metodoTexto = `• Observações Pag: ${method.texto}`;
-                break;
-            default:
-                metodoTexto = `• ${method.tipo}`;
-        }
-        if (method.ativo) {
-            condicoesPagamento.push(metodoTexto);
+  // Adicionando as formas de pagamento dinâmicas com valores
+formasPagamento.forEach(method => {
+    let metodoTexto = '';
+    let detalhesAdicionais = []; // Array para armazenar detalhes adicionais
 
-            // Detalhes adicionais para alguns tipos
-            if (method.tipo === 'parcelado_sem_juros') {
-                condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max)}`);
-            }
-            if (method.tipo === 'parcelado_com_juros') {
-                condicoesPagamento.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros)}`);
-                condicoesPagamento.push(`   Taxa de Juros: ${method.juros}%`);
-            }
-            // Não há detalhes adicionais para Adiantamento e Observação
-        }
-    });
+    switch (method.tipo) {
+        case 'pix':
+            metodoTexto = `• Pix R$ ${formatNumberBR(totaisGerais.precoTotal)}`;
+            break;
+
+        case 'boleto':
+            metodoTexto = `• Boleto Bancário R$ ${formatNumberBR(totaisGerais.precoTotal)}`;
+            break;
+
+        case 'parcelado_sem_juros':
+            const parcelaSemJuros = calculateParceladoSemJuros(totaisGerais.precoTotal, method.parcelas_max);
+            const formattedParcelaSemJuros = formatNumberBR(parcelaSemJuros);
+            metodoTexto = `• Parcelado sem Juros (até ${method.parcelas_max}x)`;
+            detalhesAdicionais.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${formattedParcelaSemJuros}`);
+            break;
+
+        case 'parcelado_com_juros':
+            const parcelaComJuros = calculateParceladoComJuros(totaisGerais.precoTotal, method.parcelas_max, method.juros);
+            const formattedParcelaComJuros = formatNumberBR(parcelaComJuros);
+            metodoTexto = `• Parcelado com Juros (até ${method.parcelas_max}x, Taxa de ${method.juros}%)`;
+            detalhesAdicionais.push(`   Número de Parcelas: ${method.parcelas_max}x R$ ${formattedParcelaComJuros}`);
+            detalhesAdicionais.push(`   Taxa de Juros: ${method.juros}%`);
+            break;
+
+        case 'adiantamento':
+            const adiantamento = calculateAdiantamento(totaisGerais.precoTotal, method.porcentagem);
+            const adiantamentoFormatado = formatNumberBR(adiantamento);
+            metodoTexto = `• Adiantamento: ${method.porcentagem}% do valor total R$ ${adiantamentoFormatado}`;
+            break;
+
+        case 'observacao':
+            metodoTexto = `• Observações Pag: ${method.texto}`;
+            break;
+
+        default:
+            metodoTexto = `• ${method.tipo}`;
+    }
+
+    if (method.ativo) {
+        // Adiciona o método de pagamento principal
+        condicoesPagamento.push(metodoTexto);
+
+        // Adiciona os detalhes adicionais, se houver
+        detalhesAdicionais.forEach(detalhe => {
+            condicoesPagamento.push(detalhe);
+        });
+    }
+});
+
 
             // Adicionando as condições estáticas
     const condicoesEstaticas = [
@@ -3469,7 +3383,7 @@ async function salvarClienteNoIndexedDB(cliente) {
         // Primeira visita
         const firstVisitDate = new Date();
         localStorage.setItem('firstVisit', firstVisitDate);
-        alert('PParabéns! Você agora faz parte do plano vitalício e pode explorar todas as funcionalidades do nosso aplicativo, sem a necessidade de pagar mensalidades! 😉');
+        alert('Parabéns! Você agora faz parte do plano vitalício e pode explorar todas as funcionalidades do nosso aplicativo, sem a necessidade de pagar mensalidades! Você será verificdo após 30 dis 😉');
     } else {
         // Calcular quantos dias restam
         const currentDate = new Date();
@@ -3480,10 +3394,10 @@ async function salvarClienteNoIndexedDB(cliente) {
 
         if (daysLeft > 0) {
             // Mostrar alerta de quantos dias restam
-            alert(`Sua verificação será concedida em  ${daysLeft} dias, como parte do nosso processo de segurança para prevenir fraudes.`);
+            alert(`Sua verificação será concedida em ${daysLeft} dias, como parte do nosso processo de segurança para prevenir fraudes.`);
         } else {
             // O período de teste acabou
-            alert('Por favor, informe seu e-mail ou o nome completo utilizado na compra para receber sua verificação e desbloquear o acesso ao aplicativo.');
+            alert('Seu período expirou. Vamos autenticar você agora. Esperamos que tenha aproveitado!');
         }
     }
 });
