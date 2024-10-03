@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v25'; // Nome do cache, altere a cada nova versão
+const CACHE_NAME = 'app-cache-v2'; // Nome do cache, altere a cada nova versão
 
 const urlsToCache = [
     '/window-film/',
