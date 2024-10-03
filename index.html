@@ -57,7 +57,7 @@
                 <!-- Cabeçalho -->
                 <div class="mb-4">
                     <div class="text-center mb-2">
-                        <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">Los_PelikoSs</h1>
+                        <h1 class="text-2xl sm:text-3xl font-montserrat text-gray-900 font-bold">WINDOW FILM APP</h1>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="clienteSelect" class="flex-grow p-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="onClienteChange()">
@@ -1291,7 +1291,6 @@ async function salvarInformacoesUsuario() {
 }
 
 
-
         // Função para fechar o popupUsuario com animação
         function fecharPopupUsuario() {
     const popupUsuario = document.getElementById('popupUsuario');
@@ -1663,92 +1662,6 @@ async function obterClienteDoIndexedDB(id) {
     });
 }
 
-// Adicione esta função para exibir mensagens via popup
-function showPopupMessage(title, message) {
-    // Remove o popup existente, se houver
-    const existingPopup = document.getElementById('popupMessage');
-    if (existingPopup) {
-        existingPopup.parentNode.removeChild(existingPopup);
-    }
-
-    const popupHTML = `
-        <div id="popupMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
-            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full mx-4 sm:mx-0">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">${title}</h2>
-                <p class="text-gray-700">${message}</p>
-                <button id="closePopupMessage" class="mt-4 w-full p-3 bg-blue-500 text-white rounded-md flex items-center justify-center">
-                    <span>Fechar</span>
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', popupHTML);
-
-    document.getElementById('closePopupMessage').addEventListener('click', () => {
-        const popup = document.getElementById('popupMessage');
-        if (popup) {
-            popup.parentNode.removeChild(popup);
-        }
-    });
-}
-
-// Modifique o evento de carregamento da janela para usar as novas mensagens e exibir via popup
-window.addEventListener('load', () => {
-    const trialDays = 30; // Definir o período de teste de 30 dias
-    const firstVisit = localStorage.getItem('firstVisit');
-    
-    if (!firstVisit) {
-        // Primeira visita
-        const firstVisitDate = new Date();
-        localStorage.setItem('firstVisit', firstVisitDate);
-        
-        // Mensagem personalizada para a primeira visita
-        const message = `
-            Bem-vindo! Você está em um <strong>plano de teste</strong> e receberá novas atualizações somente após adquirir o aplicativo.
-            <br><br>
-            Se você ativar rapidamente, economizará, pois com o cupom <strong>SEM-MENSALIDADE</strong> você faz um único pagamento de <strong>R$49</strong> e economiza <strong>R$248</strong> enquanto os cupons durarem.
-            <br><br>
-            Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
-            <br><br>
-            <strong>Os cupons estão se esgotando!</strong>
-        `;
-        showPopupMessage('Plano de Teste', message);
-        
-    } else {
-        // Calcular quantos dias restam
-        const currentDate = new Date();
-        const firstVisitDate = new Date(firstVisit);
-        const timeDiff = currentDate - firstVisitDate;
-        const daysPassed = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Converte a diferença em dias
-        const daysLeft = trialDays - daysPassed;
-
-        if (daysLeft > 0) {
-            // Mostrar mensagem de quantos dias restam
-            const message = `
-                Seu teste é válido por mais <strong>${daysLeft} dias</strong>.
-                <br><br>
-                Você pode comprar o aplicativo hoje e garantir todas as futuras atualizações.
-                <br><br>
-                Aproveite a oferta com o cupom <strong>SEM-MENSALIDADE</strong> e faça um único pagamento de <strong>R$49</strong>, economizando <strong>R$248</strong> enquanto os cupons durarem.
-                <br><br>
-                Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
-            `;
-            showPopupMessage('Teste em Andamento', message);
-        } else {
-            // O período de teste acabou
-            const message = `
-                Seu período de teste expirou.
-                <br><br>
-                Compre o aplicativo agora para continuar usando e garantir todas as futuras atualizações.
-                <br><br>
-                Aproveite a oferta com o cupom <strong>SEM-MENSALIDADE</strong> e faça um único pagamento de <strong>R$49</strong>, economizando <strong>R$248</strong> enquanto os cupons durarem.
-                <br><br>
-                Compre agora através da URL: <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="text-blue-500 underline">Clique aqui para comprar</a>.
-            `;
-            showPopupMessage('Teste Expirado', message);
-        }
-    }
-});
 
 // Função para fechar o popupCliente com animação
 function fecharPopup() {
@@ -3471,7 +3384,7 @@ async function salvarClienteNoIndexedDB(cliente) {
         // Primeira visita
         const firstVisitDate = new Date();
         localStorage.setItem('firstVisit', firstVisitDate);
-        alert('Parabéns! Você agora faz parte do plano vitalício e pode explorar todas as funcionalidades do nosso aplicativo, sem a necessidade de pagar mensalidades! Você será verificdo após 30 dis 😉');
+        mostrarPopupBoasVindas();
     } else {
         // Calcular quantos dias restam
         const currentDate = new Date();
@@ -3481,14 +3394,81 @@ async function salvarClienteNoIndexedDB(cliente) {
         const daysLeft = trialDays - daysPassed;
 
         if (daysLeft > 0) {
-            // Mostrar alerta de quantos dias restam
-            alert(`Sua verificação será concedida em ${daysLeft} dias, como parte do nosso processo de segurança para prevenir fraudes.`);
+            // Mostrar popup informando quantos dias restam
+            mostrarPopupDiasRestantes(daysLeft);
         } else {
             // O período de teste acabou
-            alert('Seu período expirou. Vamos autenticar você agora. Esperamos que tenha aproveitado!');
+            mostrarPopupFimTeste();
         }
     }
 });
+
+
+
+function mostrarPopupBoasVindas() {
+    const popupHTML = `
+        <div id="popupBoasVindas" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Bem-vindo ao nosso aplicativo!</h2>
+                <p class="mb-2 text-lg font-bold text-red-600">Cupom <span class="underline">SEM-MENSALIDADE</span></p>
+                <p class="mb-2">Limitada por cupom de <span class="line-through">R$297,00</span> por apenas:</p>
+                <p class="mb-2 text-2xl font-bold text-green-600">À vista R$49,00 ou 12x de R$4,90</p>
+                <p class="mb-2 text-red-600 font-semibold">ECONOMIZE R$248,00 ENQUANTO TIVER CUPONS DISPONÍVEIS!</p>
+                <p class="mb-4 text-gray-800">Compra 100% segura. O tempo está passando!</p>
+                <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 mb-2">Compre Agora</a>
+                <button onclick="fecharPopup('popupBoasVindas')" class="w-full p-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Fechar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+}
+
+function mostrarPopupDiasRestantes(diasRestantes) {
+    const popupHTML = `
+        <div id="popupDiasRestantes" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Período de Teste</h2>
+                <p class="mb-2">Seu teste é válido por mais <span class="font-bold">${diasRestantes} dias</span>!</p>
+                <p class="mb-2 text-lg font-bold text-red-600">Cupom <span class="underline">SEM-MENSALIDADE</span></p>
+                <p class="mb-2">Aproveite a oferta limitada de <span class="line-through">R$297,00</span> por apenas:</p>
+                <p class="mb-2 text-2xl font-bold text-green-600">À vista R$49,00 ou 12x de R$4,90</p>
+                <p class="mb-2 text-red-600 font-semibold">ECONOMIZE R$248,00 ENQUANTO TIVER CUPONS DISPONÍVEIS!</p>
+                <p class="mb-4 text-gray-800">Compra 100% segura. Restam <span class="font-bold">POUCOS</span> cupons disponíveis. O tempo está passando!</p>
+                <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 mb-2">Compre Agora</a>
+                <button onclick="fecharPopup('popupDiasRestantes')" class="w-full p-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Fechar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+}
+
+function mostrarPopupFimTeste() {
+    const popupHTML = `
+        <div id="popupFimTeste" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
+                <img src="URL_DA_IMAGEM_DO_PRODUTO" alt="Produto" class="w-full mb-4 rounded">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Teste Expirado</h2>
+                <p class="mb-2 text-lg font-bold text-red-600">Cupom <span class="underline">SEM-MENSALIDADE</span></p>
+                <p class="mb-2">Oferta limitada de <span class="line-through">R$297,00</span> por apenas:</p>
+                <p class="mb-2 text-2xl font-bold text-green-600">À vista R$49,00 ou 12x de R$4,90</p>
+                <p class="mb-2 text-red-600 font-semibold">ECONOMIZE R$248,00 ENQUANTO TIVER CUPONS DISPONÍVEIS!</p>
+                <p class="mb-4 text-gray-800">Compra 100% segura. Restam <span class="font-bold">POUCOS</span> cupons disponíveis. O tempo está passando!</p>
+                <a href="https://payfast.greenn.com.br/77326/offer/IuusU7?cupom=SEM-MENSALIDADE" target="_blank" class="block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 mb-2">Compre Agora</a>
+                <button onclick="fecharPopup('popupFimTeste')" class="w-full p-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-300">Fechar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+}
+
+function fecharPopup(id) {
+    const popup = document.getElementById(id);
+    if (popup) {
+        popup.remove();
+    }
+}
+
+
 
     </script>
 </body>
