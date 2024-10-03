@@ -1,11 +1,11 @@
 const CACHE_NAME = 'app-cache-v25'; // Nome do cache, altere a cada nova versão
 
 const urlsToCache = [
-    '/peliqueiros-br/',
-    '/peliqueiros-br/index.html',
-    '/peliqueiros-br/icons/menor.png',
-    '/peliqueiros-br/icons/maior.png',
-    '/peliqueiros-br/manifest.json',
+    '/window-film/',
+    '/window-film/index.html',
+    '/window-film/icons/menor.png',
+    '/window-film/icons/maior.png',
+    '/window-film/manifest.json',
     // Adicione outros recursos necessários para o funcionamento offline aqui
 ];
 
