@@ -7,12 +7,12 @@
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/peliqueiros-br/icons/menor.png",
+      "src": "/window-film/icons/menor.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/peliqueiros-br/icons/maior.png",
+      "src": "/window-film/icons/maior.png",
       "sizes": "512x512",
       "type": "image/png"
     }
